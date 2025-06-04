@@ -1,0 +1,40 @@
+sudo apt update
+sudo apt install default-jdk -y
+java -version
+
+sudo apt install curl -y
+
+curl -O https://www.antlr.org/download/antlr-4.13.1-complete.jar
+sudo mv antlr-4.13.1-complete.jar /usr/local/lib/
+
+nano ~/.bashrc
+
+#al final
+export CLASSPATH=".:/usr/local/lib/antlr-4.13.1-complete.jar:$CLASSPATH"
+alias antlr4="java -jar /usr/local/lib/antlr-4.13.1-complete.jar"
+alias grun="java org.antlr.v4.gui.TestRig"
+
+source ~/.bashrc
+#probar antlr4
+
+sudo apt install golang -y
+
+nano ~/.bashrc
+#pegar al final
+export PATH="$HOME/go/bin:$PATH"
+source ~/.bashrc  # o ~/.zshrc
+
+go install github.com/cosmtrek/air@v1.40.4
+echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+go install github.com/antlr/antlr4/runtime/Go/antlr@latest
+
+antlr4 -Dlanguage=Go -visitor -package gramAntlr -o gramAntlr gramatica.g4
+
+#instalacion de Fyne
+sudo apt install libgl1-mesa-dev xorg-dev
+go mod init mi_app_fyne
+go get fyne.io/fyne/v2
+
+

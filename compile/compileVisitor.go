@@ -5,7 +5,6 @@ import (
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -449,34 +448,6 @@ func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) inte
 	return sym.Value
 }
 
-//----------------------------- FUNCIONES AUXILIARES -----------------------------
-
-// Validación de tipos básicos
-func isValidType(value interface{}, typ SymbolType) bool {
-	switch typ {
-	case INT:
-		_, ok := value.(int)
-		return ok
-	case FLOAT64:
-		_, ok := value.(float64)
-		return ok
-	case STRING:
-		_, ok := value.(string)
-		return ok
-	case BOOL:
-		_, ok := value.(bool)
-		return ok
-	case RUNE:
-		_, ok := value.(rune)
-		return ok
-	}
-	return false
-}
-
-func isEqualType(a, b interface{}) bool {
-	return reflect.TypeOf(a) == reflect.TypeOf(b)
-}
-
 // ---------------------------------------------------- switch ----------------------------------------------------
 
 // Produccion de instrucciones de switch
@@ -487,11 +458,6 @@ func (v *CompilerVisitor) VisitSwitchInstruccion(ctx *gramAntlr.SwitchInstruccio
 // Produccion de switch
 func (v *CompilerVisitor) VisitSwitchStmt(ctx *gramAntlr.SwitchStmtContext) interface{} {
 	v.conditionExpr = v.Visit(ctx.Expr()) // Evaluar la condicion-tipo del switch
-	// The C# code calls Visit(context.cases()) directly here.
-	// In Go, since cases() returns a slice, you'd typically iterate through them.
-	// However, based on the C# structure, it seems 'cases' might be a rule
-	// that encompasses all 'case' and 'default' blocks, which ANTLR handles.
-	// Assuming 'cases' is a single rule that is visited, like 'sIf'
 	return v.Visit(ctx.Cases())
 }
 
@@ -541,4 +507,28 @@ func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{
 	v.currentEnv = newEnv.Parent
 
 	return nil
+}
+
+//----------------------------- FUNCIONES AUXILIARES -----------------------------
+
+// Validación de tipos básicos
+func isValidType(value interface{}, typ SymbolType) bool {
+	switch typ {
+	case INT:
+		_, ok := value.(int)
+		return ok
+	case FLOAT64:
+		_, ok := value.(float64)
+		return ok
+	case STRING:
+		_, ok := value.(string)
+		return ok
+	case BOOL:
+		_, ok := value.(bool)
+		return ok
+	case RUNE:
+		_, ok := value.(rune)
+		return ok
+	}
+	return false
 }

@@ -1,7 +1,6 @@
 package compile
 
 import (
-	"OLC2CLIENTE/compile/expresiones/asignaciones"
 	"OLC2CLIENTE/compile/expresiones/operaciones"
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
@@ -18,8 +17,7 @@ type CompilerVisitor struct {
 	*gramAntlr.BasegramaticaVisitor        // composición, como si heredara
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
-	operacionesVisitor              *operaciones.OperacionesVisitor   // Visitor para operaciones aritméticas
-	asignacionesVisitor             *asignaciones.AsignacionesVisitor // Visitor para asignaciones
+	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
 	currentEnv                      *Environment
 }
 
@@ -33,7 +31,6 @@ func NewCompilerVisitor() *CompilerVisitor {
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
 	v.operacionesVisitor = operaciones.NewOperacionesVisitor(&v.Salida, v.Visit)
-	v.asignacionesVisitor = asignaciones.NewAsignacionesVisitor(&v.Salida, v.Visit)
 	return v
 }
 
@@ -302,108 +299,231 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	return nil
 }
 
+// ------------------------------ ASIGNACIONES --------------------------------------
+// VisitAsignStmt
+func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interface{} {
+	// ctx.VarExpr() accede al nodo 'VarExpr' dentro de la asignación.
+	return v.Visit(ctx.VarAsign())
+}
+
+// VisitVarExpr
+func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	value := v.Visit(ctx.Expr())
+	sym, _ := v.currentEnv.GetVariable(id)
+	mutabilidad := sym.Mutable
+
+	context_start := ctx.GetStart()
+
+	if value == nil {
+		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable, el valor es nulo.")
+		return nil
+	}
+
+	// validar cuando es un slice
+	if !isValidType(value, sym.Type) {
+
+		if mutabilidad {
+			v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
+			return nil
+		}
+
+		v.Salida += fmt.Sprintf("Error-semántico: la variable %s no es mutable y no se puede asignar un nuevo valor.\n", id)
+		return nil
+	}
+
+	v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
+
+	return nil
+}
+
+// VisitvarAdd
+func (v *CompilerVisitor) VisitVarAdd(ctx *gramAntlr.VarAddContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	value := v.Visit(ctx.Expr())
+	token := ctx.GetStart()
+
+	sym, _ := v.currentEnv.GetVariable(id)
+	typ := sym.Type
+
+	switch typ {
+	case 1: // FLOAT64
+		switch val := value.(type) {
+		case int:
+			switch ctx.GetOp().GetText() {
+			case "+=":
+				v.currentEnv.SetVariable(id, sym.Value.(float64)+float64(val), typ, sym.Mutable, false, token)
+			case "-=":
+				v.currentEnv.SetVariable(id, sym.Value.(float64)-float64(val), typ, sym.Mutable, false, token)
+			}
+			return nil
+		case float64:
+			switch ctx.GetOp().GetText() {
+			case "+=":
+				v.currentEnv.SetVariable(id, sym.Value.(float64)+val, typ, sym.Mutable, false, token)
+			case "-=":
+				v.currentEnv.SetVariable(id, sym.Value.(float64)-val, typ, sym.Mutable, false, token)
+			}
+			return nil
+		}
+	case 2: // STRING
+		if ctx.GetOp().GetText() == "-=" {
+			v.Salida += "Error-semántico: al operar -= no se pueden operar strings."
+		}
+		if val, ok := value.(string); ok {
+			v.currentEnv.SetVariable(id, sym.Value.(string)+val, typ, sym.Mutable, false, token)
+			return nil
+		}
+	case 0: // INT
+		if val, ok := value.(int); ok {
+			switch ctx.GetOp().GetText() {
+			case "+=":
+				v.currentEnv.SetVariable(id, sym.Value.(int)+val, typ, sym.Mutable, false, token)
+			case "-=":
+				v.currentEnv.SetVariable(id, sym.Value.(int)-val, typ, sym.Mutable, false, token)
+			}
+			return nil
+		}
+	}
+
+	v.Salida = "Error-semántico: al asignar el valor a la variable, los tipos no son compatibles."
+	return nil
+}
+
+// VarInc
+func (v *CompilerVisitor) VisitVarInc(ctx *gramAntlr.VarIncContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	token := ctx.GetStart()
+
+	sym, _ := v.currentEnv.GetVariable(id)
+	typ := sym.Type
+
+	// Solo se permite ++ y -- para INT (0) y FLOAT64 (1)
+	if typ != 0 && typ != 1 {
+		v.Salida += "Error-semántico: el tipo de variable no acepta operador ++ o --."
+		return nil
+	}
+
+	switch ctx.GetOp().GetText() {
+	case "++":
+		if typ == 0 { // INT
+			v.currentEnv.SetVariable(id, sym.Value.(int)+1, typ, sym.Mutable, false, token)
+		} else { // FLOAT64
+			v.currentEnv.SetVariable(id, sym.Value.(float64)+1, typ, sym.Mutable, false, token)
+		}
+	case "--":
+		if typ == 0 { // INT
+			v.currentEnv.SetVariable(id, sym.Value.(int)-1, typ, sym.Mutable, false, token)
+		} else { // FLOAT64
+			v.currentEnv.SetVariable(id, sym.Value.(float64)-1, typ, sym.Mutable, false, token)
+		}
+	}
+
+	return nil
+}
+
+// ------------
+// VisitIfStmt actúa como un puente para las reglas anidadas de 'sIf'.
 func (v *CompilerVisitor) VisitIfStmt(ctx *gramAntlr.IfStmtContext) interface{} {
 	// ctx.SIf() accede al nodo 'sIf' dentro de la instrucción 'if'.
 	// Al visitarlo, ANTLR llamará al método correcto: VisitIfOnly o VisitIfAnidado.
 	return v.Visit(ctx.SIf())
 }
-// ------------
-// VisitIfStmt actúa como un puente para las reglas anidadas de 'sIf'.
 
 // -------------------- Produccion IF ELSE --------------------
+func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} {
 	fmt.Println("ENTRE EN VISIT IF ONLY")
 
-func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} {
 	// Evaluar la condición
 	value := v.Visit(ctx.Expr())
 	if value == nil {
-		return nil
-	}
 		v.Salida += "Error semántico: condición del if es nil\n"
-	if !ok {
-	cond, ok := value.(bool)
 		return nil
+	}
+	cond, ok := value.(bool)
+	if !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
+		return nil
 	}
 
-	if cond {
 	// Si la condición es verdadera, ejecutar el bloque[0]
+	if cond {
 		// Nuevo entorno anidado
-		v.currentEnv = newEnv
 		newEnv := NewEnvironment(v.currentEnv)
+		v.currentEnv = newEnv
 
-		result := v.Visit(ctx.Block(0))
 		// Visitar el bloque del 'if'
+		result := v.Visit(ctx.Block(0))
 
-		v.currentEnv = v.currentEnv.Parent
 		// Restaurar el entorno
+		v.currentEnv = v.currentEnv.Parent
 
 		// Propagar break / continue / return void
 		if str, ok := result.(string); ok {
-			}
 			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 				return str
+			}
 		}
 		// Si fue una expresión con valor, devolverla
 		if result != nil {
-		}
 			return result
-		// Si hay un bloque 'else' (ctx.Block() retorna []IBlockContext)
+		}
 	} else {
+		// Si hay un bloque 'else' (ctx.Block() retorna []IBlockContext)
 		blocks := ctx.AllBlock()
 		if len(blocks) > 1 {
 			// Visitar el bloque del 'else'
-			if str, ok := result.(string); ok {
 			result := v.Visit(blocks[1])
+			if str, ok := result.(string); ok {
 				if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 					return str
-			}
 				}
+			}
 			if result != nil {
 				return result
-		}
 			}
+		}
 	}
-	fmt.Println("SALI NIL EN VISIT IF ONLY")
 
+	fmt.Println("SALI NIL EN VISIT IF ONLY")
 	return nil
 }
 
-func (v *CompilerVisitor) VisitIfAnidado(ctx *gramAntlr.IfAnidadoContext) interface{} {
 // -------------------- Produccion IF ELSE IF --------------------
+func (v *CompilerVisitor) VisitIfAnidado(ctx *gramAntlr.IfAnidadoContext) interface{} {
 	// Evaluar la condición
 	value := v.Visit(ctx.Expr())
 	cond, ok := value.(bool)
-		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
 	if !ok {
+		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
 		return nil
-
 	}
-		// Nuevo entorno anidado
-	if cond {
-		newEnv := NewEnvironment(v.currentEnv)
-		// Visitar el bloque del 'if'
 
+	if cond {
+		// Nuevo entorno anidado
+		newEnv := NewEnvironment(v.currentEnv)
 		v.currentEnv = newEnv
+
+		// Visitar el bloque del 'if'
 		result := v.Visit(ctx.Block())
 
 		// Restaurar el entorno
 		v.currentEnv = v.currentEnv.Parent
 
 		// Propagar break / continue / return void
-			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 		if str, ok := result.(string); ok {
+			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 				return str
 			}
 		}
 		if result != nil {
-		}
 			return result
+		}
 	} else {
 		// Si la condición es falsa, ejecutar el 'else if' en ctx.SIf()
 		result := v.Visit(ctx.SIf())
-			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 		if str, ok := result.(string); ok {
+			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 				return str
 			}
 		}
@@ -421,40 +541,33 @@ func (v *CompilerVisitor) VisitBreakStmt(ctx *gramAntlr.BreakStmtContext) interf
 }
 
 // -------------------- VisitContinue --------------------
-	return "continue"
 func (v *CompilerVisitor) VisitContinue(ctx *gramAntlr.ContinueContext) interface{} {
+	return "continue"
 }
-// -------------------- VisitBlockStmt --------------------
 
-	for _, instrCtx := range ctx.AllInstrucciones() {
+// -------------------- VisitBlockStmt --------------------
 func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interface{} {
+	for _, instrCtx := range ctx.AllInstrucciones() {
 		value := v.Visit(instrCtx)
 		// Solo propagar control de flujo especial
-			if str == "break" || str == "continue" {
 		if str, ok := value.(string); ok {
+			if str == "break" || str == "continue" {
 				return str
 			}
 		}
 	}
 	return nil
 }
-func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
 
+func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	sym, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
 		return nil
 	}
-
 	return sym.Value
 }
-// --------------------------------- ASIGNACIONES --------------------------------------
-func (v *CompilerVisitor) VisitAsignacionVar(ctx *gramAntlr.VarExprContext) interface{} {
-	return v.asignacionesVisitor.VisitVarExpr(ctx)
-}
-
-// ---------------------------- FIN DE EXPRESIONES ------------------------------
 
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 

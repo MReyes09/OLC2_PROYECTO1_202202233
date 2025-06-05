@@ -74,17 +74,6 @@ func (e *Environment) GetVariable(id string) (*Symbol, error) {
 
 func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) error {
 	fmt.Println("entrando a setVariable")
-	// Caso 1: Es una reasignación
-	if sym, ok := e.Variables[id]; ok {
-		sym.Value = value
-		e.tableSymbol = append(e.tableSymbol, &SymbolTableEntry{
-			ID:     id,
-			Symbol: NewSymbol(value, typ, mutable),
-			Line:   token.GetLine(),
-			Col:    token.GetColumn(),
-		})
-		return nil // Sin error
-	}
 
 	// Caso 2: Es una declaración
 	if declaracion {
@@ -103,6 +92,18 @@ func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, 
 			Col:    token.GetColumn(),
 		})
 		return nil
+	}
+
+	// Caso 1: Es una reasignación
+	if sym, ok := e.Variables[id]; ok {
+		sym.Value = value
+		e.tableSymbol = append(e.tableSymbol, &SymbolTableEntry{
+			ID:     id,
+			Symbol: NewSymbol(value, typ, mutable),
+			Line:   token.GetLine(),
+			Col:    token.GetColumn(),
+		})
+		return nil // Sin error
 	}
 
 	// Caso 3: No es reasignación ni declaración, buscar en el padre

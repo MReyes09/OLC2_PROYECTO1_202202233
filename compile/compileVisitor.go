@@ -299,6 +299,14 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	return nil
 }
 
+// ------------
+// VisitIfStmt actúa como un puente para las reglas anidadas de 'sIf'.
+func (v *CompilerVisitor) VisitIfStmt(ctx *gramAntlr.IfStmtContext) interface{} {
+	// ctx.SIf() accede al nodo 'sIf' dentro de la instrucción 'if'.
+	// Al visitarlo, ANTLR llamará al método correcto: VisitIfOnly o VisitIfAnidado.
+	return v.Visit(ctx.SIf())
+}
+
 // -------------------- Produccion IF ELSE --------------------
 func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} {
 	fmt.Println("ENTRE EN VISIT IF ONLY")

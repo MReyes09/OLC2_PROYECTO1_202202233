@@ -72,8 +72,8 @@ sFor: 'for' expr block                              # ForCondicion
 ;
 
 // ----------------- Declaracion de variables -----------------
-varDcl: 'var' ID_VARIABLE type '=' expr # VarDclWithTypeAndValue
-      | 'var' ID_VARIABLE type          # VarDclWithTypeOnly
+varDcl: 'mut' ID_VARIABLE type '=' expr # VarDclWithTypeAndValue
+      | 'mut' ID_VARIABLE type          # VarDclWithTypeOnly
       | ID_VARIABLE ':=' expr           # VarDclWithInference
 ;
 

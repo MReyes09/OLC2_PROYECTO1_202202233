@@ -34,20 +34,20 @@ func gramaticaParserInit() {
 	staticData.LiteralNames = []string{
 		"", "'{'", "'}'", "'println('", "','", "')'", "';'", "'print('", "'if'",
 		"'else'", "'switch'", "'case'", "':'", "'default:'", "'for'", "':='",
-		"'range'", "'var'", "'='", "'[]'", "'type'", "'struct'", "'+='", "'-='",
-		"'++'", "'--'", "'['", "']'", "'.'", "'-'", "'!'", "'*'", "'/'", "'%'",
-		"'+'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'",
-		"'nil'", "'('", "'slices.Index('", "'strings.Join('", "'len('", "'append('",
-		"'strconv.Atoi('", "'strconv.ParseFloat('", "'reflect.TypeOf('", "'int'",
-		"'float64'", "'string'", "'bool'", "'rune'", "'break'", "'continue'",
+		"'range'", "'mut'", "'='", "'var'", "'[]'", "'type'", "'struct'", "'+='",
+		"'-='", "'++'", "'--'", "'['", "']'", "'.'", "'-'", "'!'", "'*'", "'/'",
+		"'%'", "'+'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'",
+		"'||'", "'nil'", "'('", "'slices.Index('", "'strings.Join('", "'len('",
+		"'append('", "'strconv.Atoi('", "'strconv.ParseFloat('", "'reflect.TypeOf('",
+		"'int'", "'float64'", "'string'", "'bool'", "'rune'", "'break'", "'continue'",
 		"'func'", "'return'",
 	}
 	staticData.SymbolicNames = []string{
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-		"", "", "", "", "", "", "", "", "", "", "INT", "DOUBLE", "CHAR", "STRING",
-		"BOOL", "BLANCOS", "ID_VARIABLE", "COMENTARIOLINEA", "COMENTARIOMULTILINEA",
+		"", "", "", "", "", "", "", "", "", "", "", "INT", "DOUBLE", "CHAR",
+		"STRING", "BOOL", "BLANCOS", "ID_VARIABLE", "COMENTARIOLINEA", "COMENTARIOMULTILINEA",
 	}
 	staticData.RuleNames = []string{
 		"inicio", "instrucciones", "imprimir", "sIf", "sSwitch", "cases", "block",
@@ -58,7 +58,7 @@ func gramaticaParserInit() {
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 69, 553, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 70, 553, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 2, 15, 7, 15,
 		2, 16, 7, 16, 2, 17, 7, 17, 2, 18, 7, 18, 2, 19, 7, 19, 2, 20, 7, 20, 2,
@@ -117,9 +117,9 @@ func gramaticaParserInit() {
 		3, 25, 542, 8, 25, 1, 26, 1, 26, 1, 27, 1, 27, 3, 27, 548, 8, 27, 1, 27,
 		3, 27, 551, 8, 27, 1, 27, 0, 1, 32, 28, 0, 2, 4, 6, 8, 10, 12, 14, 16,
 		18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52,
-		54, 0, 9, 2, 0, 15, 15, 18, 18, 1, 0, 22, 23, 1, 0, 24, 25, 1, 0, 31, 33,
-		2, 0, 29, 29, 34, 34, 1, 0, 35, 38, 1, 0, 39, 40, 1, 0, 41, 42, 3, 0, 21,
-		21, 52, 56, 67, 67, 627, 0, 59, 1, 0, 0, 0, 2, 86, 1, 0, 0, 0, 4, 118,
+		54, 0, 9, 2, 0, 15, 15, 18, 18, 1, 0, 23, 24, 1, 0, 25, 26, 1, 0, 32, 34,
+		2, 0, 30, 30, 35, 35, 1, 0, 36, 39, 1, 0, 40, 41, 1, 0, 42, 43, 3, 0, 22,
+		22, 53, 57, 68, 68, 627, 0, 59, 1, 0, 0, 0, 2, 86, 1, 0, 0, 0, 4, 118,
 		1, 0, 0, 0, 6, 133, 1, 0, 0, 0, 8, 135, 1, 0, 0, 0, 10, 160, 1, 0, 0, 0,
 		12, 162, 1, 0, 0, 0, 14, 191, 1, 0, 0, 0, 16, 205, 1, 0, 0, 0, 18, 228,
 		1, 0, 0, 0, 20, 230, 1, 0, 0, 0, 22, 232, 1, 0, 0, 0, 24, 257, 1, 0, 0,
@@ -175,24 +175,24 @@ func gramaticaParserInit() {
 		0, 0, 175, 176, 5, 14, 0, 0, 176, 177, 3, 16, 8, 0, 177, 178, 5, 6, 0,
 		0, 178, 179, 3, 32, 16, 0, 179, 180, 5, 6, 0, 0, 180, 181, 3, 30, 15, 0,
 		181, 182, 3, 12, 6, 0, 182, 192, 1, 0, 0, 0, 183, 184, 5, 14, 0, 0, 184,
-		185, 5, 67, 0, 0, 185, 186, 5, 4, 0, 0, 186, 187, 5, 67, 0, 0, 187, 188,
-		5, 15, 0, 0, 188, 189, 5, 16, 0, 0, 189, 190, 5, 67, 0, 0, 190, 192, 3,
+		185, 5, 68, 0, 0, 185, 186, 5, 4, 0, 0, 186, 187, 5, 68, 0, 0, 187, 188,
+		5, 15, 0, 0, 188, 189, 5, 16, 0, 0, 189, 190, 5, 68, 0, 0, 190, 192, 3,
 		12, 6, 0, 191, 171, 1, 0, 0, 0, 191, 175, 1, 0, 0, 0, 191, 183, 1, 0, 0,
-		0, 192, 15, 1, 0, 0, 0, 193, 194, 5, 17, 0, 0, 194, 195, 5, 67, 0, 0, 195,
+		0, 192, 15, 1, 0, 0, 0, 193, 194, 5, 17, 0, 0, 194, 195, 5, 68, 0, 0, 195,
 		196, 3, 36, 18, 0, 196, 197, 5, 18, 0, 0, 197, 198, 3, 32, 16, 0, 198,
-		206, 1, 0, 0, 0, 199, 200, 5, 17, 0, 0, 200, 201, 5, 67, 0, 0, 201, 206,
-		3, 36, 18, 0, 202, 203, 5, 67, 0, 0, 203, 204, 5, 15, 0, 0, 204, 206, 3,
+		206, 1, 0, 0, 0, 199, 200, 5, 17, 0, 0, 200, 201, 5, 68, 0, 0, 201, 206,
+		3, 36, 18, 0, 202, 203, 5, 68, 0, 0, 203, 204, 5, 15, 0, 0, 204, 206, 3,
 		32, 16, 0, 205, 193, 1, 0, 0, 0, 205, 199, 1, 0, 0, 0, 205, 202, 1, 0,
-		0, 0, 206, 17, 1, 0, 0, 0, 207, 208, 5, 67, 0, 0, 208, 210, 3, 20, 10,
+		0, 0, 206, 17, 1, 0, 0, 0, 207, 208, 5, 68, 0, 0, 208, 210, 3, 20, 10,
 		0, 209, 211, 3, 22, 11, 0, 210, 209, 1, 0, 0, 0, 211, 212, 1, 0, 0, 0,
 		212, 210, 1, 0, 0, 0, 212, 213, 1, 0, 0, 0, 213, 214, 1, 0, 0, 0, 214,
 		215, 3, 36, 18, 0, 215, 216, 5, 1, 0, 0, 216, 217, 3, 24, 12, 0, 217, 218,
-		5, 2, 0, 0, 218, 229, 1, 0, 0, 0, 219, 220, 5, 17, 0, 0, 220, 222, 5, 67,
+		5, 2, 0, 0, 218, 229, 1, 0, 0, 0, 219, 220, 5, 19, 0, 0, 220, 222, 5, 68,
 		0, 0, 221, 223, 3, 22, 11, 0, 222, 221, 1, 0, 0, 0, 223, 224, 1, 0, 0,
 		0, 224, 222, 1, 0, 0, 0, 224, 225, 1, 0, 0, 0, 225, 226, 1, 0, 0, 0, 226,
 		227, 3, 36, 18, 0, 227, 229, 1, 0, 0, 0, 228, 207, 1, 0, 0, 0, 228, 219,
 		1, 0, 0, 0, 229, 19, 1, 0, 0, 0, 230, 231, 7, 0, 0, 0, 231, 21, 1, 0, 0,
-		0, 232, 233, 5, 19, 0, 0, 233, 23, 1, 0, 0, 0, 234, 239, 3, 32, 16, 0,
+		0, 232, 233, 5, 20, 0, 0, 233, 23, 1, 0, 0, 0, 234, 239, 3, 32, 16, 0,
 		235, 236, 5, 4, 0, 0, 236, 238, 3, 32, 16, 0, 237, 235, 1, 0, 0, 0, 238,
 		241, 1, 0, 0, 0, 239, 237, 1, 0, 0, 0, 239, 240, 1, 0, 0, 0, 240, 258,
 		1, 0, 0, 0, 241, 239, 1, 0, 0, 0, 242, 243, 5, 1, 0, 0, 243, 244, 3, 24,
@@ -201,62 +201,62 @@ func gramaticaParserInit() {
 		246, 1, 0, 0, 0, 250, 251, 1, 0, 0, 0, 251, 253, 1, 0, 0, 0, 252, 245,
 		1, 0, 0, 0, 253, 256, 1, 0, 0, 0, 254, 252, 1, 0, 0, 0, 254, 255, 1, 0,
 		0, 0, 255, 258, 1, 0, 0, 0, 256, 254, 1, 0, 0, 0, 257, 234, 1, 0, 0, 0,
-		257, 242, 1, 0, 0, 0, 258, 25, 1, 0, 0, 0, 259, 261, 5, 20, 0, 0, 260,
+		257, 242, 1, 0, 0, 0, 258, 25, 1, 0, 0, 0, 259, 261, 5, 21, 0, 0, 260,
 		259, 1, 0, 0, 0, 260, 261, 1, 0, 0, 0, 261, 263, 1, 0, 0, 0, 262, 264,
-		5, 21, 0, 0, 263, 262, 1, 0, 0, 0, 263, 264, 1, 0, 0, 0, 264, 265, 1, 0,
-		0, 0, 265, 267, 5, 67, 0, 0, 266, 268, 5, 21, 0, 0, 267, 266, 1, 0, 0,
+		5, 22, 0, 0, 263, 262, 1, 0, 0, 0, 263, 264, 1, 0, 0, 0, 264, 265, 1, 0,
+		0, 0, 265, 267, 5, 68, 0, 0, 266, 268, 5, 22, 0, 0, 267, 266, 1, 0, 0,
 		0, 267, 268, 1, 0, 0, 0, 268, 269, 1, 0, 0, 0, 269, 275, 5, 1, 0, 0, 270,
-		271, 5, 67, 0, 0, 271, 273, 3, 36, 18, 0, 272, 274, 5, 6, 0, 0, 273, 272,
+		271, 5, 68, 0, 0, 271, 273, 3, 36, 18, 0, 272, 274, 5, 6, 0, 0, 273, 272,
 		1, 0, 0, 0, 273, 274, 1, 0, 0, 0, 274, 276, 1, 0, 0, 0, 275, 270, 1, 0,
 		0, 0, 276, 277, 1, 0, 0, 0, 277, 275, 1, 0, 0, 0, 277, 278, 1, 0, 0, 0,
 		278, 279, 1, 0, 0, 0, 279, 280, 5, 2, 0, 0, 280, 27, 1, 0, 0, 0, 281, 282,
-		5, 67, 0, 0, 282, 283, 5, 67, 0, 0, 283, 284, 5, 18, 0, 0, 284, 285, 5,
-		1, 0, 0, 285, 286, 5, 67, 0, 0, 286, 287, 5, 12, 0, 0, 287, 292, 3, 32,
-		16, 0, 288, 289, 5, 4, 0, 0, 289, 290, 5, 67, 0, 0, 290, 291, 5, 12, 0,
+		5, 68, 0, 0, 282, 283, 5, 68, 0, 0, 283, 284, 5, 18, 0, 0, 284, 285, 5,
+		1, 0, 0, 285, 286, 5, 68, 0, 0, 286, 287, 5, 12, 0, 0, 287, 292, 3, 32,
+		16, 0, 288, 289, 5, 4, 0, 0, 289, 290, 5, 68, 0, 0, 290, 291, 5, 12, 0,
 		0, 291, 293, 3, 32, 16, 0, 292, 288, 1, 0, 0, 0, 293, 294, 1, 0, 0, 0,
 		294, 292, 1, 0, 0, 0, 294, 295, 1, 0, 0, 0, 295, 296, 1, 0, 0, 0, 296,
-		297, 5, 2, 0, 0, 297, 318, 1, 0, 0, 0, 298, 299, 5, 67, 0, 0, 299, 300,
-		5, 15, 0, 0, 300, 301, 5, 67, 0, 0, 301, 302, 5, 1, 0, 0, 302, 303, 5,
-		67, 0, 0, 303, 304, 5, 12, 0, 0, 304, 311, 3, 32, 16, 0, 305, 309, 5, 4,
-		0, 0, 306, 307, 5, 67, 0, 0, 307, 308, 5, 12, 0, 0, 308, 310, 3, 32, 16,
+		297, 5, 2, 0, 0, 297, 318, 1, 0, 0, 0, 298, 299, 5, 68, 0, 0, 299, 300,
+		5, 15, 0, 0, 300, 301, 5, 68, 0, 0, 301, 302, 5, 1, 0, 0, 302, 303, 5,
+		68, 0, 0, 303, 304, 5, 12, 0, 0, 304, 311, 3, 32, 16, 0, 305, 309, 5, 4,
+		0, 0, 306, 307, 5, 68, 0, 0, 307, 308, 5, 12, 0, 0, 308, 310, 3, 32, 16,
 		0, 309, 306, 1, 0, 0, 0, 309, 310, 1, 0, 0, 0, 310, 312, 1, 0, 0, 0, 311,
 		305, 1, 0, 0, 0, 312, 313, 1, 0, 0, 0, 313, 311, 1, 0, 0, 0, 313, 314,
 		1, 0, 0, 0, 314, 315, 1, 0, 0, 0, 315, 316, 5, 2, 0, 0, 316, 318, 1, 0,
 		0, 0, 317, 281, 1, 0, 0, 0, 317, 298, 1, 0, 0, 0, 318, 29, 1, 0, 0, 0,
-		319, 320, 5, 67, 0, 0, 320, 321, 5, 18, 0, 0, 321, 349, 3, 32, 16, 0, 322,
-		323, 5, 67, 0, 0, 323, 324, 7, 1, 0, 0, 324, 349, 3, 32, 16, 0, 325, 326,
-		5, 67, 0, 0, 326, 349, 7, 2, 0, 0, 327, 332, 5, 67, 0, 0, 328, 329, 5,
-		26, 0, 0, 329, 330, 3, 32, 16, 0, 330, 331, 5, 27, 0, 0, 331, 333, 1, 0,
+		319, 320, 5, 68, 0, 0, 320, 321, 5, 18, 0, 0, 321, 349, 3, 32, 16, 0, 322,
+		323, 5, 68, 0, 0, 323, 324, 7, 1, 0, 0, 324, 349, 3, 32, 16, 0, 325, 326,
+		5, 68, 0, 0, 326, 349, 7, 2, 0, 0, 327, 332, 5, 68, 0, 0, 328, 329, 5,
+		27, 0, 0, 329, 330, 3, 32, 16, 0, 330, 331, 5, 28, 0, 0, 331, 333, 1, 0,
 		0, 0, 332, 328, 1, 0, 0, 0, 333, 334, 1, 0, 0, 0, 334, 332, 1, 0, 0, 0,
 		334, 335, 1, 0, 0, 0, 335, 336, 1, 0, 0, 0, 336, 337, 5, 18, 0, 0, 337,
-		338, 3, 32, 16, 0, 338, 349, 1, 0, 0, 0, 339, 342, 5, 67, 0, 0, 340, 341,
-		5, 28, 0, 0, 341, 343, 5, 67, 0, 0, 342, 340, 1, 0, 0, 0, 343, 344, 1,
+		338, 3, 32, 16, 0, 338, 349, 1, 0, 0, 0, 339, 342, 5, 68, 0, 0, 340, 341,
+		5, 29, 0, 0, 341, 343, 5, 68, 0, 0, 342, 340, 1, 0, 0, 0, 343, 344, 1,
 		0, 0, 0, 344, 342, 1, 0, 0, 0, 344, 345, 1, 0, 0, 0, 345, 346, 1, 0, 0,
 		0, 346, 347, 5, 18, 0, 0, 347, 349, 3, 32, 16, 0, 348, 319, 1, 0, 0, 0,
 		348, 322, 1, 0, 0, 0, 348, 325, 1, 0, 0, 0, 348, 327, 1, 0, 0, 0, 348,
 		339, 1, 0, 0, 0, 349, 31, 1, 0, 0, 0, 350, 351, 6, 16, -1, 0, 351, 352,
-		5, 29, 0, 0, 352, 427, 3, 32, 16, 26, 353, 354, 5, 30, 0, 0, 354, 427,
-		3, 32, 16, 25, 355, 427, 5, 61, 0, 0, 356, 427, 5, 62, 0, 0, 357, 427,
-		5, 64, 0, 0, 358, 427, 5, 65, 0, 0, 359, 427, 5, 67, 0, 0, 360, 427, 5,
-		63, 0, 0, 361, 427, 5, 43, 0, 0, 362, 363, 5, 44, 0, 0, 363, 364, 3, 32,
-		16, 0, 364, 365, 5, 5, 0, 0, 365, 427, 1, 0, 0, 0, 366, 371, 5, 67, 0,
-		0, 367, 368, 5, 26, 0, 0, 368, 369, 3, 32, 16, 0, 369, 370, 5, 27, 0, 0,
+		5, 30, 0, 0, 352, 427, 3, 32, 16, 26, 353, 354, 5, 31, 0, 0, 354, 427,
+		3, 32, 16, 25, 355, 427, 5, 62, 0, 0, 356, 427, 5, 63, 0, 0, 357, 427,
+		5, 65, 0, 0, 358, 427, 5, 66, 0, 0, 359, 427, 5, 68, 0, 0, 360, 427, 5,
+		64, 0, 0, 361, 427, 5, 44, 0, 0, 362, 363, 5, 45, 0, 0, 363, 364, 3, 32,
+		16, 0, 364, 365, 5, 5, 0, 0, 365, 427, 1, 0, 0, 0, 366, 371, 5, 68, 0,
+		0, 367, 368, 5, 27, 0, 0, 368, 369, 3, 32, 16, 0, 369, 370, 5, 28, 0, 0,
 		370, 372, 1, 0, 0, 0, 371, 367, 1, 0, 0, 0, 372, 373, 1, 0, 0, 0, 373,
 		371, 1, 0, 0, 0, 373, 374, 1, 0, 0, 0, 374, 427, 1, 0, 0, 0, 375, 376,
-		5, 45, 0, 0, 376, 377, 5, 67, 0, 0, 377, 378, 5, 4, 0, 0, 378, 379, 3,
-		32, 16, 0, 379, 380, 5, 5, 0, 0, 380, 427, 1, 0, 0, 0, 381, 382, 5, 46,
-		0, 0, 382, 383, 5, 67, 0, 0, 383, 384, 5, 4, 0, 0, 384, 385, 3, 32, 16,
-		0, 385, 386, 5, 5, 0, 0, 386, 427, 1, 0, 0, 0, 387, 388, 5, 47, 0, 0, 388,
-		392, 5, 67, 0, 0, 389, 391, 3, 34, 17, 0, 390, 389, 1, 0, 0, 0, 391, 394,
+		5, 46, 0, 0, 376, 377, 5, 68, 0, 0, 377, 378, 5, 4, 0, 0, 378, 379, 3,
+		32, 16, 0, 379, 380, 5, 5, 0, 0, 380, 427, 1, 0, 0, 0, 381, 382, 5, 47,
+		0, 0, 382, 383, 5, 68, 0, 0, 383, 384, 5, 4, 0, 0, 384, 385, 3, 32, 16,
+		0, 385, 386, 5, 5, 0, 0, 386, 427, 1, 0, 0, 0, 387, 388, 5, 48, 0, 0, 388,
+		392, 5, 68, 0, 0, 389, 391, 3, 34, 17, 0, 390, 389, 1, 0, 0, 0, 391, 394,
 		1, 0, 0, 0, 392, 390, 1, 0, 0, 0, 392, 393, 1, 0, 0, 0, 393, 395, 1, 0,
-		0, 0, 394, 392, 1, 0, 0, 0, 395, 427, 5, 5, 0, 0, 396, 397, 5, 48, 0, 0,
-		397, 398, 5, 67, 0, 0, 398, 399, 5, 4, 0, 0, 399, 400, 3, 32, 16, 0, 400,
-		401, 5, 5, 0, 0, 401, 427, 1, 0, 0, 0, 402, 403, 5, 49, 0, 0, 403, 404,
+		0, 0, 394, 392, 1, 0, 0, 0, 395, 427, 5, 5, 0, 0, 396, 397, 5, 49, 0, 0,
+		397, 398, 5, 68, 0, 0, 398, 399, 5, 4, 0, 0, 399, 400, 3, 32, 16, 0, 400,
+		401, 5, 5, 0, 0, 401, 427, 1, 0, 0, 0, 402, 403, 5, 50, 0, 0, 403, 404,
 		3, 32, 16, 0, 404, 405, 5, 5, 0, 0, 405, 427, 1, 0, 0, 0, 406, 407, 5,
-		50, 0, 0, 407, 408, 3, 32, 16, 0, 408, 409, 5, 5, 0, 0, 409, 427, 1, 0,
-		0, 0, 410, 411, 5, 51, 0, 0, 411, 412, 3, 32, 16, 0, 412, 413, 5, 5, 0,
-		0, 413, 427, 1, 0, 0, 0, 414, 417, 5, 67, 0, 0, 415, 416, 5, 28, 0, 0,
-		416, 418, 5, 67, 0, 0, 417, 415, 1, 0, 0, 0, 418, 419, 1, 0, 0, 0, 419,
+		51, 0, 0, 407, 408, 3, 32, 16, 0, 408, 409, 5, 5, 0, 0, 409, 427, 1, 0,
+		0, 0, 410, 411, 5, 52, 0, 0, 411, 412, 3, 32, 16, 0, 412, 413, 5, 5, 0,
+		0, 413, 427, 1, 0, 0, 0, 414, 417, 5, 68, 0, 0, 415, 416, 5, 29, 0, 0,
+		416, 418, 5, 68, 0, 0, 417, 415, 1, 0, 0, 0, 418, 419, 1, 0, 0, 0, 419,
 		417, 1, 0, 0, 0, 419, 420, 1, 0, 0, 0, 420, 422, 1, 0, 0, 0, 421, 423,
 		5, 6, 0, 0, 422, 421, 1, 0, 0, 0, 422, 423, 1, 0, 0, 0, 423, 427, 1, 0,
 		0, 0, 424, 427, 3, 48, 24, 0, 425, 427, 3, 50, 25, 0, 426, 350, 1, 0, 0,
@@ -274,42 +274,42 @@ func gramaticaParserInit() {
 		7, 0, 0, 442, 444, 3, 32, 16, 21, 443, 428, 1, 0, 0, 0, 443, 431, 1, 0,
 		0, 0, 443, 434, 1, 0, 0, 0, 443, 437, 1, 0, 0, 0, 443, 440, 1, 0, 0, 0,
 		444, 447, 1, 0, 0, 0, 445, 443, 1, 0, 0, 0, 445, 446, 1, 0, 0, 0, 446,
-		33, 1, 0, 0, 0, 447, 445, 1, 0, 0, 0, 448, 449, 5, 26, 0, 0, 449, 450,
-		3, 32, 16, 0, 450, 451, 5, 27, 0, 0, 451, 35, 1, 0, 0, 0, 452, 453, 7,
-		8, 0, 0, 453, 37, 1, 0, 0, 0, 454, 456, 5, 57, 0, 0, 455, 457, 5, 6, 0,
+		33, 1, 0, 0, 0, 447, 445, 1, 0, 0, 0, 448, 449, 5, 27, 0, 0, 449, 450,
+		3, 32, 16, 0, 450, 451, 5, 28, 0, 0, 451, 35, 1, 0, 0, 0, 452, 453, 7,
+		8, 0, 0, 453, 37, 1, 0, 0, 0, 454, 456, 5, 58, 0, 0, 455, 457, 5, 6, 0,
 		0, 456, 455, 1, 0, 0, 0, 456, 457, 1, 0, 0, 0, 457, 39, 1, 0, 0, 0, 458,
-		460, 5, 58, 0, 0, 459, 461, 5, 6, 0, 0, 460, 459, 1, 0, 0, 0, 460, 461,
-		1, 0, 0, 0, 461, 41, 1, 0, 0, 0, 462, 463, 5, 59, 0, 0, 463, 464, 5, 67,
-		0, 0, 464, 475, 5, 44, 0, 0, 465, 466, 5, 67, 0, 0, 466, 472, 3, 36, 18,
-		0, 467, 468, 5, 4, 0, 0, 468, 469, 5, 67, 0, 0, 469, 471, 3, 36, 18, 0,
+		460, 5, 59, 0, 0, 459, 461, 5, 6, 0, 0, 460, 459, 1, 0, 0, 0, 460, 461,
+		1, 0, 0, 0, 461, 41, 1, 0, 0, 0, 462, 463, 5, 60, 0, 0, 463, 464, 5, 68,
+		0, 0, 464, 475, 5, 45, 0, 0, 465, 466, 5, 68, 0, 0, 466, 472, 3, 36, 18,
+		0, 467, 468, 5, 4, 0, 0, 468, 469, 5, 68, 0, 0, 469, 471, 3, 36, 18, 0,
 		470, 467, 1, 0, 0, 0, 471, 474, 1, 0, 0, 0, 472, 470, 1, 0, 0, 0, 472,
 		473, 1, 0, 0, 0, 473, 476, 1, 0, 0, 0, 474, 472, 1, 0, 0, 0, 475, 465,
 		1, 0, 0, 0, 475, 476, 1, 0, 0, 0, 476, 477, 1, 0, 0, 0, 477, 479, 5, 5,
 		0, 0, 478, 480, 3, 52, 26, 0, 479, 478, 1, 0, 0, 0, 479, 480, 1, 0, 0,
 		0, 480, 481, 1, 0, 0, 0, 481, 482, 3, 12, 6, 0, 482, 43, 1, 0, 0, 0, 483,
-		484, 5, 59, 0, 0, 484, 485, 5, 44, 0, 0, 485, 486, 5, 67, 0, 0, 486, 487,
-		5, 67, 0, 0, 487, 488, 5, 5, 0, 0, 488, 489, 5, 67, 0, 0, 489, 491, 5,
-		44, 0, 0, 490, 492, 3, 46, 23, 0, 491, 490, 1, 0, 0, 0, 491, 492, 1, 0,
+		484, 5, 60, 0, 0, 484, 485, 5, 45, 0, 0, 485, 486, 5, 68, 0, 0, 486, 487,
+		5, 68, 0, 0, 487, 488, 5, 5, 0, 0, 488, 489, 5, 68, 0, 0, 489, 491, 5,
+		45, 0, 0, 490, 492, 3, 46, 23, 0, 491, 490, 1, 0, 0, 0, 491, 492, 1, 0,
 		0, 0, 492, 493, 1, 0, 0, 0, 493, 495, 5, 5, 0, 0, 494, 496, 3, 52, 26,
 		0, 495, 494, 1, 0, 0, 0, 495, 496, 1, 0, 0, 0, 496, 497, 1, 0, 0, 0, 497,
-		498, 3, 12, 6, 0, 498, 45, 1, 0, 0, 0, 499, 500, 5, 67, 0, 0, 500, 506,
-		3, 36, 18, 0, 501, 502, 5, 4, 0, 0, 502, 503, 5, 67, 0, 0, 503, 505, 3,
+		498, 3, 12, 6, 0, 498, 45, 1, 0, 0, 0, 499, 500, 5, 68, 0, 0, 500, 506,
+		3, 36, 18, 0, 501, 502, 5, 4, 0, 0, 502, 503, 5, 68, 0, 0, 503, 505, 3,
 		36, 18, 0, 504, 501, 1, 0, 0, 0, 505, 508, 1, 0, 0, 0, 506, 504, 1, 0,
 		0, 0, 506, 507, 1, 0, 0, 0, 507, 47, 1, 0, 0, 0, 508, 506, 1, 0, 0, 0,
-		509, 510, 5, 67, 0, 0, 510, 519, 5, 44, 0, 0, 511, 516, 3, 32, 16, 0, 512,
+		509, 510, 5, 68, 0, 0, 510, 519, 5, 45, 0, 0, 511, 516, 3, 32, 16, 0, 512,
 		513, 5, 4, 0, 0, 513, 515, 3, 32, 16, 0, 514, 512, 1, 0, 0, 0, 515, 518,
 		1, 0, 0, 0, 516, 514, 1, 0, 0, 0, 516, 517, 1, 0, 0, 0, 517, 520, 1, 0,
 		0, 0, 518, 516, 1, 0, 0, 0, 519, 511, 1, 0, 0, 0, 519, 520, 1, 0, 0, 0,
 		520, 521, 1, 0, 0, 0, 521, 523, 5, 5, 0, 0, 522, 524, 5, 6, 0, 0, 523,
 		522, 1, 0, 0, 0, 523, 524, 1, 0, 0, 0, 524, 49, 1, 0, 0, 0, 525, 526, 5,
-		67, 0, 0, 526, 527, 5, 28, 0, 0, 527, 528, 5, 67, 0, 0, 528, 537, 5, 44,
+		68, 0, 0, 526, 527, 5, 29, 0, 0, 527, 528, 5, 68, 0, 0, 528, 537, 5, 45,
 		0, 0, 529, 534, 3, 32, 16, 0, 530, 531, 5, 4, 0, 0, 531, 533, 3, 32, 16,
 		0, 532, 530, 1, 0, 0, 0, 533, 536, 1, 0, 0, 0, 534, 532, 1, 0, 0, 0, 534,
 		535, 1, 0, 0, 0, 535, 538, 1, 0, 0, 0, 536, 534, 1, 0, 0, 0, 537, 529,
 		1, 0, 0, 0, 537, 538, 1, 0, 0, 0, 538, 539, 1, 0, 0, 0, 539, 541, 5, 5,
 		0, 0, 540, 542, 5, 6, 0, 0, 541, 540, 1, 0, 0, 0, 541, 542, 1, 0, 0, 0,
 		542, 51, 1, 0, 0, 0, 543, 544, 3, 36, 18, 0, 544, 53, 1, 0, 0, 0, 545,
-		547, 5, 60, 0, 0, 546, 548, 3, 32, 16, 0, 547, 546, 1, 0, 0, 0, 547, 548,
+		547, 5, 61, 0, 0, 546, 548, 3, 32, 16, 0, 547, 546, 1, 0, 0, 0, 547, 548,
 		1, 0, 0, 0, 548, 550, 1, 0, 0, 0, 549, 551, 5, 6, 0, 0, 550, 549, 1, 0,
 		0, 0, 550, 551, 1, 0, 0, 0, 551, 55, 1, 0, 0, 0, 61, 59, 69, 86, 94, 97,
 		101, 109, 112, 116, 118, 125, 133, 147, 151, 157, 160, 166, 191, 205, 212,
@@ -414,15 +414,16 @@ const (
 	gramaticaParserT__57                = 58
 	gramaticaParserT__58                = 59
 	gramaticaParserT__59                = 60
-	gramaticaParserINT                  = 61
-	gramaticaParserDOUBLE               = 62
-	gramaticaParserCHAR                 = 63
-	gramaticaParserSTRING               = 64
-	gramaticaParserBOOL                 = 65
-	gramaticaParserBLANCOS              = 66
-	gramaticaParserID_VARIABLE          = 67
-	gramaticaParserCOMENTARIOLINEA      = 68
-	gramaticaParserCOMENTARIOMULTILINEA = 69
+	gramaticaParserT__60                = 61
+	gramaticaParserINT                  = 62
+	gramaticaParserDOUBLE               = 63
+	gramaticaParserCHAR                 = 64
+	gramaticaParserSTRING               = 65
+	gramaticaParserBOOL                 = 66
+	gramaticaParserBLANCOS              = 67
+	gramaticaParserID_VARIABLE          = 68
+	gramaticaParserCOMENTARIOLINEA      = 69
+	gramaticaParserCOMENTARIOMULTILINEA = 70
 )
 
 // gramaticaParser rules.
@@ -588,7 +589,7 @@ func (p *gramaticaParser) Inicio() (localctx IInicioContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2161727821141132682) != 0) || _la == gramaticaParserID_VARIABLE {
+	for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4323455642282640778) != 0) || _la == gramaticaParserID_VARIABLE {
 		{
 			p.SetState(56)
 			p.Instrucciones()
@@ -1700,7 +1701,7 @@ func (p *gramaticaParser) Instrucciones() (localctx IInstruccionesContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2161727821141132682) != 0) || _la == gramaticaParserID_VARIABLE {
+		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4323455642282640778) != 0) || _la == gramaticaParserID_VARIABLE {
 			{
 				p.SetState(66)
 				p.Instrucciones()
@@ -2089,7 +2090,7 @@ func (p *gramaticaParser) Imprimir() (localctx IImprimirContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
+		if (int64((_la-30)) & ^0x3f) == 0 && ((int64(1)<<(_la-30))&408030265347) != 0 {
 			{
 				p.SetState(89)
 				p.expr(0)
@@ -2169,7 +2170,7 @@ func (p *gramaticaParser) Imprimir() (localctx IImprimirContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
+		if (int64((_la-30)) & ^0x3f) == 0 && ((int64(1)<<(_la-30))&408030265347) != 0 {
 			{
 				p.SetState(104)
 				p.expr(0)
@@ -3058,7 +3059,7 @@ func (p *gramaticaParser) Cases() (localctx ICasesContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2161727821141132682) != 0) || _la == gramaticaParserID_VARIABLE {
+		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4323455642282640778) != 0) || _la == gramaticaParserID_VARIABLE {
 			{
 				p.SetState(144)
 				p.Instrucciones()
@@ -3104,7 +3105,7 @@ func (p *gramaticaParser) Cases() (localctx ICasesContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2161727821141132682) != 0) || _la == gramaticaParserID_VARIABLE {
+		for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4323455642282640778) != 0) || _la == gramaticaParserID_VARIABLE {
 			{
 				p.SetState(154)
 				p.Instrucciones()
@@ -3293,7 +3294,7 @@ func (p *gramaticaParser) Block() (localctx IBlockContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2161727821141132682) != 0) || _la == gramaticaParserID_VARIABLE {
+	for ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4323455642282640778) != 0) || _la == gramaticaParserID_VARIABLE {
 		{
 			p.SetState(163)
 			p.Instrucciones()
@@ -4460,7 +4461,7 @@ func (p *gramaticaParser) VarDclSlice() (localctx IVarDclSliceContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ok := true; ok; ok = _la == gramaticaParserT__18 {
+		for ok := true; ok; ok = _la == gramaticaParserT__19 {
 			{
 				p.SetState(209)
 				p.NuevoSlice()
@@ -4498,12 +4499,12 @@ func (p *gramaticaParser) VarDclSlice() (localctx IVarDclSliceContext) {
 			}
 		}
 
-	case gramaticaParserT__16:
+	case gramaticaParserT__18:
 		localctx = NewSliceVacioContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(219)
-			p.Match(gramaticaParserT__16)
+			p.Match(gramaticaParserT__18)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -4524,7 +4525,7 @@ func (p *gramaticaParser) VarDclSlice() (localctx IVarDclSliceContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ok := true; ok; ok = _la == gramaticaParserT__18 {
+		for ok := true; ok; ok = _la == gramaticaParserT__19 {
 			{
 				p.SetState(221)
 				p.NuevoSlice()
@@ -4739,7 +4740,7 @@ func (p *gramaticaParser) NuevoSlice() (localctx INuevoSliceContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(232)
-		p.Match(gramaticaParserT__18)
+		p.Match(gramaticaParserT__19)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -4987,7 +4988,7 @@ func (p *gramaticaParser) ContenidoSlice() (localctx IContenidoSliceContext) {
 	}
 
 	switch p.GetTokenStream().LA(1) {
-	case gramaticaParserT__28, gramaticaParserT__29, gramaticaParserT__42, gramaticaParserT__43, gramaticaParserT__44, gramaticaParserT__45, gramaticaParserT__46, gramaticaParserT__47, gramaticaParserT__48, gramaticaParserT__49, gramaticaParserT__50, gramaticaParserINT, gramaticaParserDOUBLE, gramaticaParserCHAR, gramaticaParserSTRING, gramaticaParserBOOL, gramaticaParserID_VARIABLE:
+	case gramaticaParserT__29, gramaticaParserT__30, gramaticaParserT__43, gramaticaParserT__44, gramaticaParserT__45, gramaticaParserT__46, gramaticaParserT__47, gramaticaParserT__48, gramaticaParserT__49, gramaticaParserT__50, gramaticaParserT__51, gramaticaParserINT, gramaticaParserDOUBLE, gramaticaParserCHAR, gramaticaParserSTRING, gramaticaParserBOOL, gramaticaParserID_VARIABLE:
 		localctx = NewSliceContenidoContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
@@ -5276,10 +5277,10 @@ func (p *gramaticaParser) VarDclStruct() (localctx IVarDclStructContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == gramaticaParserT__19 {
+	if _la == gramaticaParserT__20 {
 		{
 			p.SetState(259)
-			p.Match(gramaticaParserT__19)
+			p.Match(gramaticaParserT__20)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -5294,10 +5295,10 @@ func (p *gramaticaParser) VarDclStruct() (localctx IVarDclStructContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == gramaticaParserT__20 {
+	if _la == gramaticaParserT__21 {
 		{
 			p.SetState(262)
-			p.Match(gramaticaParserT__20)
+			p.Match(gramaticaParserT__21)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -5320,10 +5321,10 @@ func (p *gramaticaParser) VarDclStruct() (localctx IVarDclStructContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == gramaticaParserT__20 {
+	if _la == gramaticaParserT__21 {
 		{
 			p.SetState(266)
-			p.Match(gramaticaParserT__20)
+			p.Match(gramaticaParserT__21)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -6327,7 +6328,7 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 
 			_la = p.GetTokenStream().LA(1)
 
-			if !(_la == gramaticaParserT__21 || _la == gramaticaParserT__22) {
+			if !(_la == gramaticaParserT__22 || _la == gramaticaParserT__23) {
 				var _ri = p.GetErrorHandler().RecoverInline(p)
 
 				localctx.(*VarAddContext).op = _ri
@@ -6361,7 +6362,7 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 
 			_la = p.GetTokenStream().LA(1)
 
-			if !(_la == gramaticaParserT__23 || _la == gramaticaParserT__24) {
+			if !(_la == gramaticaParserT__24 || _la == gramaticaParserT__25) {
 				var _ri = p.GetErrorHandler().RecoverInline(p)
 
 				localctx.(*VarIncContext).op = _ri
@@ -6389,10 +6390,10 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ok := true; ok; ok = _la == gramaticaParserT__25 {
+		for ok := true; ok; ok = _la == gramaticaParserT__26 {
 			{
 				p.SetState(328)
-				p.Match(gramaticaParserT__25)
+				p.Match(gramaticaParserT__26)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
@@ -6404,7 +6405,7 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 			{
 				p.SetState(330)
-				p.Match(gramaticaParserT__26)
+				p.Match(gramaticaParserT__27)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
@@ -6449,10 +6450,10 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ok := true; ok; ok = _la == gramaticaParserT__27 {
+		for ok := true; ok; ok = _la == gramaticaParserT__28 {
 			{
 				p.SetState(340)
-				p.Match(gramaticaParserT__27)
+				p.Match(gramaticaParserT__28)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
@@ -8170,7 +8171,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 		{
 			p.SetState(351)
-			p.Match(gramaticaParserT__28)
+			p.Match(gramaticaParserT__29)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8187,7 +8188,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(353)
-			p.Match(gramaticaParserT__29)
+			p.Match(gramaticaParserT__30)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8282,7 +8283,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(361)
-			p.Match(gramaticaParserT__42)
+			p.Match(gramaticaParserT__43)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8295,7 +8296,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(362)
-			p.Match(gramaticaParserT__43)
+			p.Match(gramaticaParserT__44)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8337,7 +8338,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			case 1:
 				{
 					p.SetState(367)
-					p.Match(gramaticaParserT__25)
+					p.Match(gramaticaParserT__26)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
@@ -8349,7 +8350,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(369)
-					p.Match(gramaticaParserT__26)
+					p.Match(gramaticaParserT__27)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
@@ -8375,7 +8376,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(375)
-			p.Match(gramaticaParserT__44)
+			p.Match(gramaticaParserT__45)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8416,7 +8417,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(381)
-			p.Match(gramaticaParserT__45)
+			p.Match(gramaticaParserT__46)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8457,7 +8458,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(387)
-			p.Match(gramaticaParserT__46)
+			p.Match(gramaticaParserT__47)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8478,7 +8479,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for _la == gramaticaParserT__25 {
+		for _la == gramaticaParserT__26 {
 			{
 				p.SetState(389)
 				p.Posicion()
@@ -8506,7 +8507,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(396)
-			p.Match(gramaticaParserT__47)
+			p.Match(gramaticaParserT__48)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8547,7 +8548,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(402)
-			p.Match(gramaticaParserT__48)
+			p.Match(gramaticaParserT__49)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8572,7 +8573,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(406)
-			p.Match(gramaticaParserT__49)
+			p.Match(gramaticaParserT__50)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8597,7 +8598,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 		{
 			p.SetState(410)
-			p.Match(gramaticaParserT__50)
+			p.Match(gramaticaParserT__51)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8639,7 +8640,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			case 1:
 				{
 					p.SetState(415)
-					p.Match(gramaticaParserT__27)
+					p.Match(gramaticaParserT__28)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
@@ -8745,7 +8746,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&15032385536) != 0) {
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&30064771072) != 0) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*MulDivModuloContext).op = _ri
@@ -8777,7 +8778,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !(_la == gramaticaParserT__28 || _la == gramaticaParserT__33) {
+					if !(_la == gramaticaParserT__29 || _la == gramaticaParserT__34) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*AddSubContext).op = _ri
@@ -8809,7 +8810,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&515396075520) != 0) {
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1030792151040) != 0) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*MinorMajorEqualContext).op = _ri
@@ -8841,7 +8842,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !(_la == gramaticaParserT__38 || _la == gramaticaParserT__39) {
+					if !(_la == gramaticaParserT__39 || _la == gramaticaParserT__40) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*EqualsNotEqualsContext).op = _ri
@@ -8873,7 +8874,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !(_la == gramaticaParserT__40 || _la == gramaticaParserT__41) {
+					if !(_la == gramaticaParserT__41 || _la == gramaticaParserT__42) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*LogicalContext).op = _ri
@@ -9014,7 +9015,7 @@ func (p *gramaticaParser) Posicion() (localctx IPosicionContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(448)
-		p.Match(gramaticaParserT__25)
+		p.Match(gramaticaParserT__26)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9026,7 +9027,7 @@ func (p *gramaticaParser) Posicion() (localctx IPosicionContext) {
 	}
 	{
 		p.SetState(450)
-		p.Match(gramaticaParserT__26)
+		p.Match(gramaticaParserT__27)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9136,7 +9137,7 @@ func (p *gramaticaParser) Type_() (localctx ITypeContext) {
 		p.SetState(452)
 		_la = p.GetTokenStream().LA(1)
 
-		if !((int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0) {
+		if !((int64((_la-22)) & ^0x3f) == 0 && ((int64(1)<<(_la-22))&70435316170753) != 0) {
 			p.GetErrorHandler().RecoverInline(p)
 		} else {
 			p.GetErrorHandler().ReportMatch(p)
@@ -9236,7 +9237,7 @@ func (p *gramaticaParser) Break_() (localctx IBreakContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(454)
-		p.Match(gramaticaParserT__56)
+		p.Match(gramaticaParserT__57)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9353,7 +9354,7 @@ func (p *gramaticaParser) Continue_() (localctx IContinueContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(458)
-		p.Match(gramaticaParserT__57)
+		p.Match(gramaticaParserT__58)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9575,7 +9576,7 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(462)
-		p.Match(gramaticaParserT__58)
+		p.Match(gramaticaParserT__59)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9591,7 +9592,7 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 	}
 	{
 		p.SetState(464)
-		p.Match(gramaticaParserT__43)
+		p.Match(gramaticaParserT__44)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9670,7 +9671,7 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0 {
+	if (int64((_la-22)) & ^0x3f) == 0 && ((int64(1)<<(_la-22))&70435316170753) != 0 {
 		{
 			p.SetState(478)
 			p.ValRet()
@@ -9854,7 +9855,7 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(483)
-		p.Match(gramaticaParserT__58)
+		p.Match(gramaticaParserT__59)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9862,7 +9863,7 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 	}
 	{
 		p.SetState(484)
-		p.Match(gramaticaParserT__43)
+		p.Match(gramaticaParserT__44)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9902,7 +9903,7 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 	}
 	{
 		p.SetState(489)
-		p.Match(gramaticaParserT__43)
+		p.Match(gramaticaParserT__44)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9937,7 +9938,7 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0 {
+	if (int64((_la-22)) & ^0x3f) == 0 && ((int64(1)<<(_la-22))&70435316170753) != 0 {
 		{
 			p.SetState(494)
 			p.ValRet()
@@ -10314,7 +10315,7 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 	}
 	{
 		p.SetState(510)
-		p.Match(gramaticaParserT__43)
+		p.Match(gramaticaParserT__44)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -10327,7 +10328,7 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
+	if (int64((_la-30)) & ^0x3f) == 0 && ((int64(1)<<(_la-30))&408030265347) != 0 {
 		{
 			p.SetState(511)
 			p.expr(0)
@@ -10560,7 +10561,7 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 	}
 	{
 		p.SetState(526)
-		p.Match(gramaticaParserT__27)
+		p.Match(gramaticaParserT__28)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -10576,7 +10577,7 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 	}
 	{
 		p.SetState(528)
-		p.Match(gramaticaParserT__43)
+		p.Match(gramaticaParserT__44)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -10589,7 +10590,7 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
+	if (int64((_la-30)) & ^0x3f) == 0 && ((int64(1)<<(_la-30))&408030265347) != 0 {
 		{
 			p.SetState(529)
 			p.expr(0)
@@ -10876,7 +10877,7 @@ func (p *gramaticaParser) Retorno() (localctx IRetornoContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(545)
-		p.Match(gramaticaParserT__59)
+		p.Match(gramaticaParserT__60)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit

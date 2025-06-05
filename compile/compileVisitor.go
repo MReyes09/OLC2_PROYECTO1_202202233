@@ -5,6 +5,7 @@ import (
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -18,7 +19,8 @@ type CompilerVisitor struct {
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
 	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
-	currentEnv                      *Environment
+	currentEnv                      *Environment                    // scope
+	conditionExpr                   interface{}                     // Added for switch statement
 }
 
 // Constructor opcional
@@ -436,6 +438,7 @@ func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interf
 	return nil
 }
 
+// ----------------------- VisitIdentifier -----------------------
 func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	sym, err := v.currentEnv.GetVariable(id)
@@ -468,4 +471,74 @@ func isValidType(value interface{}, typ SymbolType) bool {
 		return ok
 	}
 	return false
+}
+
+func isEqualType(a, b interface{}) bool {
+	return reflect.TypeOf(a) == reflect.TypeOf(b)
+}
+
+// ---------------------------------------------------- switch ----------------------------------------------------
+
+// Produccion de instrucciones de switch
+func (v *CompilerVisitor) VisitSwitchInstruccion(ctx *gramAntlr.SwitchInstruccionContext) interface{} {
+	return v.Visit(ctx.SSwitch())
+}
+
+// Produccion de switch
+func (v *CompilerVisitor) VisitSwitchStmt(ctx *gramAntlr.SwitchStmtContext) interface{} {
+	v.conditionExpr = v.Visit(ctx.Expr()) // Evaluar la condicion-tipo del switch
+	// The C# code calls Visit(context.cases()) directly here.
+	// In Go, since cases() returns a slice, you'd typically iterate through them.
+	// However, based on the C# structure, it seems 'cases' might be a rule
+	// that encompasses all 'case' and 'default' blocks, which ANTLR handles.
+	// Assuming 'cases' is a single rule that is visited, like 'sIf'
+	return v.Visit(ctx.Cases())
+}
+
+// Produccion cases
+func (v *CompilerVisitor) VisitCase(ctx *gramAntlr.CaseContext) interface{} {
+	caseCondition := v.Visit(ctx.Expr())
+
+	// Implement isEqualType functionality
+	if (caseCondition == nil && v.conditionExpr == nil) ||
+		(caseCondition != nil && v.conditionExpr != nil &&
+			fmt.Sprintf("%T", caseCondition) == fmt.Sprintf("%T", v.conditionExpr)) {
+
+		if caseCondition == v.conditionExpr { // Direct comparison for equality
+			newEnv := NewEnvironment(v.currentEnv)
+			v.currentEnv = newEnv
+
+			for _, instruccion := range ctx.AllInstrucciones() {
+				dato := v.Visit(instruccion)
+				if str, ok := dato.(string); ok && str == "break" {
+					break
+				}
+			}
+			v.currentEnv = newEnv.Parent
+			return nil
+		}
+	} else {
+		v.Salida += fmt.Sprintf("Error semántico: al evaluar la condición del case, los tipos no son compatibles. Linea: %d, Columna: %d\n", ctx.GetStart().GetLine(), ctx.GetStart().GetColumn())
+		return nil // Or propagate an error
+	}
+
+	if ctx.Cases() != nil { // Check if there are more cases or a default
+		v.Visit(ctx.Cases())
+	}
+
+	return nil
+}
+
+// Produccion default
+func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{} {
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	for _, instruccion := range ctx.AllInstrucciones() {
+		v.Visit(instruccion)
+	}
+
+	v.currentEnv = newEnv.Parent
+
+	return nil
 }

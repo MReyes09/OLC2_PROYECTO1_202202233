@@ -1,9 +1,9 @@
 package compile
 
 import (
+	"OLC2CLIENTE/compile/expresiones/operaciones"
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -16,6 +16,7 @@ type CompilerVisitor struct {
 	*gramAntlr.BasegramaticaVisitor        // composición, como si heredara
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
+	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
 }
 
 // Constructor opcional
@@ -26,6 +27,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
+	v.operacionesVisitor = operaciones.NewOperacionesVisitor(&v.Salida, v.Visit)
 	return v
 }
 
@@ -132,75 +134,12 @@ func (v *CompilerVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{
 // ------------------------------ OPERADORES ARITMÉTICOS -----------------------------
 // VisitNegate
 func (v *CompilerVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} {
-	value := v.Visit(ctx.Expr())
-
-	if intVal, ok := value.(int); ok {
-		return -intVal
-	}
-
-	if floatVal, ok := value.(float64); ok {
-		return -floatVal
-	}
-
-	v.Salida += "Error: solo se pueden negar números"
-	return nil
+	return v.operacionesVisitor.VisitNegate(ctx)
 }
 
 // VisitMulDivModulo
 func (v *CompilerVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) interface{} {
-	left := v.Visit(ctx.Expr(0))
-	right := v.Visit(ctx.Expr(1))
-	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-
-	// Validación de tipos
-	_, leftIsInt := left.(int)
-	_, leftIsFloat := left.(float64)
-	_, rightIsInt := right.(int)
-	_, rightIsFloat := right.(float64)
-
-	if !(leftIsInt || leftIsFloat) || !(rightIsInt || rightIsFloat) {
-		v.Salida += fmt.Sprintf("Error semántico: no se pueden operar '%s' y '%s' con el operador '%s'.",
-			fmt.Sprintf("%v", left), fmt.Sprintf("%v", right), op)
-		return nil
-	}
-
-	// Si ambos son enteros
-	if l, ok := left.(int); ok {
-		r := right.(int)
-		switch op {
-		case "*":
-			return l * r
-		case "/":
-			if r == 0 {
-				v.Salida += "Error: división por cero"
-				return nil
-			}
-			return l / r
-		case "%":
-			return l % r
-		}
-	}
-
-	// Si ambos son flotantes
-	if l, ok := left.(float64); ok {
-		r := right.(float64)
-		switch op {
-		case "*":
-			return l * r
-		case "/":
-			if r == 0 {
-				v.Salida += "Error: división por cero"
-				return nil
-			}
-			return l / r
-		default:
-			v.Salida += "Error: operador no válido para floats (solo * y / permitidos)"
-			return nil
-		}
-	}
-
-	v.Salida += "Error en operador multiplicativo"
-	return nil
+	return v.operacionesVisitor.VisitMulDivModulo(ctx)
 }
 
 // VisitAddSub
@@ -241,95 +180,22 @@ func (v *CompilerVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} 
 // ------------------------------- OPERADORES LOGICAS -----------------------------
 // VisitEqualsNotEquals
 func (v *CompilerVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsContext) interface{} {
-	left := v.Visit(ctx.Expr(0))
-	right := v.Visit(ctx.Expr(1))
-	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-
-	switch op {
-	case "==":
-		return left == right
-	case "!=":
-		return left != right
-	default:
-		v.Salida += "Operador de comparación desconocido: " + op
-		return nil
-	}
+	return v.operacionesVisitor.VisitEqualsNotEquals(ctx)
 }
 
 // VisitMinorMajorEqual
 func (v *CompilerVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqualContext) interface{} {
-	left := v.Visit(ctx.Expr(0))
-	right := v.Visit(ctx.Expr(1))
-	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-
-	switch l := left.(type) {
-	case int:
-		r := right.(int)
-		switch op {
-		case "<":
-			return l < r
-		case "<=":
-			return l <= r
-		case ">":
-			return l > r
-		case ">=":
-			return l >= r
-		}
-	case float64:
-		r := right.(float64)
-		switch op {
-		case "<":
-			return l < r
-		case "<=":
-			return l <= r
-		case ">":
-			return l > r
-		case ">=":
-			return l >= r
-		}
-	default:
-		v.Salida += fmt.Sprintf("Error: comparación no soportada entre %T y %T", left, right)
-		return nil
-	}
-
-	v.Salida += "Operador de comparación no reconocido: " + op
-	return nil
+	return v.operacionesVisitor.VisitMinorMajorEqual(ctx)
 }
 
 // VisitLogical
 func (v *CompilerVisitor) VisitLogical(ctx *gramAntlr.LogicalContext) interface{} {
-	left := v.Visit(ctx.Expr(0))
-	right := v.Visit(ctx.Expr(1))
-	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-
-	lBool, lok := left.(bool)
-	rBool, rok := right.(bool)
-
-	if !lok || !rok {
-		v.Salida += fmt.Sprintf("Error: operación lógica %s requiere booleanos", op)
-		return nil
-	}
-
-	switch op {
-	case "&&":
-		return lBool && rBool
-	case "||":
-		return lBool || rBool
-	default:
-		v.Salida += "Operador lógico no reconocido: " + op
-		return nil
-	}
+	return v.operacionesVisitor.VisitLogical(ctx)
 }
 
 // VisitNot
 func (v *CompilerVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
-	val := v.Visit(ctx.Expr())
-	boolVal, ok := val.(bool)
-	if !ok {
-		v.Salida += "Error: operador ! requiere un valor booleano"
-		return nil
-	}
-	return !boolVal
+	return v.operacionesVisitor.VisitNot(ctx)
 }
 
 // ------------------------------- FIN OPERADORES LOGICOS -----------------------------

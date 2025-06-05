@@ -302,6 +302,153 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	return nil
 }
 
+func (v *CompilerVisitor) VisitIfStmt(ctx *gramAntlr.IfStmtContext) interface{} {
+	// ctx.SIf() accede al nodo 'sIf' dentro de la instrucción 'if'.
+	// Al visitarlo, ANTLR llamará al método correcto: VisitIfOnly o VisitIfAnidado.
+	return v.Visit(ctx.SIf())
+}
+// ------------
+// VisitIfStmt actúa como un puente para las reglas anidadas de 'sIf'.
+
+// -------------------- Produccion IF ELSE --------------------
+	fmt.Println("ENTRE EN VISIT IF ONLY")
+
+func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} {
+	// Evaluar la condición
+	value := v.Visit(ctx.Expr())
+	if value == nil {
+		return nil
+	}
+		v.Salida += "Error semántico: condición del if es nil\n"
+	if !ok {
+	cond, ok := value.(bool)
+		return nil
+		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
+	}
+
+	if cond {
+	// Si la condición es verdadera, ejecutar el bloque[0]
+		// Nuevo entorno anidado
+		v.currentEnv = newEnv
+		newEnv := NewEnvironment(v.currentEnv)
+
+		result := v.Visit(ctx.Block(0))
+		// Visitar el bloque del 'if'
+
+		v.currentEnv = v.currentEnv.Parent
+		// Restaurar el entorno
+
+		// Propagar break / continue / return void
+		if str, ok := result.(string); ok {
+			}
+			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
+				return str
+		}
+		// Si fue una expresión con valor, devolverla
+		if result != nil {
+		}
+			return result
+		// Si hay un bloque 'else' (ctx.Block() retorna []IBlockContext)
+	} else {
+		blocks := ctx.AllBlock()
+		if len(blocks) > 1 {
+			// Visitar el bloque del 'else'
+			if str, ok := result.(string); ok {
+			result := v.Visit(blocks[1])
+				if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
+					return str
+			}
+				}
+			if result != nil {
+				return result
+		}
+			}
+	}
+	fmt.Println("SALI NIL EN VISIT IF ONLY")
+
+	return nil
+}
+
+func (v *CompilerVisitor) VisitIfAnidado(ctx *gramAntlr.IfAnidadoContext) interface{} {
+// -------------------- Produccion IF ELSE IF --------------------
+	// Evaluar la condición
+	value := v.Visit(ctx.Expr())
+	cond, ok := value.(bool)
+		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
+	if !ok {
+		return nil
+
+	}
+		// Nuevo entorno anidado
+	if cond {
+		newEnv := NewEnvironment(v.currentEnv)
+		// Visitar el bloque del 'if'
+
+		v.currentEnv = newEnv
+		result := v.Visit(ctx.Block())
+
+		// Restaurar el entorno
+		v.currentEnv = v.currentEnv.Parent
+
+		// Propagar break / continue / return void
+			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
+		if str, ok := result.(string); ok {
+				return str
+			}
+		}
+		if result != nil {
+		}
+			return result
+	} else {
+		// Si la condición es falsa, ejecutar el 'else if' en ctx.SIf()
+		result := v.Visit(ctx.SIf())
+			if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
+		if str, ok := result.(string); ok {
+				return str
+			}
+		}
+		if result != nil {
+			return result
+		}
+	}
+
+	return nil
+}
+
+// -------------------- VisitBreakStmt --------------------
+func (v *CompilerVisitor) VisitBreakStmt(ctx *gramAntlr.BreakStmtContext) interface{} {
+	return "break"
+}
+
+// -------------------- VisitContinue --------------------
+	return "continue"
+func (v *CompilerVisitor) VisitContinue(ctx *gramAntlr.ContinueContext) interface{} {
+}
+// -------------------- VisitBlockStmt --------------------
+
+	for _, instrCtx := range ctx.AllInstrucciones() {
+func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interface{} {
+		value := v.Visit(instrCtx)
+		// Solo propagar control de flujo especial
+			if str == "break" || str == "continue" {
+		if str, ok := value.(string); ok {
+				return str
+			}
+		}
+	}
+	return nil
+}
+func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
+
+	id := ctx.ID_VARIABLE().GetText()
+	sym, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	return sym.Value
+}
 // --------------------------------- ASIGNACIONES --------------------------------------
 func (v *CompilerVisitor) VisitAsignacionVar(ctx *gramAntlr.VarExprContext) interface{} {
 	return v.asignacionesVisitor.VisitVarExpr(ctx)

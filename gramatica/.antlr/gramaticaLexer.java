@@ -1,4 +1,4 @@
-// Generated from /home/mati/Escritorio/OLC2Vacas/OLC2P1/gramatica/gramatica.g4 by ANTLR 4.13.1
+// Generated from /home/mati/Escritorio/OLC2Vacas/OLC2_PROYECTO1_202202233/gramatica/gramatica.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

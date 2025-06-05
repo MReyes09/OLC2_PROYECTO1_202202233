@@ -1,6 +1,7 @@
 package compile
 
 import (
+	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
 	"strconv"
@@ -14,14 +15,18 @@ import (
 type CompilerVisitor struct {
 	*gramAntlr.BasegramaticaVisitor        // composición, como si heredara
 	Salida                          string // lo que quieras almacenar
+	printVisitor                    *print.PrintVisitor
 }
 
 // Constructor opcional
 func NewCompilerVisitor() *CompilerVisitor {
-	return &CompilerVisitor{
+	v := &CompilerVisitor{
 		BasegramaticaVisitor: &gramAntlr.BasegramaticaVisitor{},
 		Salida:               "",
 	}
+	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
+	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
+	return v
 }
 
 func (v *CompilerVisitor) Visit(tree antlr.ParseTree) interface{} {
@@ -43,26 +48,11 @@ func (v *CompilerVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interf
 }
 
 func (v *CompilerVisitor) VisitPrint(ctx *gramAntlr.PrintContext) interface{} {
-	for _, expr := range ctx.AllExpr() {
-		value := v.Visit(expr)
-		if value == nil {
-			continue
-		}
-		v.Salida += fmt.Sprintf("%v ", value) // Agrega un espacio entre valores
-	}
-	return nil
+	return v.printVisitor.VisitPrint(ctx)
 }
 
 func (v *CompilerVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{} {
-	for _, expr := range ctx.AllExpr() {
-		value := v.Visit(expr)
-		if value == nil {
-			continue
-		}
-		v.Salida += fmt.Sprintf("%v ", value) // Agrega un espacio entre valores
-	}
-	v.Salida += "\n" // Añade un salto de línea al final
-	return nil
+	return v.printVisitor.VisitPrintln(ctx)
 }
 
 // ----------------------------- Final de print -----------------------------
@@ -156,6 +146,7 @@ func (v *CompilerVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} 
 	return nil
 }
 
+// VisitMulDivModulo
 func (v *CompilerVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) interface{} {
 	left := v.Visit(ctx.Expr(0))
 	right := v.Visit(ctx.Expr(1))

@@ -144,35 +144,7 @@ func (v *CompilerVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) 
 
 // VisitAddSub
 func (v *CompilerVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} {
-	left := v.Visit(ctx.Expr(0))
-	right := v.Visit(ctx.Expr(1))
-	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-
-	switch l := left.(type) {
-	case int:
-		r := right.(int)
-		switch op {
-		case "+":
-			return l + r
-		case "-":
-			return l - r
-		}
-	case float64:
-		r := right.(float64)
-		switch op {
-		case "+":
-			return l + r
-		case "-":
-			return l - r
-		}
-	case string:
-		if r, ok := right.(string); ok && op == "+" {
-			return l + r
-		}
-	}
-
-	v.Salida += "Error en operador aritmetic"
-	return nil
+	return v.operacionesVisitor.VisitAddSub(ctx)
 }
 
 // ------------------------------ FIN DE EXPR ARITMÉTICAS -----------------------------

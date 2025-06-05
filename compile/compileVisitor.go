@@ -1,6 +1,7 @@
 package compile
 
 import (
+	"OLC2CLIENTE/compile/expresiones/asignaciones"
 	"OLC2CLIENTE/compile/expresiones/operaciones"
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
@@ -17,7 +18,8 @@ type CompilerVisitor struct {
 	*gramAntlr.BasegramaticaVisitor        // composición, como si heredara
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
-	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
+	operacionesVisitor              *operaciones.OperacionesVisitor   // Visitor para operaciones aritméticas
+	asignacionesVisitor             *asignaciones.AsignacionesVisitor // Visitor para asignaciones
 	currentEnv                      *Environment
 }
 
@@ -31,6 +33,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
 	v.operacionesVisitor = operaciones.NewOperacionesVisitor(&v.Salida, v.Visit)
+	v.asignacionesVisitor = asignaciones.NewAsignacionesVisitor(&v.Salida, v.Visit)
 	return v
 }
 
@@ -298,6 +301,13 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	v.currentEnv.SetVariable(id, value, symbolType, true, true, ctx.GetStart())
 	return nil
 }
+
+// --------------------------------- ASIGNACIONES --------------------------------------
+func (v *CompilerVisitor) VisitAsignacionVar(ctx *gramAntlr.VarExprContext) interface{} {
+	return v.asignacionesVisitor.VisitVarExpr(ctx)
+}
+
+// ---------------------------- FIN DE EXPRESIONES ------------------------------
 
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 

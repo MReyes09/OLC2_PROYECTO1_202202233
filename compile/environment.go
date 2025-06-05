@@ -72,16 +72,29 @@ func (e *Environment) GetVariable(id string) (*Symbol, error) {
 	return nil, errors.New("variable " + id + " not found")
 }
 
-func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) {
-	if _, ok := e.Variables[id]; ok {
-		e.Variables[id].Value = value
+func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) error {
+	fmt.Println("entrando a setVariable")
+	// Caso 1: Es una reasignación
+	if sym, ok := e.Variables[id]; ok {
+		sym.Value = value
 		e.tableSymbol = append(e.tableSymbol, &SymbolTableEntry{
 			ID:     id,
 			Symbol: NewSymbol(value, typ, mutable),
 			Line:   token.GetLine(),
 			Col:    token.GetColumn(),
 		})
-	} else if !ok && declaracion {
+		return nil // Sin error
+	}
+
+	// Caso 2: Es una declaración
+	if declaracion {
+		// Verificar si ya existe en cualquier scope superior
+		if e.ExistsVariable(id) {
+			fmt.Println("cannot redeclare variable '" + id + "'")
+			return errors.New("cannot redeclare variable '" + id + "'")
+		}
+
+		// Si no existe, declaramos en este entorno
 		e.Variables[id] = NewSymbol(value, typ, mutable)
 		e.tableSymbol = append(e.tableSymbol, &SymbolTableEntry{
 			ID:     id,
@@ -89,11 +102,20 @@ func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, 
 			Line:   token.GetLine(),
 			Col:    token.GetColumn(),
 		})
-	} else if e.Parent != nil {
-		if _, err := e.Parent.GetVariable(id); err == nil {
-			e.Parent.SetVariable(id, value, typ, mutable, false, token)
-		}
+		return nil
 	}
+
+	// Caso 3: No es reasignación ni declaración, buscar en el padre
+	if e.Parent != nil {
+		_, err := e.Parent.GetVariable(id)
+		if err == nil {
+			return e.Parent.SetVariable(id, value, typ, mutable, false, token)
+		}
+		return err
+	}
+
+	// Si llegamos aquí, la variable no existe y no hay padre
+	return errors.New("variable " + id + " not found and cannot be assigned without declaration")
 }
 
 func (e *Environment) SetFunciones(id string, parametros []*TupleStringSymbol, body interface{}, typeRet SymbolType, token antlr.Token) {
@@ -112,6 +134,24 @@ func (e *Environment) GetFuncion(id string) (*MiFunct, error) {
 		return e.Parent.GetFuncion(id)
 	}
 	return nil, errors.New("function " + id + " not found")
+}
+
+// --------------------------------------------------------
+func (e *Environment) ExistsVariable(id string) bool {
+	// Verificar en el entorno actual
+	if _, ok := e.Variables[id]; ok {
+		fmt.Println("Si existe: " + id)
+		return true
+	}
+
+	// Si hay un entorno padre, buscar allí recursivamente
+	if e.Parent != nil {
+		return e.Parent.ExistsVariable(id)
+	}
+
+	// Si no se encontró en ningún lado
+	fmt.Println("No existe: " + id)
+	return false
 }
 
 // ----------------------------------------------------

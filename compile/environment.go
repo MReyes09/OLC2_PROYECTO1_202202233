@@ -97,13 +97,16 @@ func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, 
 	// Caso 1: Es una reasignación
 	if sym, ok := e.Variables[id]; ok {
 		sym.Value = value
-		e.tableSymbol = append(e.tableSymbol, &SymbolTableEntry{
-			ID:     id,
-			Symbol: NewSymbol(value, typ, mutable),
-			Line:   token.GetLine(),
-			Col:    token.GetColumn(),
-		})
-		return nil // Sin error
+		// Actualiza la entrada en la tabla si ya existe
+		for _, entry := range e.tableSymbol {
+			if entry.ID == id {
+				entry.Symbol = NewSymbol(value, typ, mutable)
+				entry.Line = token.GetLine()
+				entry.Col = token.GetColumn()
+				return nil
+			}
+		}
+		return errors.New("variable " + id + " no existe y no puede ser reasignada sin declaración")
 	}
 
 	// Caso 3: No es reasignación ni declaración, buscar en el padre
@@ -174,7 +177,7 @@ func (e *Environment) ImprimirScope() string {
 			"ID: %-10s | Valor: %-15s | Tipo: %-10s | Línea: %d | Columna: %d\n",
 			entry.ID,
 			valueStr,
-			symbolTypeToString(entry.Symbol.Type),
+			SymbolTypeToString(entry.Symbol.Type),
 			entry.Line,
 			entry.Col,
 		))
@@ -183,7 +186,7 @@ func (e *Environment) ImprimirScope() string {
 }
 
 // symbolTypeToString convierte un SymbolType a una cadena legible
-func symbolTypeToString(t SymbolType) string {
+func SymbolTypeToString(t SymbolType) string {
 	switch t {
 	case INT:
 		return "int"

@@ -455,6 +455,7 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 
 		// Visitar el bloque del 'if'
 		result := v.Visit(ctx.Block(0))
+		fmt.Println("RESULTADO DEL IF:", result)
 
 		// Restaurar el entorno
 		v.currentEnv = v.currentEnv.Parent
@@ -542,7 +543,7 @@ func (v *CompilerVisitor) VisitBreakStmt(ctx *gramAntlr.BreakStmtContext) interf
 }
 
 // -------------------- VisitContinue --------------------
-func (v *CompilerVisitor) VisitContinue(ctx *gramAntlr.ContinueContext) interface{} {
+func (v *CompilerVisitor) VisitContinueStmt(ctx *gramAntlr.ContinueStmtContext) interface{} {
 	return "continue"
 }
 
@@ -629,12 +630,12 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 	for condBool {
 		// Ejecutar bloque del for
 		result := v.Visit(ctx.Block())
+		fmt.Println("Resultado del bloque del for:", result)
 
 		if str, ok := result.(string); ok {
-			switch str {
-			case "break":
+			if str == "break" {
 				break
-			case "continue":
+			} else if str == "continue" {
 				// Evaluar la asignación y la nueva condición
 				v.Visit(ctx.VarAsign())
 				condition = v.Visit(ctx.Expr())
@@ -642,9 +643,9 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
 				}
 				continue
-			case "Excepcion___Return_Void":
+			} else if str == "Excepcion___Return_Void" {
 				return str
-			default:
+			} else {
 				return str
 			}
 		}

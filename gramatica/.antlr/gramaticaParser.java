@@ -1,4 +1,4 @@
-// Generated from /home/mati/Escritorio/OLC2Vacas/OLC2_PROYECTO1_202202233/gramatica/gramatica.g4 by ANTLR 4.13.1
+// Generated from /home/myubuntu/Desktop/Compi2/OLC2_PROYECTO1_202202233/gramatica/gramatica.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -132,6 +132,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_inicio; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterInicio(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitInicio(this);
+		}
 	}
 
 	public final InicioContext inicio() throws RecognitionException {
@@ -189,6 +197,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(InstruccionesContext.class,i);
 		}
 		public SeccionInstruccionContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSeccionInstruccion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSeccionInstruccion(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CallFunctionStmtContext extends InstruccionesContext {
@@ -196,6 +212,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarCallStatementContext.class,0);
 		}
 		public CallFunctionStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunctionStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunctionStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PrintStmtContext extends InstruccionesContext {
@@ -203,6 +227,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ImprimirContext.class,0);
 		}
 		public PrintStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterPrintStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitPrintStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarStructDclStmtContext extends InstruccionesContext {
@@ -210,6 +242,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarStructDclContext.class,0);
 		}
 		public VarStructDclStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarStructDclStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarStructDclStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AsignStmtContext extends InstruccionesContext {
@@ -217,6 +257,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarAsignContext.class,0);
 		}
 		public AsignStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterAsignStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitAsignStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CallFunctionStructStmtContext extends InstruccionesContext {
@@ -224,6 +272,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarCallFuncStructContext.class,0);
 		}
 		public CallFunctionStructStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunctionStructStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunctionStructStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ContinueStmtContext extends InstruccionesContext {
@@ -231,6 +287,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ContinueContext.class,0);
 		}
 		public ContinueStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterContinueStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitContinueStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarDeclStructStmtContext extends InstruccionesContext {
@@ -238,6 +302,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarDclStructContext.class,0);
 		}
 		public VarDeclStructStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDeclStructStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDeclStructStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IfStmtContext extends InstruccionesContext {
@@ -245,6 +317,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(SIfContext.class,0);
 		}
 		public IfStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterIfStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitIfStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FunctionStmtContext extends InstruccionesContext {
@@ -252,6 +332,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(FunctionsContext.class,0);
 		}
 		public FunctionStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterFunctionStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitFunctionStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FunctionStructStmtContext extends InstruccionesContext {
@@ -259,6 +347,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(FunctionStructContext.class,0);
 		}
 		public FunctionStructStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterFunctionStructStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitFunctionStructStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarDeclSliceStmtContext extends InstruccionesContext {
@@ -266,6 +362,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarDclSliceContext.class,0);
 		}
 		public VarDeclSliceStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDeclSliceStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDeclSliceStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarDeclStmtContext extends InstruccionesContext {
@@ -273,6 +377,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarDclContext.class,0);
 		}
 		public VarDeclStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDeclStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDeclStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class BreakStmtContext extends InstruccionesContext {
@@ -280,6 +392,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(BreakContext.class,0);
 		}
 		public BreakStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterBreakStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitBreakStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class SwitchInstruccionContext extends InstruccionesContext {
@@ -287,6 +407,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(SSwitchContext.class,0);
 		}
 		public SwitchInstruccionContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSwitchInstruccion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSwitchInstruccion(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ForStmtContext extends InstruccionesContext {
@@ -294,6 +422,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(SForContext.class,0);
 		}
 		public ForStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterForStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitForStmt(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ReturnStmtContext extends InstruccionesContext {
@@ -301,6 +437,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(RetornoContext.class,0);
 		}
 		public ReturnStmtContext(InstruccionesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterReturnStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitReturnStmt(this);
+		}
 	}
 
 	public final InstruccionesContext instrucciones() throws RecognitionException {
@@ -497,6 +641,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public PrintContext(ImprimirContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterPrint(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitPrint(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PrintlnContext extends ImprimirContext {
@@ -507,6 +659,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public PrintlnContext(ImprimirContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterPrintln(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitPrintln(this);
+		}
 	}
 
 	public final ImprimirContext imprimir() throws RecognitionException {
@@ -648,6 +808,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(SIfContext.class,0);
 		}
 		public IfAnidadoContext(SIfContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterIfAnidado(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitIfAnidado(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IfOnlyContext extends SIfContext {
@@ -661,6 +829,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(BlockContext.class,i);
 		}
 		public IfOnlyContext(SIfContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterIfOnly(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitIfOnly(this);
+		}
 	}
 
 	public final SIfContext sIf() throws RecognitionException {
@@ -745,6 +921,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(CasesContext.class,0);
 		}
 		public SwitchStmtContext(SSwitchContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSwitchStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSwitchStmt(this);
+		}
 	}
 
 	public final SSwitchContext sSwitch() throws RecognitionException {
@@ -798,6 +982,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(InstruccionesContext.class,i);
 		}
 		public DefaultContext(CasesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterDefault(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitDefault(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CaseContext extends CasesContext {
@@ -814,6 +1006,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(CasesContext.class,0);
 		}
 		public CaseContext(CasesContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCase(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCase(this);
+		}
 	}
 
 	public final CasesContext cases() throws RecognitionException {
@@ -918,6 +1118,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(InstruccionesContext.class,i);
 		}
 		public BlockStmtContext(BlockContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterBlockStmt(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitBlockStmt(this);
+		}
 	}
 
 	public final BlockContext block() throws RecognitionException {
@@ -980,6 +1188,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(BlockContext.class,0);
 		}
 		public ForCondicionContext(SForContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterForCondicion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitForCondicion(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ForRangeContext extends SForContext {
@@ -991,6 +1207,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(BlockContext.class,0);
 		}
 		public ForRangeContext(SForContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterForRange(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitForRange(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ForAsignacionContext extends SForContext {
@@ -1007,6 +1231,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(BlockContext.class,0);
 		}
 		public ForAsignacionContext(SForContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterForAsignacion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitForAsignacion(this);
+		}
 	}
 
 	public final SForContext sFor() throws RecognitionException {
@@ -1105,6 +1337,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public VarDclWithTypeAndValueContext(VarDclContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDclWithTypeAndValue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDclWithTypeAndValue(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarDclWithInferenceContext extends VarDclContext {
@@ -1113,6 +1353,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public VarDclWithInferenceContext(VarDclContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDclWithInference(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDclWithInference(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarDclWithTypeOnlyContext extends VarDclContext {
@@ -1121,6 +1369,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(TypeContext.class,0);
 		}
 		public VarDclWithTypeOnlyContext(VarDclContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarDclWithTypeOnly(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarDclWithTypeOnly(this);
+		}
 	}
 
 	public final VarDclContext varDcl() throws RecognitionException {
@@ -1216,6 +1472,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(NuevoSliceContext.class,i);
 		}
 		public SliceValoresContext(VarDclSliceContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSliceValores(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSliceValores(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class SliceVacioContext extends VarDclSliceContext {
@@ -1230,6 +1494,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(NuevoSliceContext.class,i);
 		}
 		public SliceVacioContext(VarDclSliceContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSliceVacio(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSliceVacio(this);
+		}
 	}
 
 	public final VarDclSliceContext varDclSlice() throws RecognitionException {
@@ -1319,6 +1591,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assign; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterAssign(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitAssign(this);
+		}
 	}
 
 	public final AssignContext assign() throws RecognitionException {
@@ -1357,6 +1637,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_nuevoSlice; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterNuevoSlice(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitNuevoSlice(this);
+		}
 	}
 
 	public final NuevoSliceContext nuevoSlice() throws RecognitionException {
@@ -1401,6 +1689,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ContenidoSliceContext.class,i);
 		}
 		public SliceContenidoSliceContext(ContenidoSliceContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSliceContenidoSlice(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSliceContenidoSlice(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class SliceContenidoContext extends ContenidoSliceContext {
@@ -1411,6 +1707,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public SliceContenidoContext(ContenidoSliceContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterSliceContenido(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitSliceContenido(this);
+		}
 	}
 
 	public final ContenidoSliceContext contenidoSlice() throws RecognitionException {
@@ -1541,6 +1845,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(TypeContext.class,i);
 		}
 		public DeclStructDataContext(VarDclStructContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterDeclStructData(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitDeclStructData(this);
+		}
 	}
 
 	public final VarDclStructContext varDclStruct() throws RecognitionException {
@@ -1651,6 +1963,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public StructVarTypeContext(VarStructDclContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterStructVarType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitStructVarType(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StructVarTypeInferenceContext extends VarStructDclContext {
@@ -1665,6 +1985,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public StructVarTypeInferenceContext(VarStructDclContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterStructVarTypeInference(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitStructVarTypeInference(this);
+		}
 	}
 
 	public final VarStructDclContext varStructDcl() throws RecognitionException {
@@ -1797,6 +2125,14 @@ public class gramaticaParser extends Parser {
 		public Token op;
 		public TerminalNode ID_VARIABLE() { return getToken(gramaticaParser.ID_VARIABLE, 0); }
 		public VarIncContext(VarAsignContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarInc(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarInc(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarExprContext extends VarAsignContext {
@@ -1805,6 +2141,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public VarExprContext(VarAsignContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayAccessContext extends VarAsignContext {
@@ -1816,6 +2160,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public ArrayAccessContext(VarAsignContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayAccess(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayAccess(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StructAccessAsignContext extends VarAsignContext {
@@ -1827,6 +2179,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public StructAccessAsignContext(VarAsignContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterStructAccessAsign(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitStructAccessAsign(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VarAddContext extends VarAsignContext {
@@ -1836,6 +2196,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public VarAddContext(VarAsignContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterVarAdd(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitVarAdd(this);
+		}
 	}
 
 	public final VarAsignContext varAsign() throws RecognitionException {
@@ -1987,6 +2355,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ParensContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterParens(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitParens(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CallFunctionValueContext extends ExprContext {
@@ -1994,6 +2370,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarCallStatementContext.class,0);
 		}
 		public CallFunctionValueContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunctionValue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunctionValue(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class LogicalContext extends ExprContext {
@@ -2005,11 +2389,27 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public LogicalContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterLogical(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitLogical(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StringContext extends ExprContext {
 		public TerminalNode STRING() { return getToken(gramaticaParser.STRING, 0); }
 		public StringContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterString(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitString(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StructAccessContext extends ExprContext {
@@ -2018,21 +2418,53 @@ public class gramaticaParser extends Parser {
 			return getToken(gramaticaParser.ID_VARIABLE, i);
 		}
 		public StructAccessContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterStructAccess(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitStructAccess(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IdentifierContext extends ExprContext {
 		public TerminalNode ID_VARIABLE() { return getToken(gramaticaParser.ID_VARIABLE, 0); }
 		public IdentifierContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterIdentifier(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitIdentifier(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CharContext extends ExprContext {
 		public TerminalNode CHAR() { return getToken(gramaticaParser.CHAR, 0); }
 		public CharContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterChar(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitChar(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class BooleanContext extends ExprContext {
 		public TerminalNode BOOL() { return getToken(gramaticaParser.BOOL, 0); }
 		public BooleanContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterBoolean(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitBoolean(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CallFunctionStructValueContext extends ExprContext {
@@ -2040,6 +2472,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(VarCallFuncStructContext.class,0);
 		}
 		public CallFunctionStructValueContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunctionStructValue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunctionStructValue(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayFindIndexContext extends ExprContext {
@@ -2048,6 +2488,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ArrayFindIndexContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayFindIndex(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayFindIndex(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayAppendContext extends ExprContext {
@@ -2056,6 +2504,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ArrayAppendContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayAppend(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayAppend(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class EqualsNotEqualsContext extends ExprContext {
@@ -2067,6 +2523,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public EqualsNotEqualsContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterEqualsNotEquals(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitEqualsNotEquals(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IntToStringContext extends ExprContext {
@@ -2074,6 +2538,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public IntToStringContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterIntToString(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitIntToString(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AddSubContext extends ExprContext {
@@ -2085,6 +2557,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public AddSubContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterAddSub(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitAddSub(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayAccessSimpleContext extends ExprContext {
@@ -2096,6 +2576,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public ArrayAccessSimpleContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayAccessSimple(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayAccessSimple(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayLengthContext extends ExprContext {
@@ -2107,6 +2595,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(PosicionContext.class,i);
 		}
 		public ArrayLengthContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayLength(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayLength(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MulDivModuloContext extends ExprContext {
@@ -2118,20 +2614,52 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public MulDivModuloContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterMulDivModulo(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitMulDivModulo(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DoubleContext extends ExprContext {
 		public TerminalNode DOUBLE() { return getToken(gramaticaParser.DOUBLE, 0); }
 		public DoubleContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterDouble(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitDouble(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IntegerContext extends ExprContext {
 		public TerminalNode INT() { return getToken(gramaticaParser.INT, 0); }
 		public IntegerContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterInteger(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitInteger(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NilContext extends ExprContext {
 		public NilContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterNil(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitNil(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MinorMajorEqualContext extends ExprContext {
@@ -2143,6 +2671,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public MinorMajorEqualContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterMinorMajorEqual(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitMinorMajorEqual(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NotContext extends ExprContext {
@@ -2150,6 +2686,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public NotContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterNot(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitNot(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ReflectTypeContext extends ExprContext {
@@ -2157,6 +2701,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ReflectTypeContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterReflectType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitReflectType(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NegateContext extends ExprContext {
@@ -2164,6 +2716,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public NegateContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterNegate(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitNegate(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayJoinContext extends ExprContext {
@@ -2172,6 +2732,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ArrayJoinContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterArrayJoin(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitArrayJoin(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FloatToStringContext extends ExprContext {
@@ -2179,6 +2747,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public FloatToStringContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterFloatToString(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitFloatToString(this);
+		}
 	}
 
 	public final ExprContext expr() throws RecognitionException {
@@ -2655,6 +3231,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_posicion; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterPosicion(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitPosicion(this);
+		}
 	}
 
 	public final PosicionContext posicion() throws RecognitionException {
@@ -2689,6 +3273,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitType(this);
+		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
@@ -2727,6 +3319,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_break; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterBreak(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitBreak(this);
+		}
 	}
 
 	public final BreakContext break_() throws RecognitionException {
@@ -2767,6 +3367,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_continue; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterContinue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitContinue(this);
+		}
 	}
 
 	public final ContinueContext continue_() throws RecognitionException {
@@ -2832,6 +3440,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ValRetContext.class,0);
 		}
 		public FuncionesContext(FunctionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterFunciones(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitFunciones(this);
+		}
 	}
 
 	public final FunctionsContext functions() throws RecognitionException {
@@ -2933,6 +3549,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ValRetContext.class,0);
 		}
 		public FuncionesStructsNativasContext(FunctionStructContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterFuncionesStructsNativas(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitFuncionesStructsNativas(this);
+		}
 	}
 
 	public final FunctionStructContext functionStruct() throws RecognitionException {
@@ -3010,6 +3634,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_defParams; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterDefParams(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitDefParams(this);
+		}
 	}
 
 	public final DefParamsContext defParams() throws RecognitionException {
@@ -3076,6 +3708,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public CallFunctionContext(VarCallStatementContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunction(this);
+		}
 	}
 
 	public final VarCallStatementContext varCallStatement() throws RecognitionException {
@@ -3166,6 +3806,14 @@ public class gramaticaParser extends Parser {
 			return getRuleContext(ExprContext.class,i);
 		}
 		public CallFunctionStructContext(VarCallFuncStructContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterCallFunctionStruct(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitCallFunctionStruct(this);
+		}
 	}
 
 	public final VarCallFuncStructContext varCallFuncStruct() throws RecognitionException {
@@ -3244,6 +3892,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_valRet; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterValRet(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitValRet(this);
+		}
 	}
 
 	public final ValRetContext valRet() throws RecognitionException {
@@ -3276,6 +3932,14 @@ public class gramaticaParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_retorno; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).enterRetorno(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof gramaticaListener ) ((gramaticaListener)listener).exitRetorno(this);
+		}
 	}
 
 	public final RetornoContext retorno() throws RecognitionException {

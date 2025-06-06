@@ -1,6 +1,7 @@
 package compile
 
 import (
+	"OLC2CLIENTE/compile/expresiones/nativas"
 	"OLC2CLIENTE/compile/expresiones/operaciones"
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
@@ -18,6 +19,7 @@ type CompilerVisitor struct {
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
 	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
+	funcionesNativasVisitor         *nativas.NativasVisitor         // Visitor para funciones nativas
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
 }
@@ -32,6 +34,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
 	v.operacionesVisitor = operaciones.NewOperacionesVisitor(&v.Salida, v.Visit)
+	v.funcionesNativasVisitor = nativas.NewNativasVisitor(&v.Salida, v.Visit)
 	return v
 }
 
@@ -722,6 +725,22 @@ func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{
 	v.currentEnv = newEnv.Parent
 
 	return nil
+}
+
+// ---------------------------- FUNCIONES NATIVAS -----------------------------
+// VisitIntToString
+func (v *CompilerVisitor) VisitIntToString(ctx *gramAntlr.IntToStringContext) interface{} {
+	return v.funcionesNativasVisitor.VisitIntToString(ctx)
+}
+
+// VisitfloatToString
+func (v *CompilerVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext) interface{} {
+	return v.funcionesNativasVisitor.VisitFloatToString(ctx)
+}
+
+// VisitReflectType
+func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
+	return v.funcionesNativasVisitor.VisitReflectType(ctx)
 }
 
 //----------------------------- FUNCIONES AUXILIARES -----------------------------

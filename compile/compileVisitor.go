@@ -268,16 +268,6 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
 
-	/*
-		// Manejar slices
-		if slice, ok := value.([]interface{}); ok {
-			dataType := getSliceType(slice)
-			symbolType, _ := parseSymbolType(dataType)
-			v.currentEnv.SetVariable(id, value, symbolType, true, true, ctx.GetStart())
-			return nil
-		}
-	*/
-
 	// Determinar tipo basado en valor
 	var symbolType SymbolType
 	switch value.(type) {
@@ -300,6 +290,71 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	return nil
 }
 
+// ------------------------------ DECLARACION SLICE ----------------------------------
+
+// VisitVarDeclSliceStmt - 'var' ID_VARIABLE slice '=' sliceValores ';'
+func (v *CompilerVisitor) VisitVarDeclSliceStmt(ctx *gramAntlr.VarDeclSliceStmtContext) interface{} {
+	return v.Visit(ctx.VarDclSlice())
+}
+
+// VisitSliceValores - 'ID_VARIABLE' ':' type '=' sliceValores
+func (v *CompilerVisitor) VisitSliceValores(ctx *gramAntlr.SliceValoresContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	typo, err := parseSymbolType(typeStr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		return nil
+	}
+
+	numDimensiones := 0
+	for range ctx.AllNuevoSlice() {
+		numDimensiones++
+	}
+
+	sliceFinal := v.Visit(ctx.ContenidoSlice())
+
+	v.currentEnv.SetVariable(id, sliceFinal, typo, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitSliceVacio - 'ID_VARIABLE' ':' type '=' sliceVacio
+func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	symbolType, err := parseSymbolType(typeStr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		return nil
+	}
+
+	v.currentEnv.SetVariable(id, make([]interface{}, 0), symbolType, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitSliceContenido - contenido de un slice con expresiones
+func (v *CompilerVisitor) VisitSliceContenido(ctx *gramAntlr.SliceContenidoContext) interface{} {
+	arrayTemp := []interface{}{}
+	for _, expr := range ctx.AllExpr() {
+		arrayTemp = append(arrayTemp, v.Visit(expr))
+	}
+	return arrayTemp
+}
+
+// VisitSliceContenidoSlice - contenido de un slice anidado
+func (v *CompilerVisitor) VisitSliceContenidoSlice(ctx *gramAntlr.SliceContenidoSliceContext) interface{} {
+	arrayTemp := []interface{}{}
+	for _, slice := range ctx.AllContenidoSlice() {
+		sliceValue := v.Visit(slice)
+		if sliceList, ok := sliceValue.([]interface{}); ok {
+			arrayTemp = append(arrayTemp, sliceList)
+		}
+	}
+	return arrayTemp
+}
+
 // ------------------------------ ASIGNACIONES --------------------------------------
 // VisitAsignStmt
 func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interface{} {
@@ -317,7 +372,7 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 	context_start := ctx.GetStart()
 
 	if value == nil {
-		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable, el valor es nulo.")
+		v.Salida += "Error-semántico: al asignar el valor a la variable, el valor es nulo."
 		return nil
 	}
 

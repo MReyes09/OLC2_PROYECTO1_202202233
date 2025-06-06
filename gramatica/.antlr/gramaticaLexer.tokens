@@ -82,10 +82,10 @@ COMENTARIOMULTILINEA=70
 ':'=12
 'default:'=13
 'for'=14
-':='=15
-'range'=16
-'mut'=17
-'='=18
+'in'=15
+'mut'=16
+'='=17
+':='=18
 'var'=19
 '[]'=20
 'type'=21

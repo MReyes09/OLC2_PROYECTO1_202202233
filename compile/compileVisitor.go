@@ -934,6 +934,49 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 	return nil
 }
 
+// VisitForRange
+func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interface{} {
+	sym, _ := v.currentEnv.GetVariable(ctx.ID_VARIABLE(2).GetText())
+
+	slice, err := sym.Value.([]interface{})
+	if !err {
+		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
+		return nil
+	}
+
+	index := ctx.ID_VARIABLE(0).GetText()
+	value := ctx.ID_VARIABLE(1).GetText()
+
+	v.currentEnv.SetVariable(index, 0, sym.Type, false, true, ctx.GetStart())         // Inicializar índice
+	v.currentEnv.SetVariable(value, nil, sym.Type, sym.Mutable, true, ctx.GetStart()) // Inicializar valor
+
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	for i, val := range slice {
+		v.currentEnv.SetVariable(index, i, INT, false, false, ctx.GetStart())
+		v.currentEnv.SetVariable(value, val, sym.Type, false, false, ctx.GetStart())
+
+		result := v.Visit(ctx.Block())
+
+		if resStr, ok := result.(string); ok {
+			if resStr == "break" {
+				break
+			} else if resStr == "continue" {
+				continue
+			} else if resStr == "Excepcion___Return_Void" {
+				return result
+			} else {
+				return result
+			}
+		}
+	}
+	// Restaurar el entorno anterior
+	v.currentEnv = newEnv.Parent
+
+	return nil
+}
+
 // ---------------------------------------------------- switch ----------------------------------------------------
 
 // Produccion de instrucciones de switch

@@ -68,7 +68,7 @@ block: '{' instrucciones* '}'           #blockStmt
 // ----------------- Sentencia For -----------------
 sFor: 'for' expr block                              # ForCondicion
     | 'for' varDcl ';' expr ';' varAsign block      # ForAsignacion
-    | 'for' ID_VARIABLE ',' ID_VARIABLE ':=' 'range' ID_VARIABLE block # ForRange
+    | 'for' ID_VARIABLE ',' ID_VARIABLE 'in' ID_VARIABLE block # ForRange
 ;
 
 // ----------------- Declaracion de variables -----------------

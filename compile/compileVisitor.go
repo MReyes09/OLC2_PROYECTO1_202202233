@@ -569,6 +569,97 @@ func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) inte
 	return sym.Value
 }
 
+// ---------------------------- SENTENCIAS FOR -----------------------------------
+func (v *CompilerVisitor) VisitForStmt(ctx *gramAntlr.ForStmtContext) interface{} {
+	return v.Visit(ctx.SFor())
+}
+
+// VisitForCondicion
+func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) interface{} {
+	condition := v.Visit(ctx.Expr())
+
+	if condBool, ok := condition.(bool); !ok {
+		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
+	} else {
+		for condBool {
+			result := v.Visit(ctx.Block())
+
+			if str, ok := result.(string); ok {
+				if str == "break" {
+					break
+				} else if str == "continue" {
+					condition = v.Visit(ctx.Expr())
+					if condBool, ok = condition.(bool); !ok {
+						v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
+					}
+					continue
+				} else if str == "Excepcion___Return_Void" {
+					return str
+				} else {
+					return str
+				}
+			}
+
+			// Recalcular la condición
+			condition = v.Visit(ctx.Expr())
+			if condBool, ok = condition.(bool); !ok {
+				v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
+			}
+		}
+	}
+
+	return nil
+}
+
+// VisitForAsignacion
+func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext) interface{} {
+	// Declaración inicial
+	v.Visit(ctx.VarDcl())
+
+	// Evaluación inicial de la condición
+	condition := v.Visit(ctx.Expr())
+
+	condBool, ok := condition.(bool)
+	if !ok {
+		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
+	}
+
+	for condBool {
+		// Ejecutar bloque del for
+		result := v.Visit(ctx.Block())
+
+		if str, ok := result.(string); ok {
+			switch str {
+			case "break":
+				break
+			case "continue":
+				// Evaluar la asignación y la nueva condición
+				v.Visit(ctx.VarAsign())
+				condition = v.Visit(ctx.Expr())
+				if condBool, ok = condition.(bool); !ok {
+					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
+				}
+				continue
+			case "Excepcion___Return_Void":
+				return str
+			default:
+				return str
+			}
+		}
+
+		// Ejecutar asignación final del for
+		v.Visit(ctx.VarAsign())
+
+		// Reevaluar condición
+		condition = v.Visit(ctx.Expr())
+		if condBool, ok = condition.(bool); !ok {
+			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
+		}
+	}
+
+	return nil
+}
+
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 
 // Validación de tipos básicos

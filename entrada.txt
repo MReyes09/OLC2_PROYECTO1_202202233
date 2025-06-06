@@ -21,3 +21,8 @@ fn main() {
     // Error: Operación inválida string + int (comentado)
     // str += 10
 }
+
+
+for mut i := 10; i < 10; i++ {
+    println(i)
+}

@@ -582,30 +582,43 @@ func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interf
 func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-	sym, _ := v.currentEnv.GetVariable(id)
-	mutabilidad := sym.Mutable
 
-	context_start := ctx.GetStart()
-
-	if value == nil {
-		v.Salida += "Error-semántico: al asignar el valor a la variable, el valor es nulo."
+	sym, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: variable %s no encontrada.\n", id)
 		return nil
 	}
 
-	// validar cuando es un slice
-	if !isValidType(value, sym.Type) {
+	mutabilidad := sym.Mutable
+	tipo := sym.Type
+	contextStart := ctx.GetStart()
 
-		if mutabilidad {
-			v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
+	if value == nil {
+		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable '%s', el valor es nulo.\n", id)
+		return nil
+	}
+
+	// Validar si es un slice
+	if slice, ok := value.([]interface{}); ok {
+		if len(slice) == 0 || isValidType(slice[0], tipo) {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 			return nil
 		}
+		v.Salida += fmt.Sprintf("Error-semántico: tipos no compatibles para el slice asignado a %s.\n", id)
+		return nil
+	}
 
+	// Validación normal
+	if !isValidType(value, tipo) {
+		if mutabilidad {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
+			return nil
+		}
 		v.Salida += fmt.Sprintf("Error-semántico: la variable %s no es mutable y no se puede asignar un nuevo valor.\n", id)
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
-
+	v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 	return nil
 }
 

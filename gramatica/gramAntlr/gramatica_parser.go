@@ -38,9 +38,8 @@ func gramaticaParserInit() {
 		"'-='", "'++'", "'--'", "'['", "']'", "'.'", "'-'", "'!'", "'*'", "'/'",
 		"'%'", "'+'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'",
 		"'||'", "'nil'", "'('", "'slices.Index('", "'strings.Join('", "'len('",
-		"'append('", "'strconv.Atoi('", "'strconv.ParseFloat('", "'reflect.TypeOf('",
-		"'int'", "'float64'", "'string'", "'bool'", "'rune'", "'break'", "'continue'",
-		"'func'", "'return'",
+		"'append('", "'Atoi('", "'parseFloat('", "'typeOf('", "'int'", "'float64'",
+		"'string'", "'bool'", "'rune'", "'break'", "'continue'", "'func'", "'return'",
 	}
 	staticData.SymbolicNames = []string{
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",

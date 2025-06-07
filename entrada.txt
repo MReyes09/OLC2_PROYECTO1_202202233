@@ -26,3 +26,12 @@ fn main() {
 for mut i := 10; i < 10; i++ {
     println(i)
 }
+
+mut x := 5
+for mut i := 0; i < 10; i++ {
+    if x == i {
+        println("llegue al 5!")
+        contiune
+    }
+    println(i)
+}

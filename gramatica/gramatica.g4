@@ -129,9 +129,9 @@ expr: '-' expr                                                # Negate
     | 'strings.Join('ID_VARIABLE ',' expr ')'               # ArrayJoin
     | 'len('ID_VARIABLE (posicion)* ')'                                 # ArrayLength
     | 'append('ID_VARIABLE ',' expr ')'                     # ArrayAppend
-    | 'strconv.Atoi(' expr ')'                              # IntToString
-    | 'strconv.ParseFloat(' expr ')'                        # floatToString
-    | 'reflect.TypeOf(' expr ')'                            # reflectType
+    | 'Atoi(' expr ')'                                      # IntToString
+    | 'parseFloat(' expr ')'                                  # floatToString
+    | 'typeOf(' expr ')'                                      # reflectType
     //Acceso a estructuras
     | ID_VARIABLE ('.' ID_VARIABLE)+ ';'?                   # StructAccess 
     | varCallStatement                                      # CallFunctionValue

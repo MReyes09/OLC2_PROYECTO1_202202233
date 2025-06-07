@@ -1,10 +1,12 @@
 package compile
 
 import (
+	"OLC2CLIENTE/compile/expresiones/nativas"
 	"OLC2CLIENTE/compile/expresiones/operaciones"
 	"OLC2CLIENTE/compile/print"
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -18,6 +20,7 @@ type CompilerVisitor struct {
 	Salida                          string // lo que quieras almacenar
 	printVisitor                    *print.PrintVisitor
 	operacionesVisitor              *operaciones.OperacionesVisitor // Visitor para operaciones aritméticas
+	funcionesNativasVisitor         *nativas.NativasVisitor         // Visitor para funciones nativas
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
 }
@@ -32,6 +35,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
 	v.operacionesVisitor = operaciones.NewOperacionesVisitor(&v.Salida, v.Visit)
+	v.funcionesNativasVisitor = nativas.NewNativasVisitor(&v.Salida, v.Visit)
 	return v
 }
 
@@ -268,16 +272,6 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
 
-	/*
-		// Manejar slices
-		if slice, ok := value.([]interface{}); ok {
-			dataType := getSliceType(slice)
-			symbolType, _ := parseSymbolType(dataType)
-			v.currentEnv.SetVariable(id, value, symbolType, true, true, ctx.GetStart())
-			return nil
-		}
-	*/
-
 	// Determinar tipo basado en valor
 	var symbolType SymbolType
 	switch value.(type) {
@@ -300,6 +294,283 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	return nil
 }
 
+// ----------------------------- Acceso a arreglos -----------------------------
+// VisitArrayAccess - 'ID_VARIABLE' '[' expr ']' '=' expr
+func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	listaBase, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	for i := 0; i < len(ctx.AllExpr()); i++ {
+		index := v.Visit(ctx.AllExpr()[i])
+		if idx, ok := index.(int); ok {
+			if i == len(ctx.AllExpr())-2 {
+				// Asignar valor en la posición final
+				value := v.Visit(ctx.AllExpr()[i+1])
+				listaBase[idx] = value
+				return nil
+			} else {
+				// Ir al siguiente nivel del arreglo anidado
+				nextLevel, ok := listaBase[idx].([]interface{})
+				if !ok {
+					v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+					return nil
+				}
+				listaBase = nextLevel
+			}
+		} else {
+			v.Salida += "Error-semántico: índice debe ser un entero.\n"
+			return nil
+		}
+	}
+
+	return nil
+}
+
+// VisitArrayAccessSimple - 'ID_VARIABLE' '[' expr ']'
+func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpleContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	listaBase, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	contador := 0
+	for _, expr := range ctx.AllExpr() {
+		index := v.Visit(expr)
+		if idx, ok := index.(int); ok {
+			dataList := listaBase[idx]
+			if contador == len(ctx.AllExpr())-1 {
+				return dataList
+			}
+
+			if nextList, ok := dataList.([]interface{}); ok {
+				listaBase = nextList
+			} else {
+				return dataList
+			}
+			contador++
+		} else {
+			v.Salida += "Error-semántico: índice debe ser un entero.\n"
+			return nil
+		}
+	}
+
+	return nil
+}
+
+// VisitArrayFindIndex - 'ID_VARIABLE' '.' 'findIndex' '(' expr ')'
+func (v *CompilerVisitor) VisitArrayFindIndex(ctx *gramAntlr.ArrayFindIndexContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	value := v.Visit(ctx.Expr())
+
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	tempList, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	valReturn := -1
+	for i, item := range tempList {
+		if reflect.DeepEqual(item, value) {
+			valReturn = i
+			break
+		}
+	}
+
+	return valReturn
+}
+
+// VisitArrayJoin - 'ID_VARIABLE' '.' 'join' '(' expr ')'
+func (v *CompilerVisitor) VisitArrayJoin(ctx *gramAntlr.ArrayJoinContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	value := v.Visit(ctx.Expr())
+
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	tempList, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	if strValue, ok := value.(string); ok {
+		result := strings.Join(convertToStringSlice(tempList), strValue)
+		return result
+	} else {
+		v.Salida += "Error-semántico: al unir el arreglo, el valor no es un string.\n"
+		return nil
+	}
+}
+
+// VisitArrayLength - 'ID_VARIABLE' '.' 'length' '(' posicion* ')'
+func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	tempList, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	var listaBase []interface{} = tempList
+	lenResult := 0
+
+	if len(ctx.AllPosicion()) == 0 {
+		lenResult = len(listaBase)
+	} else {
+		for _, pos := range ctx.AllPosicion() {
+			index := v.Visit(pos.Expr())
+			if idx, ok := index.(int); ok {
+				if idx >= len(listaBase) {
+					v.Salida += "Error-semántico: índice fuera de rango.\n"
+					return nil
+				}
+				nextItem := listaBase[idx]
+				if nextList, ok := nextItem.([]interface{}); ok {
+					listaBase = nextList
+				} else {
+					v.Salida += "Error-semántico: al acceder al arreglo, la posición no es un arreglo.\n"
+					return nil
+				}
+			} else {
+				v.Salida += "Error-semántico: índice debe ser un entero.\n"
+				return nil
+			}
+		}
+		lenResult = len(listaBase)
+	}
+
+	return lenResult
+}
+
+// VisitArrayAppend - 'ID_VARIABLE' '.' 'append' '(' expr ')'
+func (v *CompilerVisitor) VisitArrayAppend(ctx *gramAntlr.ArrayAppendContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	value := v.Visit(ctx.Expr())
+
+	variable, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		return nil
+	}
+
+	tempList, ok := variable.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		return nil
+	}
+
+	if listValue, ok := value.([]interface{}); ok {
+		newList := append(tempList, listValue...)
+		return newList
+	}
+
+	if isValidType(value, variable.Type) {
+		newList := append(tempList, value)
+		return newList
+	}
+
+	v.Salida += "Error-semántico: al agregar valor al arreglo, los tipos no son compatibles.\n"
+	return nil
+}
+
+// ------------------------------ DECLARACION SLICE ----------------------------------
+
+// VisitVarDeclSliceStmt - 'var' ID_VARIABLE slice '=' sliceValores ';'
+func (v *CompilerVisitor) VisitVarDeclSliceStmt(ctx *gramAntlr.VarDeclSliceStmtContext) interface{} {
+	return v.Visit(ctx.VarDclSlice())
+}
+
+// VisitSliceValores - 'ID_VARIABLE' ':' type '=' sliceValores
+func (v *CompilerVisitor) VisitSliceValores(ctx *gramAntlr.SliceValoresContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	typo, err := parseSymbolType(typeStr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		return nil
+	}
+
+	numDimensiones := 0
+	for range ctx.AllNuevoSlice() {
+		numDimensiones++
+	}
+
+	sliceFinal := v.Visit(ctx.ContenidoSlice())
+
+	v.currentEnv.SetVariable(id, sliceFinal, typo, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitSliceVacio - 'ID_VARIABLE' ':' type '=' sliceVacio
+func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	symbolType, err := parseSymbolType(typeStr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		return nil
+	}
+
+	v.currentEnv.SetVariable(id, make([]interface{}, 0), symbolType, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitSliceContenido - contenido de un slice con expresiones
+func (v *CompilerVisitor) VisitSliceContenido(ctx *gramAntlr.SliceContenidoContext) interface{} {
+	arrayTemp := []interface{}{}
+	for _, expr := range ctx.AllExpr() {
+		arrayTemp = append(arrayTemp, v.Visit(expr))
+	}
+	return arrayTemp
+}
+
+// VisitSliceContenidoSlice - contenido de un slice anidado
+func (v *CompilerVisitor) VisitSliceContenidoSlice(ctx *gramAntlr.SliceContenidoSliceContext) interface{} {
+	arrayTemp := []interface{}{}
+	for _, slice := range ctx.AllContenidoSlice() {
+		sliceValue := v.Visit(slice)
+		if sliceList, ok := sliceValue.([]interface{}); ok {
+			arrayTemp = append(arrayTemp, sliceList)
+		}
+	}
+	return arrayTemp
+}
+
 // ------------------------------ ASIGNACIONES --------------------------------------
 // VisitAsignStmt
 func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interface{} {
@@ -317,7 +588,7 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 	context_start := ctx.GetStart()
 
 	if value == nil {
-		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable, el valor es nulo.")
+		v.Salida += "Error-semántico: al asignar el valor a la variable, el valor es nulo."
 		return nil
 	}
 
@@ -423,7 +694,7 @@ func (v *CompilerVisitor) VisitVarInc(ctx *gramAntlr.VarIncContext) interface{} 
 	return nil
 }
 
-// ------------
+// ---------------------------- CONDICIONAL IF ---------------------------------------
 // VisitIfStmt actúa como un puente para las reglas anidadas de 'sIf'.
 func (v *CompilerVisitor) VisitIfStmt(ctx *gramAntlr.IfStmtContext) interface{} {
 	// ctx.SIf() accede al nodo 'sIf' dentro de la instrucción 'if'.
@@ -455,6 +726,7 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 
 		// Visitar el bloque del 'if'
 		result := v.Visit(ctx.Block(0))
+		fmt.Println("RESULTADO DEL IF:", result)
 
 		// Restaurar el entorno
 		v.currentEnv = v.currentEnv.Parent
@@ -542,7 +814,7 @@ func (v *CompilerVisitor) VisitBreakStmt(ctx *gramAntlr.BreakStmtContext) interf
 }
 
 // -------------------- VisitContinue --------------------
-func (v *CompilerVisitor) VisitContinue(ctx *gramAntlr.ContinueContext) interface{} {
+func (v *CompilerVisitor) VisitContinueStmt(ctx *gramAntlr.ContinueStmtContext) interface{} {
 	return "continue"
 }
 
@@ -629,12 +901,12 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 	for condBool {
 		// Ejecutar bloque del for
 		result := v.Visit(ctx.Block())
+		fmt.Println("Resultado del bloque del for:", result)
 
 		if str, ok := result.(string); ok {
-			switch str {
-			case "break":
+			if str == "break" {
 				break
-			case "continue":
+			} else if str == "continue" {
 				// Evaluar la asignación y la nueva condición
 				v.Visit(ctx.VarAsign())
 				condition = v.Visit(ctx.Expr())
@@ -642,9 +914,9 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
 				}
 				continue
-			case "Excepcion___Return_Void":
+			} else if str == "Excepcion___Return_Void" {
 				return str
-			default:
+			} else {
 				return str
 			}
 		}
@@ -723,6 +995,22 @@ func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{
 	return nil
 }
 
+// ---------------------------- FUNCIONES NATIVAS -----------------------------
+// VisitIntToString
+func (v *CompilerVisitor) VisitIntToString(ctx *gramAntlr.IntToStringContext) interface{} {
+	return v.funcionesNativasVisitor.VisitIntToString(ctx)
+}
+
+// VisitfloatToString
+func (v *CompilerVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext) interface{} {
+	return v.funcionesNativasVisitor.VisitFloatToString(ctx)
+}
+
+// VisitReflectType
+func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
+	return v.funcionesNativasVisitor.VisitReflectType(ctx)
+}
+
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 
 // Validación de tipos básicos
@@ -745,4 +1033,16 @@ func isValidType(value interface{}, typ SymbolType) bool {
 		return ok
 	}
 	return false
+}
+
+func convertToStringSlice(list []interface{}) []string {
+	result := make([]string, 0, len(list))
+	for _, item := range list {
+		if str, ok := item.(string); ok {
+			result = append(result, str)
+		} else {
+			result = append(result, fmt.Sprintf("%v", item))
+		}
+	}
+	return result
 }

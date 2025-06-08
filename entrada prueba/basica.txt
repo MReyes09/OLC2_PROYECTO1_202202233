@@ -1,378 +1,305 @@
-func main() {
+
+//func main() {
 	puntos := 0
 
-	fmt.Println("=== Archivo de prueba básico ===")
-	fmt.Println("Validaciones manuales esperadas: 4")
+	println("=== Archivo de prueba básico ===")
 
-	// 1. Declaración de variables (3 puntos)
-	fmt.Println("==== Declaración de variables ====")
+	// 1. Declaración de mutiables (2 puntos)
+	println("==== Declaración de mutiables ====")
 	puntosDeclaracion := 0
 
-	fmt.Println("Declaración explícita con tipo y valor")
-	var entero int = 42
-	var decimal float64 = 3.14
-	var texto string = "Hola!"
-	var booleano bool = true
-	var caracter rune = 'A'
+	println("Declaración explícita con tipo y valor")
+	mut entero int = 42
+	mut decimal float64 = 3.14159
+	mut texto string = "Hola, mundo!"
+	mut booleano bool = true
 
-	fmt.Println("\n\n###Validacion Manual")
-	fmt.Println("entero:", entero)
-	fmt.Println("decimal:", decimal)
-	fmt.Println("texto:", texto)
-	fmt.Println("booleano:", booleano)
-	fmt.Println("caracter:", caracter)
-	fmt.Println("")
+	println("entero:", entero)
+	println("decimal:", decimal)
+	println("texto:", texto)
+	println("booleano:", booleano)
 
-	if entero == 42 && decimal > 3.0 && texto == "Hola!" && booleano == true && caracter == 'A' {
+	if entero == 42 && decimal > 3.0 && texto == "Hola, mundo!" && booleano == true {
 		puntosDeclaracion = puntosDeclaracion + 1
-		fmt.Println("OK Declaración explícita: correcto")
+		println("OK Declaración explícita con tipo y valor: correcto")
 	} else {
-		fmt.Println("X Declaración explícita: incorrecto")
+		println("X Declaración explícita con tipo y valor: incorrecto")
 	}
 
-	fmt.Println("Declaración sin valor")
-	var enteroSinValor int
-	var decimalSinValor float64
-	var textoSinValor string
-	var booleanoSinValor bool
+	println("\nDeclaración explícita con tipo y sin valor")
+	mut enteroSinValor int
+	mut decimalSinValor float64
+	mut textoSinValor string
+	mut booleanoSinValor bool
 
-	fmt.Println("enteroSinValor:", enteroSinValor)
-	fmt.Println("decimalSinValor:", decimalSinValor)
-	fmt.Println("textoSinValor:", textoSinValor)
-	fmt.Println("booleanoSinValor:", booleanoSinValor)
+	println("enteroSinValor:", enteroSinValor)
+	println("decimalSinValor:", decimalSinValor)
+	println("textoSinValor:", textoSinValor)
+	println("booleanoSinValor:", booleanoSinValor)
 
+	// Verificamos que se inicialicen con valores por defecto
 	if enteroSinValor == 0 && decimalSinValor == 0.0 && textoSinValor == "" && booleanoSinValor == false {
 		puntosDeclaracion = puntosDeclaracion + 1
-		fmt.Println("OK Declaración sin valor: correcto")
+		println("OK Declaración explícita con tipo y sin valor: correcto")
 	} else {
-		fmt.Println("X Declaración sin valor: incorrecto")
+		println("X Declaración explícita con tipo y sin valor: incorrecto")
 	}
 
-	fmt.Println("Declaración con inferencia de tipo")
-	enteroInferido := 100
-	decimalInferido := 2.71
-	textoInferido := "Adios!"
-	booleanoInferido := false
-
-	fmt.Println("enteroInferido:", enteroInferido)
-	fmt.Println("decimalInferido:", decimalInferido)
-	fmt.Println("textoInferido:", textoInferido)
-	fmt.Println("booleanoInferido:", booleanoInferido)
-
-	if enteroInferido == 100 && decimalInferido > 2.7 && textoInferido == "Adios!" && booleanoInferido == false {
-		puntosDeclaracion = puntosDeclaracion + 1
-		fmt.Println("OK Declaración con inferencia: correcto")
+	println("\nErrores de redeclaración")
+	// mut entero int = 100 // ! ERROR: Comentar esta línea para que el programa compile
+	if entero == 100 {
+		puntosDeclaracion = puntosDeclaracion - 1
+		println("X Errores de redeclaración: incorrecto")
 	} else {
-		fmt.Println("X Declaración con inferencia: incorrecto")
+		println("OK Errores de redeclaración: correcto")
 	}
 
-	// 2. Asignación de variables (3 puntos)
-	fmt.Println("\n==== Asignación de variables ====")
+	// 2. Asignación de mutiables (2 puntos)
+	println("\n==== Asignación de mutiables ====")
 	puntosAsignacion := 0
 
-	fmt.Println("Asignación con tipo correcto")
+	println("Asignación con tipo correcto")
 	entero = 99
 	decimal = 9.9
-	texto = "Nuevo"
+	texto = "Texto modificado"
 	booleano = !booleano
 
-	fmt.Println("\n\n###Validacion Manual")
-	fmt.Println("entero:", entero)
-	fmt.Println("decimal:", decimal)
-	fmt.Println("texto:", texto)
-	fmt.Println("booleano:", booleano)
-	fmt.Println("")
+	println("entero:", entero)
+	println("decimal:", decimal)
+	println("texto:", texto)
+	println("booleano:", booleano)
 
-	if entero == 99 && decimal == 9.9 && texto == "Nuevo" && booleano == false {
+	if entero == 99 && decimal == 9.9 && texto == "Texto modificado" && booleano == false {
 		puntosAsignacion = puntosAsignacion + 1
-		fmt.Println("OK Asignación simple: correcto")
+		println("OK Asignación con tipo correcto: correcto")
 	} else {
-		fmt.Println("X Asignación simple: incorrecto")
+		println("X Asignación con tipo correcto: incorrecto")
 	}
 
-	fmt.Println("Asignación con expresiones")
-	entero = entero + 1
-	decimal = decimal * 2
-	texto = texto + "!"
-	booleano = !booleano
-
-	fmt.Println("entero:", entero)
-	fmt.Println("decimal:", decimal)
-	fmt.Println("texto:", texto)
-	fmt.Println("booleano:", booleano)
-
-	if entero == 100 && decimal == 19.8 && texto == "Nuevo!" && booleano == true {
-		puntosAsignacion = puntosAsignacion + 1
-		fmt.Println("OK Asignación con expresiones: correcto")
-	} else {
-		fmt.Println("X Asignación con expresiones: incorrecto")
-	}
-
-	fmt.Println("Asignación con tipo incorrecto")
+	println("\nAsignación con tipo incorrecto")
+	// entero = "esto debería fallar" // ! ERROR: Comentar esta línea para que el programa compile
+	println("OK Asignación con tipo incorrecto: Se detectaron errores de tipo correctamente")
 	puntosAsignacion = puntosAsignacion + 1
-	fmt.Println("OK Asignación con tipo incorrecto: correcto")
 
-	// 3. Operaciones Aritméticas (3 puntos)
-	fmt.Println("\n==== Operaciones Aritméticas ====")
+	// 3. Operaciones Aritméticas (2 puntos)
+	println("\n==== Operaciones Aritméticas ====")
 	puntosOperacionesAritmeticas := 0
 
-	fmt.Println("Suma")
+	println("Suma")
 	resultadoSuma1 := 10 + 5
 	resultadoSuma2 := 10.5 + 5.5
 	resultadoSuma3 := 10 + 5.5
 	resultadoSuma4 := 10.5 + 5
 
-	fmt.Println("10 + 5 =", resultadoSuma1)
-	fmt.Println("10.5 + 5.5 =", resultadoSuma2)
-	fmt.Println("10 + 5.5 =", resultadoSuma3)
-	fmt.Println("10.5 + 5 =", resultadoSuma4)
+	println("10 + 5 =", resultadoSuma1)
+	println("10.5 + 5.5 =", resultadoSuma2)
+	println("10 + 5.5 =", resultadoSuma3)
+	println("10.5 + 5 =", resultadoSuma4)
 
 	if resultadoSuma1 == 15 && resultadoSuma2 == 16.0 && resultadoSuma3 == 15.5 && resultadoSuma4 == 15.5 {
 		puntosOperacionesAritmeticas = puntosOperacionesAritmeticas + 1
-		fmt.Println("OK Suma: correcto")
+		println("OK Suma: correcto")
 	} else {
-		fmt.Println("X Suma: incorrecto")
+		println("X Suma: incorrecto")
 	}
 
-	fmt.Println("Multiplicación")
-	resultadoMult1 := 5 * 3
-	resultadoMult2 := 5.5 * 2.0
-	resultadoMult3 := 5 * 2.5
-	resultadoMult4 := 5.5 * 2
+	println("\nResta")
+	resultadoResta1 := 10 - 5
+	resultadoResta2 := 10.5 - 5.5
+	resultadoResta3 := 10 - 5.5
+	resultadoResta4 := 10.5 - 5
 
-	fmt.Println("5 * 3 =", resultadoMult1)
-	fmt.Println("5.5 * 2.0 =", resultadoMult2)
-	fmt.Println("5 * 2.5 =", resultadoMult3)
-	fmt.Println("5.5 * 2 =", resultadoMult4)
+	println("10 - 5 =", resultadoResta1)
+	println("10.5 - 5.5 =", resultadoResta2)
+	println("10 - 5.5 =", resultadoResta3)
+	println("10.5 - 5 =", resultadoResta4)
 
-	if resultadoMult1 == 15 && resultadoMult2 == 11.0 && resultadoMult3 == 12.5 && resultadoMult4 == 11.0 {
+	if resultadoResta1 == 5 && resultadoResta2 == 5.0 && resultadoResta3 == 4.5 && resultadoResta4 == 5.5 {
 		puntosOperacionesAritmeticas = puntosOperacionesAritmeticas + 1
-		fmt.Println("OK Multiplicación: correcto")
+		println("OK Resta: correcto")
 	} else {
-		fmt.Println("X Multiplicación: incorrecto")
+		println("X Resta: incorrecto")
 	}
 
-	fmt.Println("División")
-	resultadoDiv1 := 10 / 2
-	resultadoDiv2 := 10.0 / 4.0
-	resultadoDiv3 := 10 / 4.0
-	resultadoDiv4 := 10.0 / 4
-
-	fmt.Println("10 / 2 =", resultadoDiv1)
-	fmt.Println("10.0 / 4.0 =", resultadoDiv2)
-	fmt.Println("10 / 4.0 =", resultadoDiv3)
-	fmt.Println("10.0 / 4 =", resultadoDiv4)
-
-	if resultadoDiv1 == 5 && resultadoDiv2 == 2.5 && resultadoDiv3 == 2.5 && resultadoDiv4 == 2.5 {
-		puntosOperacionesAritmeticas = puntosOperacionesAritmeticas + 1
-		fmt.Println("OK División: correcto")
-	} else {
-		fmt.Println("X División: incorrecto")
-	}
-
-	// 4. Operaciones Relacionales (3 puntos)
-	fmt.Println("\n==== Operaciones Relacionales ====")
+	// 4. Operaciones Relacionales (2 puntos)
+	println("\n==== Operaciones Relacionales ====")
 	puntosOperacionesRelacionales := 0
 
-	fmt.Println("Igualdad")
+	println("Igualdad")
 	resultadoIgualdad1 := 10 == 10
 	resultadoIgualdad2 := 10 == 5
 	resultadoIgualdad3 := 10.5 == 10.5
 	resultadoIgualdad4 := 10.5 == 5.5
-	resultadoIgualdad5 := "Hola" == "Hola"
-	resultadoIgualdad6 := "Hola" == "Mundo"
 
-	fmt.Println("10 == 10:", resultadoIgualdad1)
-	fmt.Println("10 == 5:", resultadoIgualdad2)
-	fmt.Println("10.5 == 10.5:", resultadoIgualdad3)
-	fmt.Println("10.5 == 5.5:", resultadoIgualdad4)
-	fmt.Println("\"Hola\" == \"Hola\":", resultadoIgualdad5)
-	fmt.Println("\"Hola\" == \"Mundo\":", resultadoIgualdad6)
+	println("10 == 10:", resultadoIgualdad1)
+	println("10 == 5:", resultadoIgualdad2)
+	println("10.5 == 10.5:", resultadoIgualdad3)
+	println("10.5 == 5.5:", resultadoIgualdad4)
 
 	if resultadoIgualdad1 == true && resultadoIgualdad2 == false &&
-		resultadoIgualdad3 == true && resultadoIgualdad4 == false &&
-		resultadoIgualdad5 == true && resultadoIgualdad6 == false {
+		resultadoIgualdad3 == true && resultadoIgualdad4 == false {
 		puntosOperacionesRelacionales = puntosOperacionesRelacionales + 1
-		fmt.Println("OK Igualdad: correcto")
+		println("OK Igualdad: correcto")
 	} else {
-		fmt.Println("X Igualdad: incorrecto")
+		println("X Igualdad: incorrecto")
 	}
 
-	fmt.Println("Mayor/Menor")
-	resultadoComp1 := 10 > 5
-	resultadoComp2 := 10 < 5
-	resultadoComp3 := 10.5 > 5.5
-	resultadoComp4 := 10.5 < 5.5
+	println("\nDesigualdad")
+	resultadoDesigualdad1 := 10 != 10
+	resultadoDesigualdad2 := 10 != 5
+	resultadoDesigualdad3 := 10.5 != 10.5
+	resultadoDesigualdad4 := 10.5 != 5.5
 
-	fmt.Println("10 > 5:", resultadoComp1)
-	fmt.Println("10 < 5:", resultadoComp2)
-	fmt.Println("10.5 > 5.5:", resultadoComp3)
-	fmt.Println("10.5 < 5.5:", resultadoComp4)
+	println("10 != 10:", resultadoDesigualdad1)
+	println("10 != 5:", resultadoDesigualdad2)
+	println("10.5 != 10.5:", resultadoDesigualdad3)
+	println("10.5 != 5.5:", resultadoDesigualdad4)
 
-	if resultadoComp1 == true && resultadoComp2 == false &&
-		resultadoComp3 == true && resultadoComp4 == false {
+	if resultadoDesigualdad1 == false && resultadoDesigualdad2 == true &&
+		resultadoDesigualdad3 == false && resultadoDesigualdad4 == true {
 		puntosOperacionesRelacionales = puntosOperacionesRelacionales + 1
-		fmt.Println("OK Mayor/Menor: correcto")
+		println("OK Desigualdad: correcto")
 	} else {
-		fmt.Println("X Mayor/Menor: incorrecto")
+		println("X Desigualdad: incorrecto")
 	}
 
-	fmt.Println("Mayor o igual/Menor o igual")
-	resultadoComp5 := 10 >= 10
-	resultadoComp6 := 10 <= 5
-	resultadoComp7 := 10.5 >= 5.5
-	resultadoComp8 := 10.5 <= 10.5
-
-	fmt.Println("10 >= 10:", resultadoComp5)
-	fmt.Println("10 <= 5:", resultadoComp6)
-	fmt.Println("10.5 >= 5.5:", resultadoComp7)
-	fmt.Println("10.5 <= 10.5:", resultadoComp8)
-
-	if resultadoComp5 == true && resultadoComp6 == false &&
-		resultadoComp7 == true && resultadoComp8 == true {
-		puntosOperacionesRelacionales = puntosOperacionesRelacionales + 1
-		fmt.Println("OK Mayor o igual/Menor o igual: correcto")
-	} else {
-		fmt.Println("X Mayor o igual/Menor o igual: incorrecto")
-	}
-
-	// 5. Operaciones Lógicas (3 puntos)
-	fmt.Println("\n==== Operaciones Lógicas ====")
+	// 5. Operaciones Lógicas (2 puntos)
+	println("\n==== Operaciones Lógicas ====")
 	puntosOperacionesLogicas := 0
 
-	fmt.Println("AND")
+	println("AND")
 	resultadoAnd1 := true && true
 	resultadoAnd2 := true && false
-	resultadoAnd3 := (10 == 10) && (5 == 5)
-	resultadoAnd4 := (10 == 10) && (5 == 6)
+	resultadoAnd3 := false && true
+	resultadoAnd4 := false && false
+	resultadoAnd5 := (10 == 10) && (5 == 5)
+	resultadoAnd6 := (10 == 10) && (5 == 6)
 
-	fmt.Println("true && true:", resultadoAnd1)
-	fmt.Println("true && false:", resultadoAnd2)
-	fmt.Println("(10 == 10) && (5 == 5):", resultadoAnd3)
-	fmt.Println("(10 == 10) && (5 == 6):", resultadoAnd4)
+	println("true && true:", resultadoAnd1)
+	println("true && false:", resultadoAnd2)
+	println("false && true:", resultadoAnd3)
+	println("false && false:", resultadoAnd4)
+	println("(10 == 10) && (5 == 5):", resultadoAnd5)
+	println("(10 == 10) && (5 == 6):", resultadoAnd6)
 
 	if resultadoAnd1 == true && resultadoAnd2 == false &&
-		resultadoAnd3 == true && resultadoAnd4 == false {
+		resultadoAnd3 == false && resultadoAnd4 == false &&
+		resultadoAnd5 == true && resultadoAnd6 == false {
 		puntosOperacionesLogicas = puntosOperacionesLogicas + 1
-		fmt.Println("OK AND: correcto")
+		println("OK AND: correcto")
 	} else {
-		fmt.Println("X AND: incorrecto")
+		println("X AND: incorrecto")
 	}
 
-	fmt.Println("OR")
-	resultadoOr1 := true || false
-	resultadoOr2 := false || false
-	resultadoOr3 := (10 == 10) || (5 == 6)
-	resultadoOr4 := (10 == 11) || (5 == 6)
+	println("\nOR")
+	resultadoOr1 := true || true
+	resultadoOr2 := true || false
+	resultadoOr3 := false || true
+	resultadoOr4 := false || false
+	resultadoOr5 := (10 == 10) || (5 == 5)
+	resultadoOr6 := (10 == 10) || (5 == 6)
+	resultadoOr7 := (10 == 11) || (5 == 6)
 
-	fmt.Println("true || false:", resultadoOr1)
-	fmt.Println("false || false:", resultadoOr2)
-	fmt.Println("(10 == 10) || (5 == 6):", resultadoOr3)
-	fmt.Println("(10 == 11) || (5 == 6):", resultadoOr4)
+	println("true || true:", resultadoOr1)
+	println("true || false:", resultadoOr2)
+	println("false || true:", resultadoOr3)
+	println("false || false:", resultadoOr4)
+	println("(10 == 10) || (5 == 5):", resultadoOr5)
+	println("(10 == 10) || (5 == 6):", resultadoOr6)
+	println("(10 == 11) || (5 == 6):", resultadoOr7)
 
-	if resultadoOr1 == true && resultadoOr2 == false &&
-		resultadoOr3 == true && resultadoOr4 == false {
+	if resultadoOr1 == true && resultadoOr2 == true &&
+		resultadoOr3 == true && resultadoOr4 == false &&
+		resultadoOr5 == true && resultadoOr6 == true &&
+		resultadoOr7 == false {
 		puntosOperacionesLogicas = puntosOperacionesLogicas + 1
-		fmt.Println("OK OR: correcto")
+		println("OK OR: correcto")
 	} else {
-		fmt.Println("X OR: incorrecto")
+		println("X OR: incorrecto")
 	}
 
-	fmt.Println("NOT")
-	resultadoNot1 := !true
-	resultadoNot2 := !false
-	resultadoNot3 := !(10 == 10)
-	resultadoNot4 := !(10 == 11)
-
-	fmt.Println("!true:", resultadoNot1)
-	fmt.Println("!false:", resultadoNot2)
-	fmt.Println("!(10 == 10):", resultadoNot3)
-	fmt.Println("!(10 == 11):", resultadoNot4)
-
-	if resultadoNot1 == false && resultadoNot2 == true &&
-		resultadoNot3 == false && resultadoNot4 == true {
-		puntosOperacionesLogicas = puntosOperacionesLogicas + 1
-		fmt.Println("OK NOT: correcto")
-	} else {
-		fmt.Println("X NOT: incorrecto")
-	}
-
-	// 6. fmt.Println (3 puntos)
-	fmt.Println("\n==== fmt.Println ====")
+	// 6. println (2 puntos)
+	println("\n==== println ====")
 	puntosPrintln := 0
 
-	fmt.Println("\n\n###Validacion Manual")
-	fmt.Println("Impresión de valores simples")
-	fmt.Println(42)
-	fmt.Println(3.14)
-	fmt.Println("Texto")
-	fmt.Println(true)
-	fmt.Println('A')
-	fmt.Println("")
+	println("###Validacion Manual")
+	println("Validando impresión de un solo argumento")
+	println(42)
+	println(3.14159)
+	println("Cadena de texto")
+	println(true)
 
-	puntosPrintln = puntosPrintln + 1
-	fmt.Println("OK Impresión de valores simples: correcto")
+	println("\nValidando impresión de múltiples argumentos")
+	println("Número:", 42, "Pi:", 3.14159, "Booleano:", true)
 
-	fmt.Println("Impresión de múltiples valores")
-	fmt.Println("Números:", 42, 3.14)
-	fmt.Println("Booleano:", true, "Texto:", "Hola")
+	println("\nValidando impresión de expresiones")
+	println(10 + 5)
+	println(10 > 5)
+	println(10 * 5 / 2)
 
-	puntosPrintln = puntosPrintln + 1
-	fmt.Println("OK Impresión de múltiples valores: correcto")
+	println("\nValidando impresión de mutiables")
+	println(entero)
+	println(decimal)
+	println(texto)
+	println(booleano)
 
-	fmt.Println("Impresión de expresiones")
-	fmt.Println("Suma:", 10+5)
-	fmt.Println("Comparación:", 10 > 5)
-	fmt.Println("Lógica:", true && false)
+	println("\nValidando impresión de slices")
+	numeros := []int{1, 2, 3, 4, 5}
+	println(numeros)
 
-	puntosPrintln = puntosPrintln + 1
-	fmt.Println("OK Impresión de expresiones: correcto")
+	// Asumimos que la implementación de println es correcta
+	puntosPrintln = puntosPrintln + 2
+	println("OK println: correcto")
 
 	// 7. Manejo de valor nulo (2 puntos)
-	fmt.Println("\n==== Manejo de valor nulo ====")
+	println("\n==== Manejo de valor nulo ====")
 	puntosValorNulo := 0
 
-	fmt.Println("Valores por defecto")
-	var enteroNulo int
-	var decimalNulo float64
-	var textoNulo string
-	var booleanoNulo bool
+	println("\nOperaciones con nil")
+	// println("nilmut + 5:", nil + 5) 	// ! ERROR: Comentar esta línea para que el programa compile
 
-	fmt.Println("\n\n###Validacion Manual")
-	fmt.Println("enteroNulo:", enteroNulo)
-	fmt.Println("decimalNulo:", decimalNulo)
-	fmt.Println("textoNulo:", textoNulo)
-	fmt.Println("booleanoNulo:", booleanoNulo)
-	fmt.Println("")
+	puntosValorNulo = puntosValorNulo + 2
+	println("OK Manejo de valor nulo: correcto")
 
-	if enteroNulo == 0 && decimalNulo == 0.0 && textoNulo == "" && booleanoNulo == false {
-		puntosValorNulo = puntosValorNulo + 1
-		fmt.Println("OK Valores por defecto: correcto")
-	} else {
-		fmt.Println("X Valores por defecto: incorrecto")
-	}
+	// 8. Opcionalidad del ; (2 puntos)
+	println("\n==== Opcionalidad del ; ====")
+	puntosPuntoYComa := 0
 
-	fmt.Println("Operaciones con nil")
-	puntosValorNulo = puntosValorNulo + 1
-	fmt.Println("OK Operaciones con nil: correcto")
+	println("###Validacion Manual")
+
+	// Instrucciones sin punto y coma
+	a := 10
+	b := 20
+	c := a + b
+	println("a =", a)
+	println("b =", b)
+	println("c = a + b =", c)
+
+	puntosPuntoYComa = puntosPuntoYComa + 2
+	println("OK Opcionalidad del punto y coma: correcto")
 
 	// Resumen de puntos
 	puntos = puntosDeclaracion + puntosAsignacion + puntosOperacionesAritmeticas +
 		puntosOperacionesRelacionales + puntosOperacionesLogicas +
-		puntosPrintln + puntosValorNulo
+		puntosPrintln + puntosValorNulo + puntosPuntoYComa
 
-	fmt.Println("\n=== Tabla de Resultados ===")
-	fmt.Println("+--------------------------+--------+-------+")
-	fmt.Println("| Característica           | Puntos | Total |")
-	fmt.Println("+--------------------------+--------+-------+")
-	fmt.Println("| Declaración de variables | ", puntosDeclaracion, "    | 3     |")
-	fmt.Println("| Asignación de variables  | ", puntosAsignacion, "    | 3     |")
-	fmt.Println("| Operaciones Aritméticas  | ", puntosOperacionesAritmeticas, "    | 3     |")
-	fmt.Println("| Operaciones Relacionales | ", puntosOperacionesRelacionales, "    | 3     |")
-	fmt.Println("| Operaciones Lógicas      | ", puntosOperacionesLogicas, "    | 3     |")
-	fmt.Println("| fmt.Println              | ", puntosPrintln, "    | 3     |")
-	fmt.Println("| Manejo de valor nulo     | ", puntosValorNulo, "    | 2     |")
-	fmt.Println("+--------------------------+--------+-------+")
-	fmt.Println("| TOTAL                    | ", puntos, "   | 20    |")
-	fmt.Println("+--------------------------+--------+-------+")
-}
+	println("\n=== Errores ===")
+	println("###Validacion Manual")
+	println("Errores esperados ?/3")
+
+	println("\n=== Tabla de Resultados ===")
+	println("+--------------------------+--------+-------+")
+	println("| Característica           | Puntos | Total |")
+	println("+--------------------------+--------+-------+")
+	println("| Declaración de mutiables | ", puntosDeclaracion, "    | 2     |")
+	println("| Asignación de mutiables  | ", puntosAsignacion, "    | 2     |")
+	println("| Operaciones Aritméticas  | ", puntosOperacionesAritmeticas, "    | 2     |")
+	println("| Operaciones Relacionales | ", puntosOperacionesRelacionales, "    | 2     |")
+	println("| Operaciones Lógicas      | ", puntosOperacionesLogicas, "    | 2     |")
+	println("| println              | ", puntosPrintln, "    | 2     |")
+	println("| Manejo de valor nulo     | ", puntosValorNulo, "    | 2     |")
+	println("| Opcionalidad del ;       | ", puntosPuntoYComa, "    | 2     |")
+	println("+--------------------------+--------+-------+")
+	println("| TOTAL                    | ", puntos, "   | 16    |")
+	println("+--------------------------+--------+-------+")
+//}

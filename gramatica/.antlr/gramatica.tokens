@@ -83,8 +83,8 @@ COMENTARIOMULTILINEA=69
 'for'=14
 'in'=15
 'mut'=16
-'='=17
-':='=18
+':='=17
+'='=18
 '[]'=19
 'type'=20
 'struct'=21

@@ -124,6 +124,7 @@ func (v *CompilerVisitor) VisitChar(ctx *gramAntlr.CharContext) interface{} {
 	texto := ctx.GetText() // e.g. `'a'`
 	texto = strings.Trim(texto, "'")
 	r, _ := utf8.DecodeRuneInString(texto)
+	fmt.Println("Rune:", r)
 	return r
 }
 

@@ -49,20 +49,20 @@ func (ov *OperacionesVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloConte
 	_, rightIsFloat := right.(float64)
 
 	if !(leftIsInt || leftIsFloat) || !(rightIsInt || rightIsFloat) {
-		*ov.Salida += fmt.Sprintf("Error semántico: no se pueden operar '%s' y '%s' con el operador '%s'.",
-			fmt.Sprintf("%ov", left), fmt.Sprintf("%ov", right), op)
+		*ov.Salida += fmt.Sprintf("Error semántico: no se pueden operar '%v' y '%v' con el operador '%s'.\n", left, right, op)
 		return nil
 	}
 
-	// Si ambos son enteros
-	if l, ok := left.(int); ok {
+	// Operación entre enteros
+	if leftIsInt && rightIsInt {
+		l := left.(int)
 		r := right.(int)
 		switch op {
 		case "*":
 			return l * r
 		case "/":
 			if r == 0 {
-				*ov.Salida += "Error: división por cero"
+				*ov.Salida += "Error: división por cero\n"
 				return nil
 			}
 			return l / r
@@ -71,25 +71,34 @@ func (ov *OperacionesVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloConte
 		}
 	}
 
-	// Si ambos son flotantes
-	if l, ok := left.(float64); ok {
-		r := right.(float64)
-		switch op {
-		case "*":
-			return l * r
-		case "/":
-			if r == 0 {
-				*ov.Salida += "Error: división por cero"
-				return nil
-			}
-			return l / r
-		default:
-			*ov.Salida += "Error: operador no válido para floats (solo * y / permitidos)"
-			return nil
-		}
+	// Operaciones mixtas o entre flotantes: convertir ambos a float64
+	var l, r float64
+	if leftIsInt {
+		l = float64(left.(int))
+	} else {
+		l = left.(float64)
+	}
+	if rightIsInt {
+		r = float64(right.(int))
+	} else {
+		r = right.(float64)
 	}
 
-	*ov.Salida += "Error en operador multiplicativo"
+	switch op {
+	case "*":
+		return l * r
+	case "/":
+		if r == 0 {
+			*ov.Salida += "Error: división por cero\n"
+			return nil
+		}
+		return l / r
+	case "%":
+		*ov.Salida += "Error: operador '%' no permitido con flotantes\n"
+		return nil
+	}
+
+	*ov.Salida += "Error en operador multiplicativo\n"
 	return nil
 }
 
@@ -101,20 +110,34 @@ func (ov *OperacionesVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interfac
 
 	switch l := left.(type) {
 	case int:
-		r := right.(int)
-		switch op {
-		case "+":
-			return l + r
-		case "-":
-			return l - r
+		switch r := right.(type) {
+		case int:
+			if op == "+" {
+				return l + r
+			} else {
+				return l - r
+			}
+		case float64:
+			if op == "+" {
+				return float64(l) + r
+			} else {
+				return float64(l) - r
+			}
 		}
 	case float64:
-		r := right.(float64)
-		switch op {
-		case "+":
-			return l + r
-		case "-":
-			return l - r
+		switch r := right.(type) {
+		case int:
+			if op == "+" {
+				return l + float64(r)
+			} else {
+				return l - float64(r)
+			}
+		case float64:
+			if op == "+" {
+				return l + r
+			} else {
+				return l - r
+			}
 		}
 	case string:
 		if r, ok := right.(string); ok && op == "+" {
@@ -122,7 +145,7 @@ func (ov *OperacionesVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interfac
 		}
 	}
 
-	*ov.Salida += "Error en operador aritmetic"
+	*ov.Salida += fmt.Sprintf("Error semántico: no se pueden operar '%v' y '%v' con el operador '%s'.\n", left, right, op)
 	return nil
 }
 
@@ -190,6 +213,7 @@ func (ov *OperacionesVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqua
 func (ov *OperacionesVisitor) VisitLogical(ctx *gramAntlr.LogicalContext) interface{} {
 	left := ov.Visit(ctx.Expr(0))
 	right := ov.Visit(ctx.Expr(1))
+	fmt.Println("Visitando lógica:", left, right)
 	op := ctx.GetChild(1).(antlr.TerminalNode).GetText()
 
 	lBool, lok := left.(bool)

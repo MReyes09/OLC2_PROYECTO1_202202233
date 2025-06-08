@@ -9,12 +9,12 @@
   // Declaración implícita
   //    <identificador> := <Expresión> // ya no se usa ese ya que el enunciado a veces usa muy y veces no, asi que mejor usar con mut
   //    mut <identificador> := <Expresión>
-  
-  mut var1 int = 12 + 16 //28
-  
-  mut var2 int //0
-  
-  mut var3 := var1 + 1  //29
+  //28
+  mut var1 int = 12 + 16 
+  //0
+  mut var2 int 
+  //29
+  mut var3 := var1 + 1
   
   println("DECLACION DE VARIABLES SIMPLES")
   println("var1: " , var1 , "\nvar2: " , var2 , "\nvar3: " , var3)
@@ -36,7 +36,7 @@
 
   mut var5 []int
 
-  var4 = var5
+  var5 = var4
 
   println("DECLACION DE SLICES")
   println("var4: " , var4 , "\nvar5: " , var5)

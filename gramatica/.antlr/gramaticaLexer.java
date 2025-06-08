@@ -1,4 +1,4 @@
-// Generated from /home/myubuntu/Desktop/Compi2/OLC2_PROYECTO1_202202233/gramatica/gramatica.g4 by ANTLR 4.13.1
+// Generated from /home/mati/Escritorio/OLC2Vacas/OLC2_PROYECTO1_202202233/gramatica/gramatica.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -53,7 +53,7 @@ public class gramaticaLexer extends Lexer {
 		return new String[] {
 			null, "'{'", "'}'", "'println('", "','", "')'", "';'", "'print('", "'if'", 
 			"'else'", "'switch'", "'case'", "':'", "'default:'", "'for'", "'in'", 
-			"'mut'", "'='", "':='", "'[]'", "'type'", "'struct'", "'+='", "'-='", 
+			"'mut'", "':='", "'='", "'[]'", "'type'", "'struct'", "'+='", "'-='", 
 			"'++'", "'--'", "'['", "']'", "'.'", "'-'", "'!'", "'*'", "'/'", "'%'", 
 			"'+'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", 
 			"'nil'", "'('", "'indexOf('", "'join('", "'len('", "'append('", "'Atoi('", 
@@ -160,7 +160,7 @@ public class gramaticaLexer extends Lexer {
 		"\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001"+
 		"\f\u0001\r\u0001\r\u0001\r\u0001\r\u0001\u000e\u0001\u000e\u0001\u000e"+
 		"\u0001\u000f\u0001\u000f\u0001\u000f\u0001\u000f\u0001\u0010\u0001\u0010"+
-		"\u0001\u0011\u0001\u0011\u0001\u0011\u0001\u0012\u0001\u0012\u0001\u0012"+
+		"\u0001\u0010\u0001\u0011\u0001\u0011\u0001\u0012\u0001\u0012\u0001\u0012"+
 		"\u0001\u0013\u0001\u0013\u0001\u0013\u0001\u0013\u0001\u0013\u0001\u0014"+
 		"\u0001\u0014\u0001\u0014\u0001\u0014\u0001\u0014\u0001\u0014\u0001\u0014"+
 		"\u0001\u0015\u0001\u0015\u0001\u0015\u0001\u0016\u0001\u0016\u0001\u0016"+
@@ -236,7 +236,7 @@ public class gramaticaLexer extends Lexer {
 		"\u0000\u0017\u00b9\u0001\u0000\u0000\u0000\u0019\u00bb\u0001\u0000\u0000"+
 		"\u0000\u001b\u00c4\u0001\u0000\u0000\u0000\u001d\u00c8\u0001\u0000\u0000"+
 		"\u0000\u001f\u00cb\u0001\u0000\u0000\u0000!\u00cf\u0001\u0000\u0000\u0000"+
-		"#\u00d1\u0001\u0000\u0000\u0000%\u00d4\u0001\u0000\u0000\u0000\'\u00d7"+
+		"#\u00d2\u0001\u0000\u0000\u0000%\u00d4\u0001\u0000\u0000\u0000\'\u00d7"+
 		"\u0001\u0000\u0000\u0000)\u00dc\u0001\u0000\u0000\u0000+\u00e3\u0001\u0000"+
 		"\u0000\u0000-\u00e6\u0001\u0000\u0000\u0000/\u00e9\u0001\u0000\u0000\u0000"+
 		"1\u00ec\u0001\u0000\u0000\u00003\u00ef\u0001\u0000\u0000\u00005\u00f1"+
@@ -288,8 +288,8 @@ public class gramaticaLexer extends Lexer {
 		"\u001c\u0001\u0000\u0000\u0000\u00c8\u00c9\u0005i\u0000\u0000\u00c9\u00ca"+
 		"\u0005n\u0000\u0000\u00ca\u001e\u0001\u0000\u0000\u0000\u00cb\u00cc\u0005"+
 		"m\u0000\u0000\u00cc\u00cd\u0005u\u0000\u0000\u00cd\u00ce\u0005t\u0000"+
-		"\u0000\u00ce \u0001\u0000\u0000\u0000\u00cf\u00d0\u0005=\u0000\u0000\u00d0"+
-		"\"\u0001\u0000\u0000\u0000\u00d1\u00d2\u0005:\u0000\u0000\u00d2\u00d3"+
+		"\u0000\u00ce \u0001\u0000\u0000\u0000\u00cf\u00d0\u0005:\u0000\u0000\u00d0"+
+		"\u00d1\u0005=\u0000\u0000\u00d1\"\u0001\u0000\u0000\u0000\u00d2\u00d3"+
 		"\u0005=\u0000\u0000\u00d3$\u0001\u0000\u0000\u0000\u00d4\u00d5\u0005["+
 		"\u0000\u0000\u00d5\u00d6\u0005]\u0000\u0000\u00d6&\u0001\u0000\u0000\u0000"+
 		"\u00d7\u00d8\u0005t\u0000\u0000\u00d8\u00d9\u0005y\u0000\u0000\u00d9\u00da"+

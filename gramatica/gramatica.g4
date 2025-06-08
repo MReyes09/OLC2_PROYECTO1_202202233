@@ -78,7 +78,7 @@ varDcl: 'mut' ID_VARIABLE type '=' expr # VarDclWithTypeAndValue
 ;
 
 varDclSlice: ID_VARIABLE assign (nuevoSlice)+ type '{' contenidoSlice '}' # SliceValores
-    | 'var' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
 ;
 
 assign: ':=' 
@@ -125,8 +125,8 @@ expr: '-' expr                                                # Negate
     //Acceso a arreglos
     | ID_VARIABLE ('[' expr ']')+                           # ArrayAccessSimple
     //Funciones embebidas
-    | 'slices.Index('ID_VARIABLE ',' expr ')'               # ArrayFindIndex
-    | 'strings.Join('ID_VARIABLE ',' expr ')'               # ArrayJoin
+    | 'indexOf('ID_VARIABLE ',' expr ')'               # ArrayFindIndex
+    | 'join('ID_VARIABLE ',' expr ')'               # ArrayJoin
     | 'len('ID_VARIABLE (posicion)* ')'                                 # ArrayLength
     | 'append('ID_VARIABLE ',' expr ')'                     # ArrayAppend
     | 'Atoi(' expr ')'                                      # IntToString

@@ -23,6 +23,17 @@ const (
 	VOID
 )
 
+type StructDefinition struct {
+	Name   string
+	Fields map[string]SymbolType
+	Order  []string
+}
+
+type StructInstance struct {
+	StructName string
+	Values     map[string]interface{}
+}
+
 // Estructura del símbolo
 type Symbol struct {
 	Value   interface{}

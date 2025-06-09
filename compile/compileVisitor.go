@@ -23,6 +23,7 @@ type CompilerVisitor struct {
 	funcionesNativasVisitor         *nativas.NativasVisitor         // Visitor para funciones nativas
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
+	structDefinitions               map[string]*StructDefinition
 }
 
 // Constructor opcional
@@ -31,6 +32,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 		BasegramaticaVisitor: &gramAntlr.BasegramaticaVisitor{},
 		Salida:               "",
 		currentEnv:           NewEnvironment(nil), // Entorno raíz
+		structDefinitions:    make(map[string]*StructDefinition),
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
@@ -258,6 +260,8 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		defaultValue = false
 	case RUNE:
 		defaultValue = '\000'
+	case STRUCT:
+		return nil
 	default:
 		v.Salida += fmt.Sprintf("Error: tipo %s no soporta valor por defecto\n", typeStr)
 		return nil
@@ -1011,6 +1015,271 @@ func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 	return v.funcionesNativasVisitor.VisitReflectType(ctx)
 }
 
+// -------------------------------- STRUCTS -------------------------------------
+func (v *CompilerVisitor) VisitVarDeclStructStmt(ctx *gramAntlr.VarDeclStructStmtContext) interface{} {
+	return v.Visit(ctx.VarDclStruct())
+}
+
+// VisitDeclStructData - Definición de estructura del struct
+func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataContext) interface{} {
+	structName := ctx.ID_VARIABLE(0).GetText() // Primer ID es el nombre del struct
+
+	// Verificar que no exista ya un struct con ese nombre
+	if _, exists := v.structDefinitions[structName]; exists {
+		v.Salida += fmt.Sprintf("Error semántico: struct %s ya está definido\n", structName)
+		return nil
+	}
+
+	// Crear nueva definición de struct
+	structDef := &StructDefinition{
+		Name:   structName,
+		Fields: make(map[string]SymbolType),
+		Order:  make([]string, 0),
+	}
+
+	// Procesar campos del struct (empezando desde el índice 1)
+	variables := ctx.AllID_VARIABLE()[1:] // Omitir el primer ID que es el nombre del struct
+	types := ctx.AllType_()
+
+	if len(variables) != len(types) {
+		v.Salida += fmt.Sprintf("Error semántico: número de variables y tipos no coinciden en struct %s\n", structName)
+		return nil
+	}
+
+	for i, variable := range variables {
+		fieldName := variable.GetText()
+		fieldTypeStr := types[i].GetText()
+
+		// Verificar que no haya campos duplicados
+		if _, exists := structDef.Fields[fieldName]; exists {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s duplicado en struct %s\n", fieldName, structName)
+			return nil
+		}
+
+		// Manejar referencias a otros structs
+		if fieldTypeStr == structName {
+			// Auto-referencia permitida
+			structDef.Fields[fieldName] = STRUCT
+		} else if _, isStruct := v.structDefinitions[fieldTypeStr]; isStruct {
+			// Referencia a otro struct existente
+			structDef.Fields[fieldName] = STRUCT
+		} else {
+			// Tipo primitivo
+			fieldType, err := parseSymbolType(fieldTypeStr)
+			if err != nil {
+				v.Salida += fmt.Sprintf("Error semántico: tipo %s no válido para campo %s\n", fieldTypeStr, fieldName)
+				return nil
+			}
+			structDef.Fields[fieldName] = fieldType
+		}
+
+		structDef.Order = append(structDef.Order, fieldName)
+	}
+
+	// Verificar que el struct tenga al menos un campo
+	if len(structDef.Fields) == 0 {
+		v.Salida += fmt.Sprintf("Error semántico: struct %s debe tener al menos un campo\n", structName)
+		return nil
+	}
+
+	// Guardar definición del struct en el entorno global
+	v.structDefinitions[structName] = structDef
+	v.currentEnv.SetVariable(structName, structDef, STRUCT, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitVarStructDclStmt - Declaración de variable de tipo struct
+func (v *CompilerVisitor) VisitVarStructDclStmt(ctx *gramAntlr.VarStructDclStmtContext) interface{} {
+	return v.Visit(ctx.VarStructDcl())
+}
+
+// VisitStructVarType - Instanciación de variable struct
+func (v *CompilerVisitor) VisitStructVarType(ctx *gramAntlr.StructVarTypeContext) interface{} {
+	varName := ctx.ID_VARIABLE(0).GetText()
+	structName := ctx.ID_VARIABLE(1).GetText()
+
+	// Verificar que el struct esté definido
+	structDef, exists := v.structDefinitions[structName]
+	if !exists {
+		v.Salida += fmt.Sprintf("Error semántico: struct %s no está definido\n", structName)
+		return nil
+	}
+
+	// Verificar que el número de valores coincida con el número de campos
+	expectedFields := len(structDef.Fields)
+	providedValues := len(ctx.AllID_VARIABLE()) - 2 // Restar nombre de variable y nombre de struct
+
+	if expectedFields != providedValues {
+		v.Salida += fmt.Sprintf("Error semántico: struct %s esperaba %d campos, se proporcionaron %d\n",
+			structName, expectedFields, providedValues)
+		return nil
+	}
+
+	// Crear nueva instancia
+	instance := &StructInstance{
+		StructName: structName,
+		Values:     make(map[string]interface{}),
+	}
+
+	// Asignar valores a los campos en orden
+	valueIDs := ctx.AllID_VARIABLE()[2:] // Valores empiezan desde el índice 2
+
+	for i, fieldName := range structDef.Order {
+		if i >= len(valueIDs) {
+			break
+		}
+
+		valueID := valueIDs[i].GetText()
+
+		// Obtener el valor de la variable
+		variable, err := v.currentEnv.GetVariable(valueID)
+		if err != nil {
+			v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", valueID)
+			return nil
+		}
+
+		fieldType := structDef.Fields[fieldName]
+
+		// Verificar compatibilidad de tipos
+		if !isValidType(variable.Value, fieldType) {
+			v.Salida += fmt.Sprintf("Error semántico: tipo incompatible para campo %s en struct %s\n",
+				fieldName, structName)
+			return nil
+		}
+
+		instance.Values[fieldName] = variable.Value
+	}
+
+	// Declarar la variable en el entorno actual
+	v.currentEnv.SetVariable(varName, instance, STRUCT, false, true, ctx.GetStart())
+
+	return nil
+}
+
+// VisitStructAccess - Acceso a campo de struct
+func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) interface{} {
+	variables := ctx.AllID_VARIABLE()
+
+	if len(variables) < 2 {
+		v.Salida += "Error semántico: acceso a struct requiere al menos variable.campo\n"
+		return nil
+	}
+
+	// Obtener la variable struct inicial
+	structVarName := variables[0].GetText()
+	variable, err := v.currentEnv.GetVariable(structVarName)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", structVarName)
+		return nil
+	}
+
+	// Navegar a través de la cadena de accesos
+	currentStruct, ok := variable.Value.(*StructInstance)
+	if !ok {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", structVarName)
+		return nil
+	}
+
+	// Procesar cada nivel de acceso
+	for i := 1; i < len(variables); i++ {
+		fieldName := variables[i].GetText()
+
+		// Verificar que el campo existe
+		structDef := v.structDefinitions[currentStruct.StructName]
+		if _, exists := structDef.Fields[fieldName]; !exists {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
+				fieldName, currentStruct.StructName)
+			return nil
+		}
+
+		// Si es el último campo, retornar su valor
+		if i == len(variables)-1 {
+			return currentStruct.Values[fieldName]
+		}
+
+		// Si no es el último, debe ser otro struct
+		nextValue := currentStruct.Values[fieldName]
+		nextStruct, ok := nextValue.(*StructInstance)
+		if !ok {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s no es un struct\n", fieldName)
+			return nil
+		}
+		currentStruct = nextStruct
+	}
+
+	return nil
+}
+
+// VisitStructAccessAsign - Asignación a campo de struct
+func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsignContext) interface{} {
+	variables := ctx.AllID_VARIABLE()
+	newValue := v.Visit(ctx.Expr())
+
+	if len(variables) < 2 {
+		v.Salida += "Error semántico: asignación a struct requiere al menos variable.campo\n"
+		return nil
+	}
+
+	// Obtener la variable struct inicial
+	structVarName := variables[0].GetText()
+	variable, err := v.currentEnv.GetVariable(structVarName)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", structVarName)
+		return nil
+	}
+
+	// Navegar a través de la cadena de accesos
+	currentStruct, ok := variable.Value.(*StructInstance)
+	if !ok {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", structVarName)
+		return nil
+	}
+
+	// Procesar cada nivel de acceso hasta el penúltimo
+	for i := 1; i < len(variables)-1; i++ {
+		fieldName := variables[i].GetText()
+
+		// Verificar que el campo existe
+		structDef := v.structDefinitions[currentStruct.StructName]
+		if _, exists := structDef.Fields[fieldName]; !exists {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
+				fieldName, currentStruct.StructName)
+			return nil
+		}
+
+		// Navegar al siguiente struct
+		nextValue := currentStruct.Values[fieldName]
+		nextStruct, ok := nextValue.(*StructInstance)
+		if !ok {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s no es un struct\n", fieldName)
+			return nil
+		}
+		currentStruct = nextStruct
+	}
+
+	// Asignar al campo final
+	finalFieldName := variables[len(variables)-1].GetText()
+	structDef := v.structDefinitions[currentStruct.StructName]
+	fieldType, exists := structDef.Fields[finalFieldName]
+	if !exists {
+		v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
+			finalFieldName, currentStruct.StructName)
+		return nil
+	}
+
+	// Verificar compatibilidad de tipos
+	if !isValidType(newValue, fieldType) {
+		v.Salida += fmt.Sprintf("Error semántico: tipo incompatible para campo %s\n", finalFieldName)
+		return nil
+	}
+
+	// Asignar nuevo valor
+	currentStruct.Values[finalFieldName] = newValue
+
+	return nil
+}
+
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 
 // Validación de tipos básicos
@@ -1030,6 +1299,9 @@ func isValidType(value interface{}, typ SymbolType) bool {
 		return ok
 	case RUNE:
 		_, ok := value.(rune)
+		return ok
+	case STRUCT:
+		_, ok := value.(*StructInstance)
 		return ok
 	}
 	return false

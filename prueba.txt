@@ -1,0 +1,69 @@
+// VARIABLES SIMPLES
+
+  // Declaración explícita con tipo y valor
+  //    mut <identificador> <Tipo> = <Expresión>
+
+  // Declaración explícita con tipo y sin valor
+  //    mut <identificador> <Tipo>
+
+  // Declaración implícita
+  //    <identificador> := <Expresión> // ya no se usa ese ya que el enunciado a veces usa muy y veces no, asi que mejor usar con mut
+  //    mut <identificador> := <Expresión>
+  //28
+  mut var1 int = 12 + 16 
+  //0
+  mut var2 int 
+  //29
+  mut var3 := var1 + 1
+  
+  println("DECLACION DE VARIABLES SIMPLES")
+  println("var1: " , var1 , "\nvar2: " , var2 , "\nvar3: " , var3)
+
+  // ACCESO DE VARIABLES
+  println("ACCESO DE VARIABLES SIMPLES")
+  
+  var2 = var3 + var1  //57
+  println("var2: " , var2)
+
+// SLICES
+  // Declaración con inicialización de valores
+  //     <identificador> = ([])+ <Tipo> { <lista de elementos> }
+  
+  // Declaración de slice vacío
+  //     mut <identificador> = ([])+ <Tipo>
+  
+  var4 = []int {1, 2, 3, 4, 5}
+
+  mut var5 []int
+
+  var5 = var4
+
+  println("DECLACION DE SLICES")
+  println("var4: " , var4 , "\nvar5: " , var5)
+
+  // ACCESO DE SLICES
+  println("ACCESO DE SLICES")
+  println("var4[0]: " , var4[0], "\nvar5[4]: " , var5[4])
+
+  for indice, valor in var4 {
+    println("índice:", indice, " valor:", valor)
+  }
+
+  var4[0] = 99
+  println("var4[0] modificado: " , var4[0])
+
+  // FUNCIONES ESPECIALES DE SLICES
+  println("FUNCIONES ESPECIALES DE SLICES")
+  println("indice del elemento 99 en var4: " , indexOf(var4 , 99) )
+  println("longitud del slice de var4: " , var4 )
+
+  var6 = []string {"tomate", "cebolla"} 
+  var6 = append(var6 , "perejil")
+
+ println("join del slice de var6: " , join(var6 , "-") )
+
+
+
+
+
+

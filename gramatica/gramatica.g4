@@ -68,17 +68,17 @@ block: '{' instrucciones* '}'           #blockStmt
 // ----------------- Sentencia For -----------------
 sFor: 'for' expr block                              # ForCondicion
     | 'for' varDcl ';' expr ';' varAsign block      # ForAsignacion
-    | 'for' ID_VARIABLE ',' ID_VARIABLE ':=' 'range' ID_VARIABLE block # ForRange
+    | 'for' ID_VARIABLE ',' ID_VARIABLE 'in' ID_VARIABLE block # ForRange
 ;
 
 // ----------------- Declaracion de variables -----------------
-varDcl: 'mut' ID_VARIABLE type '=' expr # VarDclWithTypeAndValue
+varDcl: 'mut' ID_VARIABLE type assign expr # VarDclWithTypeAndValue
       | 'mut' ID_VARIABLE type          # VarDclWithTypeOnly
-      | 'mut' ID_VARIABLE ':=' expr           # VarDclWithInference
+      | 'mut'? ID_VARIABLE assign expr           # VarDclWithInference
 ;
 
 varDclSlice: ID_VARIABLE assign (nuevoSlice)+ type '{' contenidoSlice '}' # SliceValores
-    | 'var' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
 ;
 
 assign: ':=' 
@@ -125,8 +125,8 @@ expr: '-' expr                                                # Negate
     //Acceso a arreglos
     | ID_VARIABLE ('[' expr ']')+                           # ArrayAccessSimple
     //Funciones embebidas
-    | 'slices.Index('ID_VARIABLE ',' expr ')'               # ArrayFindIndex
-    | 'strings.Join('ID_VARIABLE ',' expr ')'               # ArrayJoin
+    | 'indexOf('ID_VARIABLE ',' expr ')'               # ArrayFindIndex
+    | 'join('ID_VARIABLE ',' expr ')'               # ArrayJoin
     | 'len('ID_VARIABLE (posicion)* ')'                                 # ArrayLength
     | 'append('ID_VARIABLE ',' expr ')'                     # ArrayAppend
     | 'Atoi(' expr ')'                                      # IntToString

@@ -124,6 +124,7 @@ func (v *CompilerVisitor) VisitChar(ctx *gramAntlr.CharContext) interface{} {
 	texto := ctx.GetText() // e.g. `'a'`
 	texto = strings.Trim(texto, "'")
 	r, _ := utf8.DecodeRuneInString(texto)
+	fmt.Println("Rune:", r)
 	return r
 }
 
@@ -582,30 +583,43 @@ func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interf
 func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-	sym, _ := v.currentEnv.GetVariable(id)
-	mutabilidad := sym.Mutable
 
-	context_start := ctx.GetStart()
-
-	if value == nil {
-		v.Salida += "Error-semántico: al asignar el valor a la variable, el valor es nulo."
+	sym, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: variable %s no encontrada.\n", id)
 		return nil
 	}
 
-	// validar cuando es un slice
-	if !isValidType(value, sym.Type) {
+	mutabilidad := sym.Mutable
+	tipo := sym.Type
+	contextStart := ctx.GetStart()
 
-		if mutabilidad {
-			v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
+	if value == nil {
+		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable '%s', el valor es nulo.\n", id)
+		return nil
+	}
+
+	// Validar si es un slice
+	if slice, ok := value.([]interface{}); ok {
+		if len(slice) == 0 || isValidType(slice[0], tipo) {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 			return nil
 		}
+		v.Salida += fmt.Sprintf("Error-semántico: tipos no compatibles para el slice asignado a %s.\n", id)
+		return nil
+	}
 
+	// Validación normal
+	if !isValidType(value, tipo) {
+		if mutabilidad {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
+			return nil
+		}
 		v.Salida += fmt.Sprintf("Error-semántico: la variable %s no es mutable y no se puede asignar un nuevo valor.\n", id)
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
-
+	v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 	return nil
 }
 
@@ -930,6 +944,49 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
 		}
 	}
+
+	return nil
+}
+
+// VisitForRange
+func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interface{} {
+	sym, _ := v.currentEnv.GetVariable(ctx.ID_VARIABLE(2).GetText())
+
+	slice, err := sym.Value.([]interface{})
+	if !err {
+		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
+		return nil
+	}
+
+	index := ctx.ID_VARIABLE(0).GetText()
+	value := ctx.ID_VARIABLE(1).GetText()
+
+	v.currentEnv.SetVariable(index, 0, sym.Type, false, true, ctx.GetStart())         // Inicializar índice
+	v.currentEnv.SetVariable(value, nil, sym.Type, sym.Mutable, true, ctx.GetStart()) // Inicializar valor
+
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	for i, val := range slice {
+		v.currentEnv.SetVariable(index, i, INT, false, false, ctx.GetStart())
+		v.currentEnv.SetVariable(value, val, sym.Type, false, false, ctx.GetStart())
+
+		result := v.Visit(ctx.Block())
+
+		if resStr, ok := result.(string); ok {
+			if resStr == "break" {
+				break
+			} else if resStr == "continue" {
+				continue
+			} else if resStr == "Excepcion___Return_Void" {
+				return result
+			} else {
+				return result
+			}
+		}
+	}
+	// Restaurar el entorno anterior
+	v.currentEnv = newEnv.Parent
 
 	return nil
 }

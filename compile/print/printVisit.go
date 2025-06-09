@@ -38,9 +38,30 @@ func (pv *PrintVisitor) handlePrintExprs(exprs []gramAntlr.IExprContext, newline
 		if value == nil {
 			continue
 		}
-		*pv.Salida += fmt.Sprintf("%v ", value)
+
+		// Si es slice, lo mostramos bonito
+		if slice, ok := value.([]interface{}); ok {
+			*pv.Salida += "{" + getStringSlice(slice, "") + "}"
+		} else {
+			*pv.Salida += fmt.Sprintf("%v", value)
+		}
+		*pv.Salida += " "
 	}
 	if newline {
 		*pv.Salida += "\n"
 	}
+}
+
+func getStringSlice(lista []interface{}, cadena string) string {
+	for _, item := range lista {
+		switch v := item.(type) {
+		case []interface{}:
+			cadena += "\n\t{"
+			cadena = getStringSlice(v, cadena)
+			cadena += " },\n"
+		default:
+			cadena += " " + fmt.Sprintf("%v", v)
+		}
+	}
+	return cadena
 }

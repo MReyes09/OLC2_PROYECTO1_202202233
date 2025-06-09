@@ -35,3 +35,8 @@ for mut i := 0; i < 10; i++ {
     }
     println(i)
 }
+
+numeros := []int {10, 20, 30, 40, 50}
+for indice, valor in numeros {
+    println("índice:", indice, "valor:", valor)
+}

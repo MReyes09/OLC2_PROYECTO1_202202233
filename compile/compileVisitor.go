@@ -23,6 +23,8 @@ type CompilerVisitor struct {
 	funcionesNativasVisitor         *nativas.NativasVisitor         // Visitor para funciones nativas
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
+	structDefinitions               map[string]*StructDefinition
+	StructRelational                map[string][]string
 }
 
 // Constructor opcional
@@ -31,6 +33,8 @@ func NewCompilerVisitor() *CompilerVisitor {
 		BasegramaticaVisitor: &gramAntlr.BasegramaticaVisitor{},
 		Salida:               "",
 		currentEnv:           NewEnvironment(nil), // Entorno raíz
+		structDefinitions:    make(map[string]*StructDefinition),
+		StructRelational:     make(map[string][]string), // <--- NUEVO campo agregado
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
@@ -259,6 +263,8 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		defaultValue = false
 	case RUNE:
 		defaultValue = '\000'
+	case STRUCT:
+		return nil
 	default:
 		v.Salida += fmt.Sprintf("Error: tipo %s no soporta valor por defecto\n", typeStr)
 		return nil
@@ -1068,6 +1074,268 @@ func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 	return v.funcionesNativasVisitor.VisitReflectType(ctx)
 }
 
+// -------------------------------- STRUCTS -------------------------------------
+func (v *CompilerVisitor) VisitVarDeclStructStmt(ctx *gramAntlr.VarDeclStructStmtContext) interface{} {
+	return v.Visit(ctx.VarDclStruct())
+}
+
+// VisitDeclStructData - Definición de estructura del struct
+func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataContext) interface{} {
+	var firstTime bool = true
+	var tipoValor int = 0
+	var id string = ""
+
+	variableStruct := make(map[string]Symbol)
+
+	for _, variable := range ctx.AllID_VARIABLE() {
+		if firstTime {
+			firstTime = false
+			id = variable.GetText() // Nombre del struct
+			continue
+		} else {
+			varStruct, ok := v.currentEnv.GetVariable(ctx.AllType_()[tipoValor].GetText())
+			if ok == nil {
+				// Agregando variable al struct
+				variableStruct[variable.GetText()] = *varStruct
+				continue
+			}
+
+			if varStruct == nil && ctx.AllType_()[tipoValor].GetText() == id {
+				variableStruct[variable.GetText()] = Symbol{nil, STRUCT, true}
+				continue
+			}
+			//agregar aqui
+			symbolType, _ := StringToSymbolType(ctx.AllType_()[tipoValor].GetText())
+			switch symbolType {
+			case INT:
+				variableStruct[variable.GetText()] = Symbol{0, INT, false}
+			case FLOAT64:
+				variableStruct[variable.GetText()] = Symbol{0.0, FLOAT64, false}
+			case STRING:
+				variableStruct[variable.GetText()] = Symbol{"", STRING, false}
+			case BOOL:
+				variableStruct[variable.GetText()] = Symbol{false, BOOL, false}
+			case RUNE:
+				variableStruct[variable.GetText()] = Symbol{rune(0), RUNE, false}
+			default:
+				v.Salida += fmt.Sprintf("Error semántico: tipo no compatible para variable: %s", ctx.AllType_()[tipoValor].GetText())
+			}
+			tipoValor++
+		}
+
+	}
+	v.currentEnv.SetVariable(id, variableStruct, STRUCT, false, true, ctx.GetStart())
+	return nil
+}
+
+// VisitVarStructDclStmt - Declaración de variable de tipo struct
+func (v *CompilerVisitor) VisitVarStructDclStmt(ctx *gramAntlr.VarStructDclStmtContext) interface{} {
+	return v.Visit(ctx.VarStructDcl())
+}
+func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTypeInferenceContext) interface{} {
+	idStruct := ctx.ID_VARIABLE(1).GetText()
+	baseStruct, _ := v.currentEnv.GetVariable(idStruct)
+
+	if baseStruct.Type != 6 {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", idStruct)
+		return nil
+	}
+	bodyStruct, ok := baseStruct.Value.(map[string]Symbol)
+	if !ok {
+		v.Salida += fmt.Sprintf("Error semántico: el contenido de %s no es un struct válido (map[string]Symbol)\n", idStruct)
+		return nil
+	}
+
+	if len(bodyStruct) != len(ctx.AllID_VARIABLE())-2 {
+		v.Salida += fmt.Sprintf("Error semántico: número de campos en la declaración de struct %s no coincide con el número de campos definidos\n", idStruct)
+	}
+	//Agregar copia de datoStructBase a una nueva instancia de struct
+	// ✅ Deep Copy del struct base
+	copiaDeep := make(map[string]Symbol)
+
+	for k, vSimbolo := range bodyStruct {
+		var copiedValue interface{}
+
+		// Verificar si el value es otro struct (map[string]Symbol)
+		if innerMap, ok := vSimbolo.Value.(map[string]Symbol); ok {
+			innerCopy := make(map[string]Symbol)
+			for innerKey, innerSymbol := range innerMap {
+				innerCopy[innerKey] = Symbol{
+					Value:   innerSymbol.Value, // puedes profundizar más aquí si se necesita
+					Type:    innerSymbol.Type,
+					Mutable: innerSymbol.Mutable,
+				}
+			}
+			copiedValue = innerCopy
+		} else {
+			// Si no es un map, asumimos que es un tipo básico o valor por copia
+			copiedValue = vSimbolo.Value
+		}
+
+		// Crear la copia del símbolo
+		copiaDeep[k] = Symbol{
+			Value:   copiedValue,
+			Type:    vSimbolo.Type,
+			Mutable: vSimbolo.Mutable,
+		}
+	}
+
+	for i := 2; i < len(ctx.AllID_VARIABLE()); i++ {
+		varBaseStruct, exist := copiaDeep[ctx.ID_VARIABLE(i).GetText()]
+		if !exist {
+			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct base %s\n",
+				ctx.ID_VARIABLE(i).GetText(), idStruct)
+			return nil
+		}
+		expVisit := v.Visit(ctx.Expr(i - 2))
+		if expVisit == "nil" {
+			temp := copiaDeep[ctx.ID_VARIABLE(i).GetText()]
+			temp.Value = "nil"
+			copiaDeep[ctx.ID_VARIABLE(i).GetText()] = temp
+			continue
+		}
+		if isValidType(expVisit, varBaseStruct.Type) {
+			temp := copiaDeep[ctx.ID_VARIABLE(i).GetText()]
+			temp.Value = expVisit
+			copiaDeep[ctx.ID_VARIABLE(i).GetText()] = temp
+			continue
+		} else {
+			v.Salida += fmt.Sprintf("Error semántico: tipo incompatible para campo %s\n", ctx.ID_VARIABLE(i).GetText())
+			return nil
+		}
+	}
+
+	v.currentEnv.SetVariable(ctx.ID_VARIABLE(0).GetText(), copiaDeep, STRUCT, false, true, ctx.GetStart())
+
+	if _, exists := v.StructRelational[idStruct]; exists {
+		v.StructRelational[idStruct] = append(v.StructRelational[idStruct], ctx.ID_VARIABLE(0).GetText())
+	} else {
+		v.StructRelational[idStruct] = []string{ctx.ID_VARIABLE(0).GetText()}
+	}
+	return nil
+}
+
+// VisitStructAccess - Acceso a campo de struct
+func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) interface{} {
+	var varStruct Symbol
+	var datosStruct map[string]Symbol
+	first := true
+
+	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
+		idStruct := ctx.ID_VARIABLE(i).GetText()
+		idVar := ctx.ID_VARIABLE(i + 1).GetText()
+
+		if first {
+			first = false
+			// Buscar la variable struct en el entorno
+			symbol, found := v.currentEnv.GetVariable(idStruct)
+			if found != nil || symbol.Type != STRUCT {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct o no existe.\n", idStruct)
+				return nil
+			}
+			varStruct = *symbol
+
+			// Convertir el valor del struct a map[string]Symbol
+			castedMap, ok := varStruct.Value.(map[string]Symbol)
+			if !ok {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				return nil
+			}
+			datosStruct = castedMap
+
+			if val, exists := datosStruct[idVar]; exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					return val.Value
+				} else {
+					varStruct = val
+					if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+						datosStruct = nestedMap
+					} else {
+						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						return nil
+					}
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				return nil
+			}
+		} else {
+			idVar := ctx.ID_VARIABLE(i + 1).GetText()
+
+			if val, exists := datosStruct[idVar]; exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					return val.Value
+				}
+				varStruct = val
+				if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+					datosStruct = nestedMap
+				} else {
+					v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+					return nil
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, ctx.ID_VARIABLE(i).GetText())
+				return nil
+			}
+		}
+	}
+
+	return nil
+}
+
+// VisitStructAccessAsign - Asignación a campo de struct
+func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsignContext) interface{} {
+	datosStruct := make(map[string]Symbol)
+	first := true
+	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
+		idStruct := ctx.ID_VARIABLE(i).GetText()
+		idVar := ctx.ID_VARIABLE(i + 1).GetText()
+
+		if first {
+			first = false
+			varStruct, err := v.currentEnv.GetVariable(idStruct)
+			if err != nil {
+				return nil
+			}
+			if varStruct.Type != 6 {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct.\n", idStruct)
+				return nil
+			}
+			datosStruct = make(map[string]Symbol)
+			castedMap, ok := varStruct.Value.(map[string]Symbol)
+			if !ok {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				return nil
+			}
+			datosStruct = castedMap
+			sym, exists := datosStruct[idVar]
+			if exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					temp := datosStruct[idVar]
+					temp.Value = v.Visit(ctx.Expr())
+					datosStruct[idVar] = temp
+					return nil
+				} else {
+					varStruct = &sym
+					if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+						datosStruct = nestedMap
+					} else {
+						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						return nil
+					}
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				return nil
+			}
+
+		}
+
+	}
+
+	return nil
+}
+
 //----------------------------- FUNCIONES AUXILIARES -----------------------------
 
 // Validación de tipos básicos
@@ -1087,6 +1355,9 @@ func isValidType(value interface{}, typ SymbolType) bool {
 		return ok
 	case RUNE:
 		_, ok := value.(rune)
+		return ok
+	case STRUCT:
+		_, ok := value.(*StructInstance)
 		return ok
 	}
 	return false

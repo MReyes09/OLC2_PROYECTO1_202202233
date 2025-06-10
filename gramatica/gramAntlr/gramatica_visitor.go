@@ -124,9 +124,6 @@ type gramaticaVisitor interface {
 	// Visit a parse tree produced by gramaticaParser#DeclStructData.
 	VisitDeclStructData(ctx *DeclStructDataContext) interface{}
 
-	// Visit a parse tree produced by gramaticaParser#StructVarType.
-	VisitStructVarType(ctx *StructVarTypeContext) interface{}
-
 	// Visit a parse tree produced by gramaticaParser#StructVarTypeInference.
 	VisitStructVarTypeInference(ctx *StructVarTypeInferenceContext) interface{}
 

@@ -57,7 +57,11 @@ func gramaticaParserInit() {
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
+<<<<<<< HEAD
 		4, 1, 69, 556, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+=======
+		4, 1, 70, 535, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+>>>>>>> feature/Structs/Dilan
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 2, 15, 7, 15,
 		2, 16, 7, 16, 2, 17, 7, 17, 2, 18, 7, 18, 2, 19, 7, 19, 2, 20, 7, 20, 2,
@@ -88,6 +92,7 @@ func gramaticaParserInit() {
 		1, 13, 1, 13, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1,
 		14, 1, 14, 1, 14, 4, 14, 296, 8, 14, 11, 14, 12, 14, 297, 1, 14, 1, 14,
 		1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1,
+<<<<<<< HEAD
 		14, 3, 14, 313, 8, 14, 4, 14, 315, 8, 14, 11, 14, 12, 14, 316, 1, 14, 1,
 		14, 3, 14, 321, 8, 14, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15,
 		1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 4, 15, 336, 8, 15, 11, 15, 12,
@@ -316,6 +321,229 @@ func gramaticaParserInit() {
 		190, 202, 208, 215, 227, 231, 242, 253, 257, 260, 263, 266, 270, 276, 280,
 		297, 312, 316, 320, 337, 347, 351, 376, 395, 422, 425, 429, 446, 448, 459,
 		463, 475, 478, 482, 494, 498, 509, 519, 522, 526, 537, 540, 544, 550, 553,
+=======
+		14, 3, 14, 294, 8, 14, 4, 14, 296, 8, 14, 11, 14, 12, 14, 297, 1, 14, 1,
+		14, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15, 1, 15,
+		1, 15, 1, 15, 1, 15, 4, 15, 315, 8, 15, 11, 15, 12, 15, 316, 1, 15, 1,
+		15, 1, 15, 1, 15, 1, 15, 1, 15, 4, 15, 325, 8, 15, 11, 15, 12, 15, 326,
+		1, 15, 1, 15, 3, 15, 331, 8, 15, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1,
+		16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16,
+		1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 4, 16, 354, 8, 16, 11, 16, 12, 16, 355,
+		1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1,
+		16, 1, 16, 1, 16, 1, 16, 1, 16, 5, 16, 373, 8, 16, 10, 16, 12, 16, 376,
+		9, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1,
+		16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16,
+		1, 16, 1, 16, 4, 16, 400, 8, 16, 11, 16, 12, 16, 401, 1, 16, 3, 16, 405,
+		8, 16, 1, 16, 1, 16, 3, 16, 409, 8, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1,
+		16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16,
+		5, 16, 426, 8, 16, 10, 16, 12, 16, 429, 9, 16, 1, 17, 1, 17, 1, 17, 1,
+		17, 1, 18, 1, 18, 1, 19, 1, 19, 3, 19, 439, 8, 19, 1, 20, 1, 20, 3, 20,
+		443, 8, 20, 1, 21, 1, 21, 1, 21, 1, 21, 1, 21, 1, 21, 1, 21, 1, 21, 5,
+		21, 453, 8, 21, 10, 21, 12, 21, 456, 9, 21, 3, 21, 458, 8, 21, 1, 21, 1,
+		21, 3, 21, 462, 8, 21, 1, 21, 1, 21, 1, 22, 1, 22, 1, 22, 1, 22, 1, 22,
+		1, 22, 1, 22, 1, 22, 3, 22, 474, 8, 22, 1, 22, 1, 22, 3, 22, 478, 8, 22,
+		1, 22, 1, 22, 1, 23, 1, 23, 1, 23, 1, 23, 1, 23, 5, 23, 487, 8, 23, 10,
+		23, 12, 23, 490, 9, 23, 1, 24, 1, 24, 1, 24, 1, 24, 1, 24, 5, 24, 497,
+		8, 24, 10, 24, 12, 24, 500, 9, 24, 3, 24, 502, 8, 24, 1, 24, 1, 24, 3,
+		24, 506, 8, 24, 1, 25, 1, 25, 1, 25, 1, 25, 1, 25, 1, 25, 1, 25, 5, 25,
+		515, 8, 25, 10, 25, 12, 25, 518, 9, 25, 3, 25, 520, 8, 25, 1, 25, 1, 25,
+		3, 25, 524, 8, 25, 1, 26, 1, 26, 1, 27, 1, 27, 3, 27, 530, 8, 27, 1, 27,
+		3, 27, 533, 8, 27, 1, 27, 0, 1, 32, 28, 0, 2, 4, 6, 8, 10, 12, 14, 16,
+		18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52,
+		54, 0, 9, 2, 0, 15, 15, 18, 18, 1, 0, 23, 24, 1, 0, 25, 26, 1, 0, 32, 34,
+		2, 0, 30, 30, 35, 35, 1, 0, 36, 39, 1, 0, 40, 41, 1, 0, 42, 43, 3, 0, 22,
+		22, 53, 57, 68, 68, 607, 0, 59, 1, 0, 0, 0, 2, 86, 1, 0, 0, 0, 4, 118,
+		1, 0, 0, 0, 6, 133, 1, 0, 0, 0, 8, 135, 1, 0, 0, 0, 10, 160, 1, 0, 0, 0,
+		12, 162, 1, 0, 0, 0, 14, 191, 1, 0, 0, 0, 16, 206, 1, 0, 0, 0, 18, 229,
+		1, 0, 0, 0, 20, 231, 1, 0, 0, 0, 22, 233, 1, 0, 0, 0, 24, 258, 1, 0, 0,
+		0, 26, 261, 1, 0, 0, 0, 28, 282, 1, 0, 0, 0, 30, 330, 1, 0, 0, 0, 32, 408,
+		1, 0, 0, 0, 34, 430, 1, 0, 0, 0, 36, 434, 1, 0, 0, 0, 38, 436, 1, 0, 0,
+		0, 40, 440, 1, 0, 0, 0, 42, 444, 1, 0, 0, 0, 44, 465, 1, 0, 0, 0, 46, 481,
+		1, 0, 0, 0, 48, 491, 1, 0, 0, 0, 50, 507, 1, 0, 0, 0, 52, 525, 1, 0, 0,
+		0, 54, 527, 1, 0, 0, 0, 56, 58, 3, 2, 1, 0, 57, 56, 1, 0, 0, 0, 58, 61,
+		1, 0, 0, 0, 59, 57, 1, 0, 0, 0, 59, 60, 1, 0, 0, 0, 60, 1, 1, 0, 0, 0,
+		61, 59, 1, 0, 0, 0, 62, 87, 3, 4, 2, 0, 63, 87, 3, 6, 3, 0, 64, 87, 3,
+		8, 4, 0, 65, 69, 5, 1, 0, 0, 66, 68, 3, 2, 1, 0, 67, 66, 1, 0, 0, 0, 68,
+		71, 1, 0, 0, 0, 69, 67, 1, 0, 0, 0, 69, 70, 1, 0, 0, 0, 70, 72, 1, 0, 0,
+		0, 71, 69, 1, 0, 0, 0, 72, 87, 5, 2, 0, 0, 73, 87, 3, 14, 7, 0, 74, 87,
+		3, 18, 9, 0, 75, 87, 3, 30, 15, 0, 76, 87, 3, 16, 8, 0, 77, 87, 3, 26,
+		13, 0, 78, 87, 3, 28, 14, 0, 79, 87, 3, 38, 19, 0, 80, 87, 3, 40, 20, 0,
+		81, 87, 3, 42, 21, 0, 82, 87, 3, 44, 22, 0, 83, 87, 3, 48, 24, 0, 84, 87,
+		3, 50, 25, 0, 85, 87, 3, 54, 27, 0, 86, 62, 1, 0, 0, 0, 86, 63, 1, 0, 0,
+		0, 86, 64, 1, 0, 0, 0, 86, 65, 1, 0, 0, 0, 86, 73, 1, 0, 0, 0, 86, 74,
+		1, 0, 0, 0, 86, 75, 1, 0, 0, 0, 86, 76, 1, 0, 0, 0, 86, 77, 1, 0, 0, 0,
+		86, 78, 1, 0, 0, 0, 86, 79, 1, 0, 0, 0, 86, 80, 1, 0, 0, 0, 86, 81, 1,
+		0, 0, 0, 86, 82, 1, 0, 0, 0, 86, 83, 1, 0, 0, 0, 86, 84, 1, 0, 0, 0, 86,
+		85, 1, 0, 0, 0, 87, 3, 1, 0, 0, 0, 88, 97, 5, 3, 0, 0, 89, 94, 3, 32, 16,
+		0, 90, 91, 5, 4, 0, 0, 91, 93, 3, 32, 16, 0, 92, 90, 1, 0, 0, 0, 93, 96,
+		1, 0, 0, 0, 94, 92, 1, 0, 0, 0, 94, 95, 1, 0, 0, 0, 95, 98, 1, 0, 0, 0,
+		96, 94, 1, 0, 0, 0, 97, 89, 1, 0, 0, 0, 97, 98, 1, 0, 0, 0, 98, 99, 1,
+		0, 0, 0, 99, 101, 5, 5, 0, 0, 100, 102, 5, 6, 0, 0, 101, 100, 1, 0, 0,
+		0, 101, 102, 1, 0, 0, 0, 102, 119, 1, 0, 0, 0, 103, 112, 5, 7, 0, 0, 104,
+		109, 3, 32, 16, 0, 105, 106, 5, 4, 0, 0, 106, 108, 3, 32, 16, 0, 107, 105,
+		1, 0, 0, 0, 108, 111, 1, 0, 0, 0, 109, 107, 1, 0, 0, 0, 109, 110, 1, 0,
+		0, 0, 110, 113, 1, 0, 0, 0, 111, 109, 1, 0, 0, 0, 112, 104, 1, 0, 0, 0,
+		112, 113, 1, 0, 0, 0, 113, 114, 1, 0, 0, 0, 114, 116, 5, 5, 0, 0, 115,
+		117, 5, 6, 0, 0, 116, 115, 1, 0, 0, 0, 116, 117, 1, 0, 0, 0, 117, 119,
+		1, 0, 0, 0, 118, 88, 1, 0, 0, 0, 118, 103, 1, 0, 0, 0, 119, 5, 1, 0, 0,
+		0, 120, 121, 5, 8, 0, 0, 121, 122, 3, 32, 16, 0, 122, 125, 3, 12, 6, 0,
+		123, 124, 5, 9, 0, 0, 124, 126, 3, 12, 6, 0, 125, 123, 1, 0, 0, 0, 125,
+		126, 1, 0, 0, 0, 126, 134, 1, 0, 0, 0, 127, 128, 5, 8, 0, 0, 128, 129,
+		3, 32, 16, 0, 129, 130, 3, 12, 6, 0, 130, 131, 5, 9, 0, 0, 131, 132, 3,
+		6, 3, 0, 132, 134, 1, 0, 0, 0, 133, 120, 1, 0, 0, 0, 133, 127, 1, 0, 0,
+		0, 134, 7, 1, 0, 0, 0, 135, 136, 5, 10, 0, 0, 136, 137, 3, 32, 16, 0, 137,
+		138, 5, 1, 0, 0, 138, 139, 3, 10, 5, 0, 139, 140, 5, 2, 0, 0, 140, 9, 1,
+		0, 0, 0, 141, 142, 5, 11, 0, 0, 142, 143, 3, 32, 16, 0, 143, 147, 5, 12,
+		0, 0, 144, 146, 3, 2, 1, 0, 145, 144, 1, 0, 0, 0, 146, 149, 1, 0, 0, 0,
+		147, 145, 1, 0, 0, 0, 147, 148, 1, 0, 0, 0, 148, 151, 1, 0, 0, 0, 149,
+		147, 1, 0, 0, 0, 150, 152, 3, 10, 5, 0, 151, 150, 1, 0, 0, 0, 151, 152,
+		1, 0, 0, 0, 152, 161, 1, 0, 0, 0, 153, 157, 5, 13, 0, 0, 154, 156, 3, 2,
+		1, 0, 155, 154, 1, 0, 0, 0, 156, 159, 1, 0, 0, 0, 157, 155, 1, 0, 0, 0,
+		157, 158, 1, 0, 0, 0, 158, 161, 1, 0, 0, 0, 159, 157, 1, 0, 0, 0, 160,
+		141, 1, 0, 0, 0, 160, 153, 1, 0, 0, 0, 161, 11, 1, 0, 0, 0, 162, 166, 5,
+		1, 0, 0, 163, 165, 3, 2, 1, 0, 164, 163, 1, 0, 0, 0, 165, 168, 1, 0, 0,
+		0, 166, 164, 1, 0, 0, 0, 166, 167, 1, 0, 0, 0, 167, 169, 1, 0, 0, 0, 168,
+		166, 1, 0, 0, 0, 169, 170, 5, 2, 0, 0, 170, 13, 1, 0, 0, 0, 171, 172, 5,
+		14, 0, 0, 172, 173, 3, 32, 16, 0, 173, 174, 3, 12, 6, 0, 174, 192, 1, 0,
+		0, 0, 175, 176, 5, 14, 0, 0, 176, 177, 3, 16, 8, 0, 177, 178, 5, 6, 0,
+		0, 178, 179, 3, 32, 16, 0, 179, 180, 5, 6, 0, 0, 180, 181, 3, 30, 15, 0,
+		181, 182, 3, 12, 6, 0, 182, 192, 1, 0, 0, 0, 183, 184, 5, 14, 0, 0, 184,
+		185, 5, 68, 0, 0, 185, 186, 5, 4, 0, 0, 186, 187, 5, 68, 0, 0, 187, 188,
+		5, 15, 0, 0, 188, 189, 5, 16, 0, 0, 189, 190, 5, 68, 0, 0, 190, 192, 3,
+		12, 6, 0, 191, 171, 1, 0, 0, 0, 191, 175, 1, 0, 0, 0, 191, 183, 1, 0, 0,
+		0, 192, 15, 1, 0, 0, 0, 193, 194, 5, 17, 0, 0, 194, 195, 5, 68, 0, 0, 195,
+		196, 3, 36, 18, 0, 196, 197, 5, 18, 0, 0, 197, 198, 3, 32, 16, 0, 198,
+		207, 1, 0, 0, 0, 199, 200, 5, 17, 0, 0, 200, 201, 5, 68, 0, 0, 201, 207,
+		3, 36, 18, 0, 202, 203, 5, 17, 0, 0, 203, 204, 5, 68, 0, 0, 204, 205, 5,
+		15, 0, 0, 205, 207, 3, 32, 16, 0, 206, 193, 1, 0, 0, 0, 206, 199, 1, 0,
+		0, 0, 206, 202, 1, 0, 0, 0, 207, 17, 1, 0, 0, 0, 208, 209, 5, 68, 0, 0,
+		209, 211, 3, 20, 10, 0, 210, 212, 3, 22, 11, 0, 211, 210, 1, 0, 0, 0, 212,
+		213, 1, 0, 0, 0, 213, 211, 1, 0, 0, 0, 213, 214, 1, 0, 0, 0, 214, 215,
+		1, 0, 0, 0, 215, 216, 3, 36, 18, 0, 216, 217, 5, 1, 0, 0, 217, 218, 3,
+		24, 12, 0, 218, 219, 5, 2, 0, 0, 219, 230, 1, 0, 0, 0, 220, 221, 5, 19,
+		0, 0, 221, 223, 5, 68, 0, 0, 222, 224, 3, 22, 11, 0, 223, 222, 1, 0, 0,
+		0, 224, 225, 1, 0, 0, 0, 225, 223, 1, 0, 0, 0, 225, 226, 1, 0, 0, 0, 226,
+		227, 1, 0, 0, 0, 227, 228, 3, 36, 18, 0, 228, 230, 1, 0, 0, 0, 229, 208,
+		1, 0, 0, 0, 229, 220, 1, 0, 0, 0, 230, 19, 1, 0, 0, 0, 231, 232, 7, 0,
+		0, 0, 232, 21, 1, 0, 0, 0, 233, 234, 5, 20, 0, 0, 234, 23, 1, 0, 0, 0,
+		235, 240, 3, 32, 16, 0, 236, 237, 5, 4, 0, 0, 237, 239, 3, 32, 16, 0, 238,
+		236, 1, 0, 0, 0, 239, 242, 1, 0, 0, 0, 240, 238, 1, 0, 0, 0, 240, 241,
+		1, 0, 0, 0, 241, 259, 1, 0, 0, 0, 242, 240, 1, 0, 0, 0, 243, 244, 5, 1,
+		0, 0, 244, 245, 3, 24, 12, 0, 245, 255, 5, 2, 0, 0, 246, 251, 5, 4, 0,
+		0, 247, 248, 5, 1, 0, 0, 248, 249, 3, 24, 12, 0, 249, 250, 5, 2, 0, 0,
+		250, 252, 1, 0, 0, 0, 251, 247, 1, 0, 0, 0, 251, 252, 1, 0, 0, 0, 252,
+		254, 1, 0, 0, 0, 253, 246, 1, 0, 0, 0, 254, 257, 1, 0, 0, 0, 255, 253,
+		1, 0, 0, 0, 255, 256, 1, 0, 0, 0, 256, 259, 1, 0, 0, 0, 257, 255, 1, 0,
+		0, 0, 258, 235, 1, 0, 0, 0, 258, 243, 1, 0, 0, 0, 259, 25, 1, 0, 0, 0,
+		260, 262, 5, 21, 0, 0, 261, 260, 1, 0, 0, 0, 261, 262, 1, 0, 0, 0, 262,
+		264, 1, 0, 0, 0, 263, 265, 5, 22, 0, 0, 264, 263, 1, 0, 0, 0, 264, 265,
+		1, 0, 0, 0, 265, 266, 1, 0, 0, 0, 266, 268, 5, 68, 0, 0, 267, 269, 5, 22,
+		0, 0, 268, 267, 1, 0, 0, 0, 268, 269, 1, 0, 0, 0, 269, 270, 1, 0, 0, 0,
+		270, 276, 5, 1, 0, 0, 271, 272, 3, 36, 18, 0, 272, 274, 5, 68, 0, 0, 273,
+		275, 5, 6, 0, 0, 274, 273, 1, 0, 0, 0, 274, 275, 1, 0, 0, 0, 275, 277,
+		1, 0, 0, 0, 276, 271, 1, 0, 0, 0, 277, 278, 1, 0, 0, 0, 278, 276, 1, 0,
+		0, 0, 278, 279, 1, 0, 0, 0, 279, 280, 1, 0, 0, 0, 280, 281, 5, 2, 0, 0,
+		281, 27, 1, 0, 0, 0, 282, 283, 5, 68, 0, 0, 283, 284, 5, 15, 0, 0, 284,
+		285, 5, 68, 0, 0, 285, 286, 5, 1, 0, 0, 286, 287, 5, 68, 0, 0, 287, 288,
+		5, 12, 0, 0, 288, 295, 3, 32, 16, 0, 289, 293, 5, 4, 0, 0, 290, 291, 5,
+		68, 0, 0, 291, 292, 5, 12, 0, 0, 292, 294, 3, 32, 16, 0, 293, 290, 1, 0,
+		0, 0, 293, 294, 1, 0, 0, 0, 294, 296, 1, 0, 0, 0, 295, 289, 1, 0, 0, 0,
+		296, 297, 1, 0, 0, 0, 297, 295, 1, 0, 0, 0, 297, 298, 1, 0, 0, 0, 298,
+		299, 1, 0, 0, 0, 299, 300, 5, 2, 0, 0, 300, 29, 1, 0, 0, 0, 301, 302, 5,
+		68, 0, 0, 302, 303, 5, 18, 0, 0, 303, 331, 3, 32, 16, 0, 304, 305, 5, 68,
+		0, 0, 305, 306, 7, 1, 0, 0, 306, 331, 3, 32, 16, 0, 307, 308, 5, 68, 0,
+		0, 308, 331, 7, 2, 0, 0, 309, 314, 5, 68, 0, 0, 310, 311, 5, 27, 0, 0,
+		311, 312, 3, 32, 16, 0, 312, 313, 5, 28, 0, 0, 313, 315, 1, 0, 0, 0, 314,
+		310, 1, 0, 0, 0, 315, 316, 1, 0, 0, 0, 316, 314, 1, 0, 0, 0, 316, 317,
+		1, 0, 0, 0, 317, 318, 1, 0, 0, 0, 318, 319, 5, 18, 0, 0, 319, 320, 3, 32,
+		16, 0, 320, 331, 1, 0, 0, 0, 321, 324, 5, 68, 0, 0, 322, 323, 5, 29, 0,
+		0, 323, 325, 5, 68, 0, 0, 324, 322, 1, 0, 0, 0, 325, 326, 1, 0, 0, 0, 326,
+		324, 1, 0, 0, 0, 326, 327, 1, 0, 0, 0, 327, 328, 1, 0, 0, 0, 328, 329,
+		5, 18, 0, 0, 329, 331, 3, 32, 16, 0, 330, 301, 1, 0, 0, 0, 330, 304, 1,
+		0, 0, 0, 330, 307, 1, 0, 0, 0, 330, 309, 1, 0, 0, 0, 330, 321, 1, 0, 0,
+		0, 331, 31, 1, 0, 0, 0, 332, 333, 6, 16, -1, 0, 333, 334, 5, 30, 0, 0,
+		334, 409, 3, 32, 16, 26, 335, 336, 5, 31, 0, 0, 336, 409, 3, 32, 16, 25,
+		337, 409, 5, 62, 0, 0, 338, 409, 5, 63, 0, 0, 339, 409, 5, 65, 0, 0, 340,
+		409, 5, 66, 0, 0, 341, 409, 5, 68, 0, 0, 342, 409, 5, 64, 0, 0, 343, 409,
+		5, 44, 0, 0, 344, 345, 5, 45, 0, 0, 345, 346, 3, 32, 16, 0, 346, 347, 5,
+		5, 0, 0, 347, 409, 1, 0, 0, 0, 348, 353, 5, 68, 0, 0, 349, 350, 5, 27,
+		0, 0, 350, 351, 3, 32, 16, 0, 351, 352, 5, 28, 0, 0, 352, 354, 1, 0, 0,
+		0, 353, 349, 1, 0, 0, 0, 354, 355, 1, 0, 0, 0, 355, 353, 1, 0, 0, 0, 355,
+		356, 1, 0, 0, 0, 356, 409, 1, 0, 0, 0, 357, 358, 5, 46, 0, 0, 358, 359,
+		5, 68, 0, 0, 359, 360, 5, 4, 0, 0, 360, 361, 3, 32, 16, 0, 361, 362, 5,
+		5, 0, 0, 362, 409, 1, 0, 0, 0, 363, 364, 5, 47, 0, 0, 364, 365, 5, 68,
+		0, 0, 365, 366, 5, 4, 0, 0, 366, 367, 3, 32, 16, 0, 367, 368, 5, 5, 0,
+		0, 368, 409, 1, 0, 0, 0, 369, 370, 5, 48, 0, 0, 370, 374, 5, 68, 0, 0,
+		371, 373, 3, 34, 17, 0, 372, 371, 1, 0, 0, 0, 373, 376, 1, 0, 0, 0, 374,
+		372, 1, 0, 0, 0, 374, 375, 1, 0, 0, 0, 375, 377, 1, 0, 0, 0, 376, 374,
+		1, 0, 0, 0, 377, 409, 5, 5, 0, 0, 378, 379, 5, 49, 0, 0, 379, 380, 5, 68,
+		0, 0, 380, 381, 5, 4, 0, 0, 381, 382, 3, 32, 16, 0, 382, 383, 5, 5, 0,
+		0, 383, 409, 1, 0, 0, 0, 384, 385, 5, 50, 0, 0, 385, 386, 3, 32, 16, 0,
+		386, 387, 5, 5, 0, 0, 387, 409, 1, 0, 0, 0, 388, 389, 5, 51, 0, 0, 389,
+		390, 3, 32, 16, 0, 390, 391, 5, 5, 0, 0, 391, 409, 1, 0, 0, 0, 392, 393,
+		5, 52, 0, 0, 393, 394, 3, 32, 16, 0, 394, 395, 5, 5, 0, 0, 395, 409, 1,
+		0, 0, 0, 396, 399, 5, 68, 0, 0, 397, 398, 5, 29, 0, 0, 398, 400, 5, 68,
+		0, 0, 399, 397, 1, 0, 0, 0, 400, 401, 1, 0, 0, 0, 401, 399, 1, 0, 0, 0,
+		401, 402, 1, 0, 0, 0, 402, 404, 1, 0, 0, 0, 403, 405, 5, 6, 0, 0, 404,
+		403, 1, 0, 0, 0, 404, 405, 1, 0, 0, 0, 405, 409, 1, 0, 0, 0, 406, 409,
+		3, 48, 24, 0, 407, 409, 3, 50, 25, 0, 408, 332, 1, 0, 0, 0, 408, 335, 1,
+		0, 0, 0, 408, 337, 1, 0, 0, 0, 408, 338, 1, 0, 0, 0, 408, 339, 1, 0, 0,
+		0, 408, 340, 1, 0, 0, 0, 408, 341, 1, 0, 0, 0, 408, 342, 1, 0, 0, 0, 408,
+		343, 1, 0, 0, 0, 408, 344, 1, 0, 0, 0, 408, 348, 1, 0, 0, 0, 408, 357,
+		1, 0, 0, 0, 408, 363, 1, 0, 0, 0, 408, 369, 1, 0, 0, 0, 408, 378, 1, 0,
+		0, 0, 408, 384, 1, 0, 0, 0, 408, 388, 1, 0, 0, 0, 408, 392, 1, 0, 0, 0,
+		408, 396, 1, 0, 0, 0, 408, 406, 1, 0, 0, 0, 408, 407, 1, 0, 0, 0, 409,
+		427, 1, 0, 0, 0, 410, 411, 10, 24, 0, 0, 411, 412, 7, 3, 0, 0, 412, 426,
+		3, 32, 16, 25, 413, 414, 10, 23, 0, 0, 414, 415, 7, 4, 0, 0, 415, 426,
+		3, 32, 16, 24, 416, 417, 10, 22, 0, 0, 417, 418, 7, 5, 0, 0, 418, 426,
+		3, 32, 16, 23, 419, 420, 10, 21, 0, 0, 420, 421, 7, 6, 0, 0, 421, 426,
+		3, 32, 16, 22, 422, 423, 10, 20, 0, 0, 423, 424, 7, 7, 0, 0, 424, 426,
+		3, 32, 16, 21, 425, 410, 1, 0, 0, 0, 425, 413, 1, 0, 0, 0, 425, 416, 1,
+		0, 0, 0, 425, 419, 1, 0, 0, 0, 425, 422, 1, 0, 0, 0, 426, 429, 1, 0, 0,
+		0, 427, 425, 1, 0, 0, 0, 427, 428, 1, 0, 0, 0, 428, 33, 1, 0, 0, 0, 429,
+		427, 1, 0, 0, 0, 430, 431, 5, 27, 0, 0, 431, 432, 3, 32, 16, 0, 432, 433,
+		5, 28, 0, 0, 433, 35, 1, 0, 0, 0, 434, 435, 7, 8, 0, 0, 435, 37, 1, 0,
+		0, 0, 436, 438, 5, 58, 0, 0, 437, 439, 5, 6, 0, 0, 438, 437, 1, 0, 0, 0,
+		438, 439, 1, 0, 0, 0, 439, 39, 1, 0, 0, 0, 440, 442, 5, 59, 0, 0, 441,
+		443, 5, 6, 0, 0, 442, 441, 1, 0, 0, 0, 442, 443, 1, 0, 0, 0, 443, 41, 1,
+		0, 0, 0, 444, 445, 5, 60, 0, 0, 445, 446, 5, 68, 0, 0, 446, 457, 5, 45,
+		0, 0, 447, 448, 5, 68, 0, 0, 448, 454, 3, 36, 18, 0, 449, 450, 5, 4, 0,
+		0, 450, 451, 5, 68, 0, 0, 451, 453, 3, 36, 18, 0, 452, 449, 1, 0, 0, 0,
+		453, 456, 1, 0, 0, 0, 454, 452, 1, 0, 0, 0, 454, 455, 1, 0, 0, 0, 455,
+		458, 1, 0, 0, 0, 456, 454, 1, 0, 0, 0, 457, 447, 1, 0, 0, 0, 457, 458,
+		1, 0, 0, 0, 458, 459, 1, 0, 0, 0, 459, 461, 5, 5, 0, 0, 460, 462, 3, 52,
+		26, 0, 461, 460, 1, 0, 0, 0, 461, 462, 1, 0, 0, 0, 462, 463, 1, 0, 0, 0,
+		463, 464, 3, 12, 6, 0, 464, 43, 1, 0, 0, 0, 465, 466, 5, 60, 0, 0, 466,
+		467, 5, 45, 0, 0, 467, 468, 5, 68, 0, 0, 468, 469, 5, 68, 0, 0, 469, 470,
+		5, 5, 0, 0, 470, 471, 5, 68, 0, 0, 471, 473, 5, 45, 0, 0, 472, 474, 3,
+		46, 23, 0, 473, 472, 1, 0, 0, 0, 473, 474, 1, 0, 0, 0, 474, 475, 1, 0,
+		0, 0, 475, 477, 5, 5, 0, 0, 476, 478, 3, 52, 26, 0, 477, 476, 1, 0, 0,
+		0, 477, 478, 1, 0, 0, 0, 478, 479, 1, 0, 0, 0, 479, 480, 3, 12, 6, 0, 480,
+		45, 1, 0, 0, 0, 481, 482, 5, 68, 0, 0, 482, 488, 3, 36, 18, 0, 483, 484,
+		5, 4, 0, 0, 484, 485, 5, 68, 0, 0, 485, 487, 3, 36, 18, 0, 486, 483, 1,
+		0, 0, 0, 487, 490, 1, 0, 0, 0, 488, 486, 1, 0, 0, 0, 488, 489, 1, 0, 0,
+		0, 489, 47, 1, 0, 0, 0, 490, 488, 1, 0, 0, 0, 491, 492, 5, 68, 0, 0, 492,
+		501, 5, 45, 0, 0, 493, 498, 3, 32, 16, 0, 494, 495, 5, 4, 0, 0, 495, 497,
+		3, 32, 16, 0, 496, 494, 1, 0, 0, 0, 497, 500, 1, 0, 0, 0, 498, 496, 1,
+		0, 0, 0, 498, 499, 1, 0, 0, 0, 499, 502, 1, 0, 0, 0, 500, 498, 1, 0, 0,
+		0, 501, 493, 1, 0, 0, 0, 501, 502, 1, 0, 0, 0, 502, 503, 1, 0, 0, 0, 503,
+		505, 5, 5, 0, 0, 504, 506, 5, 6, 0, 0, 505, 504, 1, 0, 0, 0, 505, 506,
+		1, 0, 0, 0, 506, 49, 1, 0, 0, 0, 507, 508, 5, 68, 0, 0, 508, 509, 5, 29,
+		0, 0, 509, 510, 5, 68, 0, 0, 510, 519, 5, 45, 0, 0, 511, 516, 3, 32, 16,
+		0, 512, 513, 5, 4, 0, 0, 513, 515, 3, 32, 16, 0, 514, 512, 1, 0, 0, 0,
+		515, 518, 1, 0, 0, 0, 516, 514, 1, 0, 0, 0, 516, 517, 1, 0, 0, 0, 517,
+		520, 1, 0, 0, 0, 518, 516, 1, 0, 0, 0, 519, 511, 1, 0, 0, 0, 519, 520,
+		1, 0, 0, 0, 520, 521, 1, 0, 0, 0, 521, 523, 5, 5, 0, 0, 522, 524, 5, 6,
+		0, 0, 523, 522, 1, 0, 0, 0, 523, 524, 1, 0, 0, 0, 524, 51, 1, 0, 0, 0,
+		525, 526, 3, 36, 18, 0, 526, 53, 1, 0, 0, 0, 527, 529, 5, 61, 0, 0, 528,
+		530, 3, 32, 16, 0, 529, 528, 1, 0, 0, 0, 529, 530, 1, 0, 0, 0, 530, 532,
+		1, 0, 0, 0, 531, 533, 5, 6, 0, 0, 532, 531, 1, 0, 0, 0, 532, 533, 1, 0,
+		0, 0, 533, 55, 1, 0, 0, 0, 59, 59, 69, 86, 94, 97, 101, 109, 112, 116,
+		118, 125, 133, 147, 151, 157, 160, 166, 191, 206, 213, 225, 229, 240, 251,
+		255, 258, 261, 264, 268, 274, 278, 293, 297, 316, 326, 330, 355, 374, 401,
+		404, 408, 425, 427, 438, 442, 454, 457, 461, 473, 477, 488, 498, 501, 505,
+		516, 519, 523, 529, 532,
+>>>>>>> feature/Structs/Dilan
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -5382,20 +5610,32 @@ func (p *gramaticaParser) VarDclStruct() (localctx IVarDclStructContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	for ok := true; ok; ok = _la == gramaticaParserID_VARIABLE {
+	for ok := true; ok; ok = ((int64((_la-22)) & ^0x3f) == 0 && ((int64(1)<<(_la-22))&70435316170753) != 0) {
 		{
+<<<<<<< HEAD
 			p.SetState(273)
+=======
+			p.SetState(271)
+			p.Type_()
+		}
+		{
+			p.SetState(272)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		{
 			p.SetState(274)
 			p.Type_()
 		}
 		p.SetState(276)
+=======
+		p.SetState(274)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -5497,95 +5737,6 @@ func (s *VarStructDclContext) ToStringTree(ruleNames []string, recog antlr.Recog
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-type StructVarTypeContext struct {
-	VarStructDclContext
-}
-
-func NewStructVarTypeContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StructVarTypeContext {
-	var p = new(StructVarTypeContext)
-
-	InitEmptyVarStructDclContext(&p.VarStructDclContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*VarStructDclContext))
-
-	return p
-}
-
-func (s *StructVarTypeContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *StructVarTypeContext) AllID_VARIABLE() []antlr.TerminalNode {
-	return s.GetTokens(gramaticaParserID_VARIABLE)
-}
-
-func (s *StructVarTypeContext) ID_VARIABLE(i int) antlr.TerminalNode {
-	return s.GetToken(gramaticaParserID_VARIABLE, i)
-}
-
-func (s *StructVarTypeContext) AllExpr() []IExprContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(IExprContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]IExprContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(IExprContext); ok {
-			tst[i] = t.(IExprContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *StructVarTypeContext) Expr(i int) IExprContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *StructVarTypeContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(gramaticaListener); ok {
-		listenerT.EnterStructVarType(s)
-	}
-}
-
-func (s *StructVarTypeContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(gramaticaListener); ok {
-		listenerT.ExitStructVarType(s)
-	}
-}
-
-func (s *StructVarTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case gramaticaVisitor:
-		return t.VisitStructVarType(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
 type StructVarTypeInferenceContext struct {
 	VarStructDclContext
 }
@@ -5680,12 +5831,72 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 	p.EnterRule(localctx, 28, gramaticaParserRULE_varStructDcl)
 	var _la int
 
+<<<<<<< HEAD
 	p.SetState(320)
+=======
+	localctx = NewStructVarTypeInferenceContext(p, localctx)
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(282)
+		p.Match(gramaticaParserID_VARIABLE)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(283)
+		p.Match(gramaticaParserT__14)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(284)
+		p.Match(gramaticaParserID_VARIABLE)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(285)
+		p.Match(gramaticaParserT__0)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(286)
+		p.Match(gramaticaParserID_VARIABLE)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(287)
+		p.Match(gramaticaParserT__11)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(288)
+		p.expr(0)
+	}
+	p.SetState(295)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
+	_la = p.GetTokenStream().LA(1)
 
+<<<<<<< HEAD
 	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 35, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewStructVarTypeContext(p, localctx)
@@ -5733,22 +5944,33 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 		{
 			p.SetState(289)
 			p.Match(gramaticaParserT__11)
+=======
+	for ok := true; ok; ok = _la == gramaticaParserT__3 {
+		{
+			p.SetState(289)
+			p.Match(gramaticaParserT__3)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		{
 			p.SetState(290)
 			p.expr(0)
 		}
 		p.SetState(295)
+=======
+		p.SetState(293)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
 		_la = p.GetTokenStream().LA(1)
 
+<<<<<<< HEAD
 		for ok := true; ok; ok = _la == gramaticaParserT__3 {
 			{
 				p.SetState(291)
@@ -5758,6 +5980,9 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 					goto errorExit
 				}
 			}
+=======
+		if _la == gramaticaParserID_VARIABLE {
+>>>>>>> feature/Structs/Dilan
 			{
 				p.SetState(292)
 				p.Match(gramaticaParserID_VARIABLE)
@@ -5779,6 +6004,7 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 				p.expr(0)
 			}
 
+<<<<<<< HEAD
 			p.SetState(297)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
@@ -5851,11 +6077,17 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 			p.expr(0)
 		}
 		p.SetState(314)
+=======
+		}
+
+		p.SetState(297)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
 		_la = p.GetTokenStream().LA(1)
+<<<<<<< HEAD
 
 		for ok := true; ok; ok = _la == gramaticaParserT__3 {
 			{
@@ -5915,6 +6147,16 @@ func (p *gramaticaParser) VarStructDcl() (localctx IVarStructDclContext) {
 
 	case antlr.ATNInvalidAltNumber:
 		goto errorExit
+=======
+	}
+	{
+		p.SetState(299)
+		p.Match(gramaticaParserT__1)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+>>>>>>> feature/Structs/Dilan
 	}
 
 errorExit:
@@ -6312,18 +6554,30 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 	p.EnterRule(localctx, 30, gramaticaParserRULE_varAsign)
 	var _la int
 
+<<<<<<< HEAD
 	p.SetState(351)
+=======
+	p.SetState(330)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
 
+<<<<<<< HEAD
 	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 38, p.GetParserRuleContext()) {
+=======
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 35, p.GetParserRuleContext()) {
+>>>>>>> feature/Structs/Dilan
 	case 1:
 		localctx = NewVarExprContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
+<<<<<<< HEAD
 			p.SetState(322)
+=======
+			p.SetState(301)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6331,7 +6585,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(323)
+=======
+			p.SetState(302)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__17)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6339,7 +6597,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(324)
+=======
+			p.SetState(303)
+>>>>>>> feature/Structs/Dilan
 			p.expr(0)
 		}
 
@@ -6347,7 +6609,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		localctx = NewVarAddContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
+<<<<<<< HEAD
 			p.SetState(325)
+=======
+			p.SetState(304)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6355,7 +6621,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(326)
+=======
+			p.SetState(305)
+>>>>>>> feature/Structs/Dilan
 
 			var _lt = p.GetTokenStream().LT(1)
 
@@ -6373,7 +6643,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(327)
+=======
+			p.SetState(306)
+>>>>>>> feature/Structs/Dilan
 			p.expr(0)
 		}
 
@@ -6381,7 +6655,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		localctx = NewVarIncContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
+<<<<<<< HEAD
 			p.SetState(328)
+=======
+			p.SetState(307)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6389,7 +6667,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(329)
+=======
+			p.SetState(308)
+>>>>>>> feature/Structs/Dilan
 
 			var _lt = p.GetTokenStream().LT(1)
 
@@ -6411,14 +6693,22 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		localctx = NewArrayAccessContext(p, localctx)
 		p.EnterOuterAlt(localctx, 4)
 		{
+<<<<<<< HEAD
 			p.SetState(330)
+=======
+			p.SetState(309)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		p.SetState(335)
+=======
+		p.SetState(314)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -6427,6 +6717,7 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 
 		for ok := true; ok; ok = _la == gramaticaParserT__25 {
 			{
+<<<<<<< HEAD
 				p.SetState(331)
 				p.Match(gramaticaParserT__25)
 				if p.HasError() {
@@ -6440,14 +6731,34 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 			{
 				p.SetState(333)
+=======
+				p.SetState(310)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserT__26)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
 				}
 			}
+<<<<<<< HEAD
 
 			p.SetState(337)
+=======
+			{
+				p.SetState(311)
+				p.expr(0)
+			}
+			{
+				p.SetState(312)
+				p.Match(gramaticaParserT__27)
+				if p.HasError() {
+					// Recognition error - abort rule
+					goto errorExit
+				}
+			}
+
+			p.SetState(316)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -6455,7 +6766,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			_la = p.GetTokenStream().LA(1)
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(339)
+=======
+			p.SetState(318)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__17)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6463,7 +6778,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(340)
+=======
+			p.SetState(319)
+>>>>>>> feature/Structs/Dilan
 			p.expr(0)
 		}
 
@@ -6471,14 +6790,22 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 		localctx = NewStructAccessAsignContext(p, localctx)
 		p.EnterOuterAlt(localctx, 5)
 		{
+<<<<<<< HEAD
 			p.SetState(342)
+=======
+			p.SetState(321)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		p.SetState(345)
+=======
+		p.SetState(324)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -6487,15 +6814,24 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 
 		for ok := true; ok; ok = _la == gramaticaParserT__27 {
 			{
+<<<<<<< HEAD
 				p.SetState(343)
 				p.Match(gramaticaParserT__27)
+=======
+				p.SetState(322)
+				p.Match(gramaticaParserT__28)
+>>>>>>> feature/Structs/Dilan
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
 				}
 			}
 			{
+<<<<<<< HEAD
 				p.SetState(344)
+=======
+				p.SetState(323)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserID_VARIABLE)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -6503,7 +6839,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 				}
 			}
 
+<<<<<<< HEAD
 			p.SetState(347)
+=======
+			p.SetState(326)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -6511,7 +6851,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			_la = p.GetTokenStream().LA(1)
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(349)
+=======
+			p.SetState(328)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__17)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -6519,7 +6863,11 @@ func (p *gramaticaParser) VarAsign() (localctx IVarAsignContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(350)
+=======
+			p.SetState(329)
+>>>>>>> feature/Structs/Dilan
 			p.expr(0)
 		}
 
@@ -8192,28 +8540,45 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
+<<<<<<< HEAD
 	p.SetState(429)
+=======
+	p.SetState(408)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
 
+<<<<<<< HEAD
 	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 43, p.GetParserRuleContext()) {
+=======
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 40, p.GetParserRuleContext()) {
+>>>>>>> feature/Structs/Dilan
 	case 1:
 		localctx = NewNegateContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 
 		{
+<<<<<<< HEAD
 			p.SetState(354)
 			p.Match(gramaticaParserT__28)
+=======
+			p.SetState(333)
+			p.Match(gramaticaParserT__29)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(355)
+=======
+			p.SetState(334)
+>>>>>>> feature/Structs/Dilan
 			p.expr(26)
 		}
 
@@ -8222,15 +8587,24 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(356)
 			p.Match(gramaticaParserT__29)
+=======
+			p.SetState(335)
+			p.Match(gramaticaParserT__30)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(357)
+=======
+			p.SetState(336)
+>>>>>>> feature/Structs/Dilan
 			p.expr(25)
 		}
 
@@ -8239,7 +8613,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(358)
+=======
+			p.SetState(337)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserINT)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8252,7 +8630,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(359)
+=======
+			p.SetState(338)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserDOUBLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8265,7 +8647,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(360)
+=======
+			p.SetState(339)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserSTRING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8278,7 +8664,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(361)
+=======
+			p.SetState(340)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserBOOL)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8291,7 +8681,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(362)
+=======
+			p.SetState(341)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8304,7 +8698,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(363)
+=======
+			p.SetState(342)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserCHAR)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8317,8 +8715,13 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(364)
 			p.Match(gramaticaParserT__42)
+=======
+			p.SetState(343)
+			p.Match(gramaticaParserT__43)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8330,8 +8733,220 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(365)
 			p.Match(gramaticaParserT__43)
+=======
+			p.SetState(344)
+			p.Match(gramaticaParserT__44)
+>>>>>>> feature/Structs/Dilan
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+<<<<<<< HEAD
+			p.SetState(366)
+			p.expr(0)
+		}
+		{
+			p.SetState(367)
+=======
+			p.SetState(345)
+			p.expr(0)
+		}
+		{
+			p.SetState(346)
+>>>>>>> feature/Structs/Dilan
+			p.Match(gramaticaParserT__4)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 11:
+		localctx = NewArrayAccessSimpleContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+<<<<<<< HEAD
+			p.SetState(369)
+=======
+			p.SetState(348)
+>>>>>>> feature/Structs/Dilan
+			p.Match(gramaticaParserID_VARIABLE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+<<<<<<< HEAD
+		p.SetState(374)
+=======
+		p.SetState(353)
+>>>>>>> feature/Structs/Dilan
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_alt = 1
+		for ok := true; ok; ok = _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+			switch _alt {
+			case 1:
+				{
+<<<<<<< HEAD
+					p.SetState(370)
+					p.Match(gramaticaParserT__25)
+=======
+					p.SetState(349)
+					p.Match(gramaticaParserT__26)
+>>>>>>> feature/Structs/Dilan
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+				{
+<<<<<<< HEAD
+					p.SetState(371)
+					p.expr(0)
+				}
+				{
+					p.SetState(372)
+					p.Match(gramaticaParserT__26)
+=======
+					p.SetState(350)
+					p.expr(0)
+				}
+				{
+					p.SetState(351)
+					p.Match(gramaticaParserT__27)
+>>>>>>> feature/Structs/Dilan
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+
+			default:
+				p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+				goto errorExit
+			}
+
+<<<<<<< HEAD
+			p.SetState(376)
+			p.GetErrorHandler().Sync(p)
+			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 39, p.GetParserRuleContext())
+=======
+			p.SetState(355)
+			p.GetErrorHandler().Sync(p)
+			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 36, p.GetParserRuleContext())
+>>>>>>> feature/Structs/Dilan
+			if p.HasError() {
+				goto errorExit
+			}
+		}
+
+	case 12:
+		localctx = NewArrayFindIndexContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+<<<<<<< HEAD
+			p.SetState(378)
+			p.Match(gramaticaParserT__44)
+=======
+			p.SetState(357)
+			p.Match(gramaticaParserT__45)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(358)
+			p.Match(gramaticaParserID_VARIABLE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(359)
+			p.Match(gramaticaParserT__3)
+>>>>>>> feature/Structs/Dilan
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+<<<<<<< HEAD
+			p.SetState(379)
+			p.Match(gramaticaParserID_VARIABLE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(380)
+			p.Match(gramaticaParserT__3)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(381)
+			p.expr(0)
+		}
+		{
+			p.SetState(382)
+=======
+			p.SetState(360)
+			p.expr(0)
+		}
+		{
+			p.SetState(361)
+>>>>>>> feature/Structs/Dilan
+			p.Match(gramaticaParserT__4)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 13:
+		localctx = NewArrayJoinContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+<<<<<<< HEAD
+			p.SetState(384)
+			p.Match(gramaticaParserT__45)
+=======
+			p.SetState(363)
+			p.Match(gramaticaParserT__46)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(364)
+			p.Match(gramaticaParserID_VARIABLE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(365)
+			p.Match(gramaticaParserT__3)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8350,12 +8965,20 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
-	case 11:
-		localctx = NewArrayAccessSimpleContext(p, localctx)
+	case 14:
+		localctx = NewArrayLengthContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
 			p.SetState(369)
+			p.Match(gramaticaParserT__47)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(370)
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8367,51 +8990,37 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		if p.HasError() {
 			goto errorExit
 		}
-		_alt = 1
-		for ok := true; ok; ok = _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-			switch _alt {
-			case 1:
-				{
-					p.SetState(370)
-					p.Match(gramaticaParserT__25)
-					if p.HasError() {
-						// Recognition error - abort rule
-						goto errorExit
-					}
-				}
-				{
-					p.SetState(371)
-					p.expr(0)
-				}
-				{
-					p.SetState(372)
-					p.Match(gramaticaParserT__26)
-					if p.HasError() {
-						// Recognition error - abort rule
-						goto errorExit
-					}
-				}
+		_la = p.GetTokenStream().LA(1)
 
-			default:
-				p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
-				goto errorExit
+		for _la == gramaticaParserT__26 {
+			{
+				p.SetState(371)
+				p.Posicion()
 			}
 
 			p.SetState(376)
 			p.GetErrorHandler().Sync(p)
-			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 39, p.GetParserRuleContext())
 			if p.HasError() {
+				goto errorExit
+			}
+			_la = p.GetTokenStream().LA(1)
+		}
+		{
+			p.SetState(377)
+			p.Match(gramaticaParserT__4)
+			if p.HasError() {
+				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 
-	case 12:
-		localctx = NewArrayFindIndexContext(p, localctx)
+	case 15:
+		localctx = NewArrayAppendContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
 			p.SetState(378)
-			p.Match(gramaticaParserT__44)
+			p.Match(gramaticaParserT__48)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8446,13 +9055,13 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
-	case 13:
-		localctx = NewArrayJoinContext(p, localctx)
+	case 16:
+		localctx = NewIntToStringContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
 			p.SetState(384)
-			p.Match(gramaticaParserT__45)
+			p.Match(gramaticaParserT__49)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -8487,6 +9096,7 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
+<<<<<<< HEAD
 	case 14:
 		localctx = NewArrayLengthContext(p, localctx)
 		p.SetParserRuleContext(localctx)
@@ -8602,24 +9212,39 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
+=======
+>>>>>>> feature/Structs/Dilan
 	case 17:
 		localctx = NewFloatToStringContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(409)
 			p.Match(gramaticaParserT__49)
+=======
+			p.SetState(388)
+			p.Match(gramaticaParserT__50)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(410)
 			p.expr(0)
 		}
 		{
 			p.SetState(411)
+=======
+			p.SetState(389)
+			p.expr(0)
+		}
+		{
+			p.SetState(390)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__4)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8632,19 +9257,32 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(413)
 			p.Match(gramaticaParserT__50)
+=======
+			p.SetState(392)
+			p.Match(gramaticaParserT__51)
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(414)
 			p.expr(0)
 		}
 		{
 			p.SetState(415)
+=======
+			p.SetState(393)
+			p.expr(0)
+		}
+		{
+			p.SetState(394)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__4)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -8657,14 +9295,22 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(417)
+=======
+			p.SetState(396)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		p.SetState(420)
+=======
+		p.SetState(399)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -8674,15 +9320,24 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			switch _alt {
 			case 1:
 				{
+<<<<<<< HEAD
 					p.SetState(418)
 					p.Match(gramaticaParserT__27)
+=======
+					p.SetState(397)
+					p.Match(gramaticaParserT__28)
+>>>>>>> feature/Structs/Dilan
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(419)
+=======
+					p.SetState(398)
+>>>>>>> feature/Structs/Dilan
 					p.Match(gramaticaParserID_VARIABLE)
 					if p.HasError() {
 						// Recognition error - abort rule
@@ -8695,19 +9350,34 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 				goto errorExit
 			}
 
+<<<<<<< HEAD
 			p.SetState(422)
 			p.GetErrorHandler().Sync(p)
 			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 41, p.GetParserRuleContext())
+=======
+			p.SetState(401)
+			p.GetErrorHandler().Sync(p)
+			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 38, p.GetParserRuleContext())
+>>>>>>> feature/Structs/Dilan
 			if p.HasError() {
 				goto errorExit
 			}
 		}
+<<<<<<< HEAD
 		p.SetState(425)
 		p.GetErrorHandler().Sync(p)
 
 		if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 42, p.GetParserRuleContext()) == 1 {
 			{
 				p.SetState(424)
+=======
+		p.SetState(404)
+		p.GetErrorHandler().Sync(p)
+
+		if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 39, p.GetParserRuleContext()) == 1 {
+			{
+				p.SetState(403)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserT__5)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -8724,7 +9394,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(427)
+=======
+			p.SetState(406)
+>>>>>>> feature/Structs/Dilan
 			p.VarCallStatement()
 		}
 
@@ -8733,7 +9407,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
+<<<<<<< HEAD
 			p.SetState(428)
+=======
+			p.SetState(407)
+>>>>>>> feature/Structs/Dilan
 			p.VarCallFuncStruct()
 		}
 
@@ -8741,12 +9419,20 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 		goto errorExit
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+<<<<<<< HEAD
 	p.SetState(448)
+=======
+	p.SetState(427)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
+<<<<<<< HEAD
 	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 45, p.GetParserRuleContext())
+=======
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 42, p.GetParserRuleContext())
+>>>>>>> feature/Structs/Dilan
 	if p.HasError() {
 		goto errorExit
 	}
@@ -8756,24 +9442,40 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
+<<<<<<< HEAD
 			p.SetState(446)
+=======
+			p.SetState(425)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
 			}
 
+<<<<<<< HEAD
 			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 44, p.GetParserRuleContext()) {
 			case 1:
 				localctx = NewMulDivModuloContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
 				p.SetState(431)
+=======
+			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 41, p.GetParserRuleContext()) {
+			case 1:
+				localctx = NewMulDivModuloContext(p, NewExprContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
+				p.SetState(410)
+>>>>>>> feature/Structs/Dilan
 
 				if !(p.Precpred(p.GetParserRuleContext(), 24)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 24)", ""))
 					goto errorExit
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(432)
+=======
+					p.SetState(411)
+>>>>>>> feature/Structs/Dilan
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -8791,21 +9493,33 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(433)
+=======
+					p.SetState(412)
+>>>>>>> feature/Structs/Dilan
 					p.expr(25)
 				}
 
 			case 2:
 				localctx = NewAddSubContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
+<<<<<<< HEAD
 				p.SetState(434)
+=======
+				p.SetState(413)
+>>>>>>> feature/Structs/Dilan
 
 				if !(p.Precpred(p.GetParserRuleContext(), 23)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 23)", ""))
 					goto errorExit
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(435)
+=======
+					p.SetState(414)
+>>>>>>> feature/Structs/Dilan
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -8823,21 +9537,33 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(436)
+=======
+					p.SetState(415)
+>>>>>>> feature/Structs/Dilan
 					p.expr(24)
 				}
 
 			case 3:
 				localctx = NewMinorMajorEqualContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
+<<<<<<< HEAD
 				p.SetState(437)
+=======
+				p.SetState(416)
+>>>>>>> feature/Structs/Dilan
 
 				if !(p.Precpred(p.GetParserRuleContext(), 22)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 22)", ""))
 					goto errorExit
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(438)
+=======
+					p.SetState(417)
+>>>>>>> feature/Structs/Dilan
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -8855,21 +9581,33 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(439)
+=======
+					p.SetState(418)
+>>>>>>> feature/Structs/Dilan
 					p.expr(23)
 				}
 
 			case 4:
 				localctx = NewEqualsNotEqualsContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
+<<<<<<< HEAD
 				p.SetState(440)
+=======
+				p.SetState(419)
+>>>>>>> feature/Structs/Dilan
 
 				if !(p.Precpred(p.GetParserRuleContext(), 21)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 21)", ""))
 					goto errorExit
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(441)
+=======
+					p.SetState(420)
+>>>>>>> feature/Structs/Dilan
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -8887,21 +9625,33 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(442)
+=======
+					p.SetState(421)
+>>>>>>> feature/Structs/Dilan
 					p.expr(22)
 				}
 
 			case 5:
 				localctx = NewLogicalContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, gramaticaParserRULE_expr)
+<<<<<<< HEAD
 				p.SetState(443)
+=======
+				p.SetState(422)
+>>>>>>> feature/Structs/Dilan
 
 				if !(p.Precpred(p.GetParserRuleContext(), 20)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 20)", ""))
 					goto errorExit
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(444)
+=======
+					p.SetState(423)
+>>>>>>> feature/Structs/Dilan
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -8919,7 +9669,11 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
+<<<<<<< HEAD
 					p.SetState(445)
+=======
+					p.SetState(424)
+>>>>>>> feature/Structs/Dilan
 					p.expr(21)
 				}
 
@@ -8928,12 +9682,20 @@ func (p *gramaticaParser) expr(_p int) (localctx IExprContext) {
 			}
 
 		}
+<<<<<<< HEAD
 		p.SetState(450)
+=======
+		p.SetState(429)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
+<<<<<<< HEAD
 		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 45, p.GetParserRuleContext())
+=======
+		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 42, p.GetParserRuleContext())
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			goto errorExit
 		}
@@ -9049,20 +9811,34 @@ func (p *gramaticaParser) Posicion() (localctx IPosicionContext) {
 	p.EnterRule(localctx, 34, gramaticaParserRULE_posicion)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(451)
 		p.Match(gramaticaParserT__25)
+=======
+		p.SetState(430)
+		p.Match(gramaticaParserT__26)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(452)
 		p.expr(0)
 	}
 	{
 		p.SetState(453)
 		p.Match(gramaticaParserT__26)
+=======
+		p.SetState(431)
+		p.expr(0)
+	}
+	{
+		p.SetState(432)
+		p.Match(gramaticaParserT__27)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -9169,7 +9945,11 @@ func (p *gramaticaParser) Type_() (localctx ITypeContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(455)
+=======
+		p.SetState(434)
+>>>>>>> feature/Structs/Dilan
 		_la = p.GetTokenStream().LA(1)
 
 		if !((int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0) {
@@ -9271,14 +10051,23 @@ func (p *gramaticaParser) Break_() (localctx IBreakContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(457)
 		p.Match(gramaticaParserT__56)
+=======
+		p.SetState(436)
+		p.Match(gramaticaParserT__57)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(459)
+=======
+	p.SetState(438)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9287,7 +10076,11 @@ func (p *gramaticaParser) Break_() (localctx IBreakContext) {
 
 	if _la == gramaticaParserT__5 {
 		{
+<<<<<<< HEAD
 			p.SetState(458)
+=======
+			p.SetState(437)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -9388,14 +10181,23 @@ func (p *gramaticaParser) Continue_() (localctx IContinueContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(461)
 		p.Match(gramaticaParserT__57)
+=======
+		p.SetState(440)
+		p.Match(gramaticaParserT__58)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(463)
+=======
+	p.SetState(442)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9404,7 +10206,11 @@ func (p *gramaticaParser) Continue_() (localctx IContinueContext) {
 
 	if _la == gramaticaParserT__5 {
 		{
+<<<<<<< HEAD
 			p.SetState(462)
+=======
+			p.SetState(441)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -9610,15 +10416,24 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 	localctx = NewFuncionesContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(465)
 		p.Match(gramaticaParserT__58)
+=======
+		p.SetState(444)
+		p.Match(gramaticaParserT__59)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(466)
+=======
+		p.SetState(445)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserID_VARIABLE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -9626,14 +10441,23 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(467)
 		p.Match(gramaticaParserT__43)
+=======
+		p.SetState(446)
+		p.Match(gramaticaParserT__44)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(478)
+=======
+	p.SetState(457)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9642,7 +10466,11 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 
 	if _la == gramaticaParserID_VARIABLE {
 		{
+<<<<<<< HEAD
 			p.SetState(468)
+=======
+			p.SetState(447)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -9650,10 +10478,17 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(469)
 			p.Type_()
 		}
 		p.SetState(475)
+=======
+			p.SetState(448)
+			p.Type_()
+		}
+		p.SetState(454)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -9662,7 +10497,11 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 
 		for _la == gramaticaParserT__3 {
 			{
+<<<<<<< HEAD
 				p.SetState(470)
+=======
+				p.SetState(449)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserT__3)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -9670,7 +10509,11 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 				}
 			}
 			{
+<<<<<<< HEAD
 				p.SetState(471)
+=======
+				p.SetState(450)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserID_VARIABLE)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -9678,11 +10521,19 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 				}
 			}
 			{
+<<<<<<< HEAD
 				p.SetState(472)
 				p.Type_()
 			}
 
 			p.SetState(477)
+=======
+				p.SetState(451)
+				p.Type_()
+			}
+
+			p.SetState(456)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -9692,14 +10543,22 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(480)
+=======
+		p.SetState(459)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserT__4)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(482)
+=======
+	p.SetState(461)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9708,13 +10567,21 @@ func (p *gramaticaParser) Functions() (localctx IFunctionsContext) {
 
 	if (int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0 {
 		{
+<<<<<<< HEAD
 			p.SetState(481)
+=======
+			p.SetState(460)
+>>>>>>> feature/Structs/Dilan
 			p.ValRet()
 		}
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(484)
+=======
+		p.SetState(463)
+>>>>>>> feature/Structs/Dilan
 		p.Block()
 	}
 
@@ -9889,31 +10756,62 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 	localctx = NewFuncionesStructsNativasContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(486)
 		p.Match(gramaticaParserT__58)
+=======
+		p.SetState(465)
+		p.Match(gramaticaParserT__59)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
+		p.SetState(466)
+		p.Match(gramaticaParserT__44)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+		p.SetState(467)
+		p.Match(gramaticaParserID_VARIABLE)
+>>>>>>> feature/Structs/Dilan
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+<<<<<<< HEAD
 		p.SetState(487)
 		p.Match(gramaticaParserT__43)
+=======
+		p.SetState(468)
+		p.Match(gramaticaParserID_VARIABLE)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(488)
 		p.Match(gramaticaParserID_VARIABLE)
+=======
+		p.SetState(469)
+		p.Match(gramaticaParserT__4)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
-		p.SetState(489)
+		p.SetState(470)
 		p.Match(gramaticaParserID_VARIABLE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -9921,13 +10819,19 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(490)
 		p.Match(gramaticaParserT__4)
+=======
+		p.SetState(471)
+		p.Match(gramaticaParserT__44)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	{
 		p.SetState(491)
 		p.Match(gramaticaParserID_VARIABLE)
@@ -9945,6 +10849,9 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 		}
 	}
 	p.SetState(494)
+=======
+	p.SetState(473)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9953,20 +10860,32 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 
 	if _la == gramaticaParserID_VARIABLE {
 		{
+<<<<<<< HEAD
 			p.SetState(493)
+=======
+			p.SetState(472)
+>>>>>>> feature/Structs/Dilan
 			p.DefParams()
 		}
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(496)
+=======
+		p.SetState(475)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserT__4)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(498)
+=======
+	p.SetState(477)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -9975,13 +10894,21 @@ func (p *gramaticaParser) FunctionStruct() (localctx IFunctionStructContext) {
 
 	if (int64((_la-21)) & ^0x3f) == 0 && ((int64(1)<<(_la-21))&70435316170753) != 0 {
 		{
+<<<<<<< HEAD
 			p.SetState(497)
+=======
+			p.SetState(476)
+>>>>>>> feature/Structs/Dilan
 			p.ValRet()
 		}
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(500)
+=======
+		p.SetState(479)
+>>>>>>> feature/Structs/Dilan
 		p.Block()
 	}
 
@@ -10133,7 +11060,11 @@ func (p *gramaticaParser) DefParams() (localctx IDefParamsContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(502)
+=======
+		p.SetState(481)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserID_VARIABLE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -10141,10 +11072,17 @@ func (p *gramaticaParser) DefParams() (localctx IDefParamsContext) {
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(503)
 		p.Type_()
 	}
 	p.SetState(509)
+=======
+		p.SetState(482)
+		p.Type_()
+	}
+	p.SetState(488)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -10153,7 +11091,11 @@ func (p *gramaticaParser) DefParams() (localctx IDefParamsContext) {
 
 	for _la == gramaticaParserT__3 {
 		{
+<<<<<<< HEAD
 			p.SetState(504)
+=======
+			p.SetState(483)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__3)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -10161,7 +11103,11 @@ func (p *gramaticaParser) DefParams() (localctx IDefParamsContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(505)
+=======
+			p.SetState(484)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserID_VARIABLE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -10169,11 +11115,19 @@ func (p *gramaticaParser) DefParams() (localctx IDefParamsContext) {
 			}
 		}
 		{
+<<<<<<< HEAD
 			p.SetState(506)
 			p.Type_()
 		}
 
 		p.SetState(511)
+=======
+			p.SetState(485)
+			p.Type_()
+		}
+
+		p.SetState(490)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -10341,7 +11295,11 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 	localctx = NewCallFunctionContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(512)
+=======
+		p.SetState(491)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserID_VARIABLE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -10349,14 +11307,23 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 		}
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(513)
 		p.Match(gramaticaParserT__43)
+=======
+		p.SetState(492)
+		p.Match(gramaticaParserT__44)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(522)
+=======
+	p.SetState(501)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -10365,10 +11332,17 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 
 	if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
 		{
+<<<<<<< HEAD
 			p.SetState(514)
 			p.expr(0)
 		}
 		p.SetState(519)
+=======
+			p.SetState(493)
+			p.expr(0)
+		}
+		p.SetState(498)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -10377,7 +11351,11 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 
 		for _la == gramaticaParserT__3 {
 			{
+<<<<<<< HEAD
 				p.SetState(515)
+=======
+				p.SetState(494)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserT__3)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -10385,11 +11363,19 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 				}
 			}
 			{
+<<<<<<< HEAD
 				p.SetState(516)
 				p.expr(0)
 			}
 
 			p.SetState(521)
+=======
+				p.SetState(495)
+				p.expr(0)
+			}
+
+			p.SetState(500)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -10399,19 +11385,32 @@ func (p *gramaticaParser) VarCallStatement() (localctx IVarCallStatementContext)
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(524)
+=======
+		p.SetState(503)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserT__4)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(526)
 	p.GetErrorHandler().Sync(p)
 
 	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 56, p.GetParserRuleContext()) == 1 {
 		{
 			p.SetState(525)
+=======
+	p.SetState(505)
+	p.GetErrorHandler().Sync(p)
+
+	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 53, p.GetParserRuleContext()) == 1 {
+		{
+			p.SetState(504)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -10587,7 +11586,10 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 	localctx = NewCallFunctionStructContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(528)
+=======
+		p.SetState(507)
 		p.Match(gramaticaParserID_VARIABLE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -10595,13 +11597,36 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 		}
 	}
 	{
-		p.SetState(529)
-		p.Match(gramaticaParserT__27)
+		p.SetState(508)
+		p.Match(gramaticaParserT__28)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+	{
+		p.SetState(509)
+>>>>>>> feature/Structs/Dilan
+		p.Match(gramaticaParserID_VARIABLE)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+	{
+<<<<<<< HEAD
+		p.SetState(529)
+		p.Match(gramaticaParserT__27)
+=======
+		p.SetState(510)
+		p.Match(gramaticaParserT__44)
+>>>>>>> feature/Structs/Dilan
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+<<<<<<< HEAD
 	{
 		p.SetState(530)
 		p.Match(gramaticaParserID_VARIABLE)
@@ -10619,6 +11644,9 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 		}
 	}
 	p.SetState(540)
+=======
+	p.SetState(519)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -10627,10 +11655,17 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 
 	if (int64((_la-29)) & ^0x3f) == 0 && ((int64(1)<<(_la-29))&408030265347) != 0 {
 		{
+<<<<<<< HEAD
 			p.SetState(532)
 			p.expr(0)
 		}
 		p.SetState(537)
+=======
+			p.SetState(511)
+			p.expr(0)
+		}
+		p.SetState(516)
+>>>>>>> feature/Structs/Dilan
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -10639,7 +11674,11 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 
 		for _la == gramaticaParserT__3 {
 			{
+<<<<<<< HEAD
 				p.SetState(533)
+=======
+				p.SetState(512)
+>>>>>>> feature/Structs/Dilan
 				p.Match(gramaticaParserT__3)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -10647,11 +11686,19 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 				}
 			}
 			{
+<<<<<<< HEAD
 				p.SetState(534)
 				p.expr(0)
 			}
 
 			p.SetState(539)
+=======
+				p.SetState(513)
+				p.expr(0)
+			}
+
+			p.SetState(518)
+>>>>>>> feature/Structs/Dilan
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -10661,19 +11708,32 @@ func (p *gramaticaParser) VarCallFuncStruct() (localctx IVarCallFuncStructContex
 
 	}
 	{
+<<<<<<< HEAD
 		p.SetState(542)
+=======
+		p.SetState(521)
+>>>>>>> feature/Structs/Dilan
 		p.Match(gramaticaParserT__4)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(544)
 	p.GetErrorHandler().Sync(p)
 
 	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 59, p.GetParserRuleContext()) == 1 {
 		{
 			p.SetState(543)
+=======
+	p.SetState(523)
+	p.GetErrorHandler().Sync(p)
+
+	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 56, p.GetParserRuleContext()) == 1 {
+		{
+			p.SetState(522)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -10795,7 +11855,11 @@ func (p *gramaticaParser) ValRet() (localctx IValRetContext) {
 	p.EnterRule(localctx, 52, gramaticaParserRULE_valRet)
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(546)
+=======
+		p.SetState(525)
+>>>>>>> feature/Structs/Dilan
 		p.Type_()
 	}
 
@@ -10911,26 +11975,44 @@ func (p *gramaticaParser) Retorno() (localctx IRetornoContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
+<<<<<<< HEAD
 		p.SetState(548)
 		p.Match(gramaticaParserT__59)
+=======
+		p.SetState(527)
+		p.Match(gramaticaParserT__60)
+>>>>>>> feature/Structs/Dilan
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
+<<<<<<< HEAD
 	p.SetState(550)
 	p.GetErrorHandler().Sync(p)
 
 	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 60, p.GetParserRuleContext()) == 1 {
 		{
 			p.SetState(549)
+=======
+	p.SetState(529)
+	p.GetErrorHandler().Sync(p)
+
+	if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 57, p.GetParserRuleContext()) == 1 {
+		{
+			p.SetState(528)
+>>>>>>> feature/Structs/Dilan
 			p.expr(0)
 		}
 
 	} else if p.HasError() { // JIM
 		goto errorExit
 	}
+<<<<<<< HEAD
 	p.SetState(553)
+=======
+	p.SetState(532)
+>>>>>>> feature/Structs/Dilan
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -10939,7 +12021,11 @@ func (p *gramaticaParser) Retorno() (localctx IRetornoContext) {
 
 	if _la == gramaticaParserT__5 {
 		{
+<<<<<<< HEAD
 			p.SetState(552)
+=======
+			p.SetState(531)
+>>>>>>> feature/Structs/Dilan
 			p.Match(gramaticaParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule

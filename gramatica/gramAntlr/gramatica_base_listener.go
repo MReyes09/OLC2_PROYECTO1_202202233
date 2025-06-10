@@ -254,12 +254,6 @@ func (s *BasegramaticaListener) EnterDeclStructData(ctx *DeclStructDataContext) 
 // ExitDeclStructData is called when production DeclStructData is exited.
 func (s *BasegramaticaListener) ExitDeclStructData(ctx *DeclStructDataContext) {}
 
-// EnterStructVarType is called when production StructVarType is entered.
-func (s *BasegramaticaListener) EnterStructVarType(ctx *StructVarTypeContext) {}
-
-// ExitStructVarType is called when production StructVarType is exited.
-func (s *BasegramaticaListener) ExitStructVarType(ctx *StructVarTypeContext) {}
-
 // EnterStructVarTypeInference is called when production StructVarTypeInference is entered.
 func (s *BasegramaticaListener) EnterStructVarTypeInference(ctx *StructVarTypeInferenceContext) {}
 

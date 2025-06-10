@@ -92,11 +92,10 @@ contenidoSlice: expr (',' expr)*                                # SliceContenido
     | '{' contenidoSlice '}' (',' ('{' contenidoSlice '}')?)*      # SliceContenidoSlice
 ;
 // ----------------- Declaracion de estructuras -----------------
-varDclStruct: 'type'? 'struct'? ID_VARIABLE 'struct'? '{'( ID_VARIABLE type';'?)+'}'   # DeclStructData
+varDclStruct: 'type'? 'struct'? ID_VARIABLE 'struct'? '{'( type ID_VARIABLE ';'?)+'}'   # DeclStructData
 ;
 
-varStructDcl: ID_VARIABLE ID_VARIABLE '=' '{' ID_VARIABLE ':' expr (',' ID_VARIABLE ':' expr)+ '}'  # StructVarType
-    | ID_VARIABLE ':=' ID_VARIABLE '{' ID_VARIABLE ':' expr (',' (ID_VARIABLE ':' expr)?)+ '}'  # StructVarTypeInference
+varStructDcl: ID_VARIABLE ':=' ID_VARIABLE '{' ID_VARIABLE ':' expr (',' (ID_VARIABLE ':' expr)?)+ '}'  # StructVarTypeInference
 ;
 
 // ----------------- Asignacion de variables -----------------

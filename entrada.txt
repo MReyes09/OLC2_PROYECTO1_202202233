@@ -1,42 +1,27 @@
-fn main() {
-    // Declaración e inicialización de variables
-    mut var1 := 10
-    mut var2 := 0.0
-    // Correcto: Operación += con valores del mismo tipo
-    var1 += 10 // var1 tendrá el valor de 20
-    println('var1: $var1')
-    // Error: No se puede asignar un float a un int (comentado)
-    // var1 += 10.0
-    // Correcto: Operación += con valores float
-    var2 += 10 // var2 tendrá el valor de 10.0
-    println('var2: $var2')
-    // Correcto: Operación += con valores del mismo tipo (float)
-    var2 += 10.0 // var2 tendrá el valor de 20.0
-    println('var2: $var2')
-    // Declaración de una cadena de texto
-    mut str := 'cad'
-    // Correcto: Concatenación de strings con +=
-    str += 'cad' // str tendrá el valor de "cadcad"
-    println('str: $str')
-    // Error: Operación inválida string + int (comentado)
-    // str += 10
+// Definición del struct
+struct Persona {
+    string Nombre
+    int Edad
+    bool EsEstudiante
 }
 
-
-for mut i := 10; i < 10; i++ {
-    println(i)
+// Creación de una instancia
+miInstancia := Persona{
+    Nombre: "Ya estuvo",
+    Edad: 25,
+    EsEstudiante: false,
 }
 
-mut x := 5
-for mut i := 0; i < 10; i++ {
-    if x == i {
-        println("llegue al 5!")
-        contiune
-    }
-    println(i)
-}
+println("Valores del struct miInstancia")
+println("Nombre:", miInstancia.Nombre)
+println("EsEstudiante:", miInstancia.EsEstudiante)
+println("Edad:", miInstancia.Edad)
 
-numeros := []int {10, 20, 30, 40, 50}
-for indice, valor in numeros {
-    println("índice:", indice, "valor:", valor)
-}
+println("\nCambio de valores")
+miInstancia.Nombre = "Cambiamos"
+miInstancia.Edad = 15
+miInstancia.EsEstudiante = true
+
+println("Nombre:", miInstancia.Nombre)
+println("Edad:", miInstancia.Edad)
+println("EsEstudiante:", miInstancia.EsEstudiante)

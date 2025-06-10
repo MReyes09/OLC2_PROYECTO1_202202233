@@ -7,7 +7,21 @@ struct Persona {
 
 // Creación de una instancia
 miInstancia := Persona{
-    Nombre: "Alice",
+    Nombre: "Ya estuvo",
     Edad: 25,
     EsEstudiante: false,
 }
+
+println("Valores del struct miInstancia")
+println("Nombre:", miInstancia.Nombre)
+println("Edad:", miInstancia.Edad)
+println("EsEstudiante:", miInstancia.EsEstudiante)
+
+println("\nCambio de valores")
+miInstancia.Nombre = "Cambiamos"
+miInstancia.Edad = 15
+miInstancia.EsEstudiante = true
+
+println("Nombre:", miInstancia.Nombre)
+println("Edad:", miInstancia.Edad)
+println("EsEstudiante:", miInstancia.EsEstudiante)

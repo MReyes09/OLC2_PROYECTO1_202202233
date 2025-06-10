@@ -1160,53 +1160,67 @@ func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTy
 
 // VisitStructAccess - Acceso a campo de struct
 func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) interface{} {
-	variables := ctx.AllID_VARIABLE()
+	var varStruct Symbol
+	var datosStruct map[string]Symbol
+	first := true
 
-	if len(variables) < 2 {
-		v.Salida += "Error semántico: acceso a struct requiere al menos variable.campo\n"
-		return nil
-	}
+	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
+		idStruct := ctx.ID_VARIABLE(i).GetText()
+		idVar := ctx.ID_VARIABLE(i + 1).GetText()
 
-	// Obtener la variable struct inicial
-	structVarName := variables[0].GetText()
-	variable, err := v.currentEnv.GetVariable(structVarName)
-	if err != nil {
-		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", structVarName)
-		return nil
-	}
+		if first {
+			first = false
+			// Buscar la variable struct en el entorno
+			symbol, found := v.currentEnv.GetVariable(idStruct)
+			if found != nil || symbol.Type != STRUCT {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct o no existe.\n", idStruct)
+				return nil
+			}
+			varStruct = *symbol
 
-	// Navegar a través de la cadena de accesos
-	currentStruct, ok := variable.Value.(*StructInstance)
-	if !ok {
-		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", structVarName)
-		return nil
-	}
+			// Convertir el valor del struct a map[string]Symbol
+			castedMap, ok := varStruct.Value.(map[string]Symbol)
+			if !ok {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				return nil
+			}
+			datosStruct = castedMap
 
-	// Procesar cada nivel de acceso
-	for i := 1; i < len(variables); i++ {
-		fieldName := variables[i].GetText()
+			if val, exists := datosStruct[idVar]; exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					return val.Value
+				} else {
+					varStruct = val
+					if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+						datosStruct = nestedMap
+					} else {
+						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						return nil
+					}
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				return nil
+			}
+		} else {
+			idVar := ctx.ID_VARIABLE(i + 1).GetText()
 
-		// Verificar que el campo existe
-		structDef := v.structDefinitions[currentStruct.StructName]
-		if _, exists := structDef.Fields[fieldName]; !exists {
-			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
-				fieldName, currentStruct.StructName)
-			return nil
+			if val, exists := datosStruct[idVar]; exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					return val.Value
+				}
+				varStruct = val
+				if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+					datosStruct = nestedMap
+				} else {
+					v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+					return nil
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, ctx.ID_VARIABLE(i).GetText())
+				return nil
+			}
 		}
-
-		// Si es el último campo, retornar su valor
-		if i == len(variables)-1 {
-			return currentStruct.Values[fieldName]
-		}
-
-		// Si no es el último, debe ser otro struct
-		nextValue := currentStruct.Values[fieldName]
-		nextStruct, ok := nextValue.(*StructInstance)
-		if !ok {
-			v.Salida += fmt.Sprintf("Error semántico: campo %s no es un struct\n", fieldName)
-			return nil
-		}
-		currentStruct = nextStruct
 	}
 
 	return nil
@@ -1214,69 +1228,53 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 
 // VisitStructAccessAsign - Asignación a campo de struct
 func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsignContext) interface{} {
-	variables := ctx.AllID_VARIABLE()
-	newValue := v.Visit(ctx.Expr())
+	datosStruct := make(map[string]Symbol)
+	first := true
+	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
+		idStruct := ctx.ID_VARIABLE(i).GetText()
+		idVar := ctx.ID_VARIABLE(i + 1).GetText()
 
-	if len(variables) < 2 {
-		v.Salida += "Error semántico: asignación a struct requiere al menos variable.campo\n"
-		return nil
-	}
+		if first {
+			first = false
+			varStruct, err := v.currentEnv.GetVariable(idStruct)
+			if err != nil {
+				return nil
+			}
+			if varStruct.Type != 6 {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct.\n", idStruct)
+				return nil
+			}
+			datosStruct = make(map[string]Symbol)
+			castedMap, ok := varStruct.Value.(map[string]Symbol)
+			if !ok {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				return nil
+			}
+			datosStruct = castedMap
+			sym, exists := datosStruct[idVar]
+			if exists {
+				if i+1 == len(ctx.AllID_VARIABLE())-1 {
+					temp := datosStruct[idVar]
+					temp.Value = v.Visit(ctx.Expr())
+					datosStruct[idVar] = temp
+					return nil
+				} else {
+					varStruct = &sym
+					if nestedMap, ok := varStruct.Value.(map[string]Symbol); ok {
+						datosStruct = nestedMap
+					} else {
+						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						return nil
+					}
+				}
+			} else {
+				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				return nil
+			}
 
-	// Obtener la variable struct inicial
-	structVarName := variables[0].GetText()
-	variable, err := v.currentEnv.GetVariable(structVarName)
-	if err != nil {
-		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", structVarName)
-		return nil
-	}
-
-	// Navegar a través de la cadena de accesos
-	currentStruct, ok := variable.Value.(*StructInstance)
-	if !ok {
-		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", structVarName)
-		return nil
-	}
-
-	// Procesar cada nivel de acceso hasta el penúltimo
-	for i := 1; i < len(variables)-1; i++ {
-		fieldName := variables[i].GetText()
-
-		// Verificar que el campo existe
-		structDef := v.structDefinitions[currentStruct.StructName]
-		if _, exists := structDef.Fields[fieldName]; !exists {
-			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
-				fieldName, currentStruct.StructName)
-			return nil
 		}
 
-		// Navegar al siguiente struct
-		nextValue := currentStruct.Values[fieldName]
-		nextStruct, ok := nextValue.(*StructInstance)
-		if !ok {
-			v.Salida += fmt.Sprintf("Error semántico: campo %s no es un struct\n", fieldName)
-			return nil
-		}
-		currentStruct = nextStruct
 	}
-
-	// Asignar al campo final
-	finalFieldName := variables[len(variables)-1].GetText()
-	structDef := v.structDefinitions[currentStruct.StructName]
-	fieldType, exists := structDef.Fields[finalFieldName]
-	if !exists {
-		v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct %s\n",
-			finalFieldName, currentStruct.StructName)
-		return nil
-	}
-
-	// Verificar compatibilidad de tipos
-	if !isValidType(newValue, fieldType) {
-		v.Salida += fmt.Sprintf("Error semántico: tipo incompatible para campo %s\n", finalFieldName)
-		return nil
-	}
-
-	// Asignar nuevo valor
-	currentStruct.Values[finalFieldName] = newValue
 
 	return nil
 }

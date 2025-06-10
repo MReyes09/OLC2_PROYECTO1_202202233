@@ -163,10 +163,6 @@ func (v *BasegramaticaVisitor) VisitDeclStructData(ctx *DeclStructDataContext) i
 	return v.VisitChildren(ctx)
 }
 
-func (v *BasegramaticaVisitor) VisitStructVarType(ctx *StructVarTypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BasegramaticaVisitor) VisitStructVarTypeInference(ctx *StructVarTypeInferenceContext) interface{} {
 	return v.VisitChildren(ctx)
 }

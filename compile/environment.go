@@ -219,3 +219,26 @@ func SymbolTypeToString(t SymbolType) string {
 		return "desconocido"
 	}
 }
+
+func StringToSymbolType(s string) (SymbolType, error) {
+	switch strings.ToLower(s) {
+	case "int":
+		return INT, nil
+	case "float64":
+		return FLOAT64, nil
+	case "string":
+		return STRING, nil
+	case "bool":
+		return BOOL, nil
+	case "rune":
+		return RUNE, nil
+	case "slice":
+		return SLICE, nil
+	case "struct":
+		return STRUCT, nil
+	case "void":
+		return VOID, nil
+	default:
+		return -1, fmt.Errorf("tipo desconocido: %s", s)
+	}
+}

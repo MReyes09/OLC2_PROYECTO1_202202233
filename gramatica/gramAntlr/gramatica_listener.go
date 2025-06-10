@@ -124,9 +124,6 @@ type gramaticaListener interface {
 	// EnterDeclStructData is called when entering the DeclStructData production.
 	EnterDeclStructData(c *DeclStructDataContext)
 
-	// EnterStructVarType is called when entering the StructVarType production.
-	EnterStructVarType(c *StructVarTypeContext)
-
 	// EnterStructVarTypeInference is called when entering the StructVarTypeInference production.
 	EnterStructVarTypeInference(c *StructVarTypeInferenceContext)
 
@@ -372,9 +369,6 @@ type gramaticaListener interface {
 
 	// ExitDeclStructData is called when exiting the DeclStructData production.
 	ExitDeclStructData(c *DeclStructDataContext)
-
-	// ExitStructVarType is called when exiting the StructVarType production.
-	ExitStructVarType(c *StructVarTypeContext)
 
 	// ExitStructVarTypeInference is called when exiting the StructVarTypeInference production.
 	ExitStructVarTypeInference(c *StructVarTypeInferenceContext)

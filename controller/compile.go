@@ -26,6 +26,7 @@ func CompileCode(code string) string {
 	visitor.Visit(tree)
 
 	fmt.Println("\n SCOPE GLOBAL PARA VER DECLARACIONES \n" + visitor.ReportScope())
+	fmt.Println("\n SCOPE PARA VER FUNCIONES GLOBALES \n" + visitor.ReportFunctions())
 
 	return visitor.Salida
 }

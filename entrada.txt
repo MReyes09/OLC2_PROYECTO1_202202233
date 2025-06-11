@@ -1,27 +1,8 @@
-// Definición del struct
-struct Persona {
-    string Nombre
-    int Edad
-    bool EsEstudiante
+mut var1 := "Queso"
+
+mut var2 := true
+
+if var2 {
+    mut var1 := "Banana"
+    println(var1)
 }
-
-// Creación de una instancia
-miInstancia := Persona{
-    Nombre: "Ya estuvo",
-    Edad: 25,
-    EsEstudiante: false,
-}
-
-println("Valores del struct miInstancia")
-println("Nombre:", miInstancia.Nombre)
-println("EsEstudiante:", miInstancia.EsEstudiante)
-println("Edad:", miInstancia.Edad)
-
-println("\nCambio de valores")
-miInstancia.Nombre = "Cambiamos"
-miInstancia.Edad = 15
-miInstancia.EsEstudiante = true
-
-println("Nombre:", miInstancia.Nombre)
-println("Edad:", miInstancia.Edad)
-println("EsEstudiante:", miInstancia.EsEstudiante)

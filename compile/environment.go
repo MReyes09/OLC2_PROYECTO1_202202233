@@ -84,7 +84,7 @@ func (e *Environment) ExistsVariableLocal(id string) bool {
 }
 
 func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) error {
-	fmt.Println("entrando a setVariable")
+	//fmt.Println("entrando a setVariable")
 
 	// Caso 2: Es una declaración
 	if declaracion {

@@ -749,6 +749,7 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 		// Visitar el bloque del 'if'
 		result := v.Visit(ctx.Block(0))
 
+		//fmt.Println("SCOPE DEL IF antes de restaurar padre \n", v.currentEnv.ImprimirScope())
 		// Restaurar el entorno
 		v.currentEnv = v.currentEnv.Parent
 

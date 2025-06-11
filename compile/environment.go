@@ -78,13 +78,18 @@ func (e *Environment) GetVariable(id string) (*Symbol, error) {
 	return nil, errors.New("variable " + id + " not found")
 }
 
+func (e *Environment) ExistsVariableLocal(id string) bool {
+	_, ok := e.Variables[id]
+	return ok
+}
+
 func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) error {
 	fmt.Println("entrando a setVariable")
 
 	// Caso 2: Es una declaración
 	if declaracion {
 		// Verificar si ya existe en cualquier scope superior
-		if e.ExistsVariable(id) {
+		if e.ExistsVariableLocal(id) {
 			fmt.Println("cannot redeclare variable '" + id + "'")
 			return errors.New("cannot redeclare variable '" + id + "'")
 		}

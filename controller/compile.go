@@ -50,9 +50,45 @@ func CompileCode(code string) string {
 	dotFilePath := "salida.dot"
 	err := GenerateDotFromFormattedTreeString(formattedOutput, dotFilePath)
 	println(err)
+	var searchTree SearchTree = *NewSearchTree()
+	searchTree.Visit(tree)
 	// Visitor
 	visitor := compile.NewCompilerVisitor() // luego lo cambias por tu visitor real
-	visitor.Visit(tree)
+
+	// Visitar cada declaración y sentencia en orden
+	for _, dclSimple := range searchTree.DeclaracionesSimples {
+		visitor.Visit(dclSimple)
+	}
+
+	for _, dclSlice := range searchTree.DeclaracionesArreglos {
+		visitor.Visit(dclSlice)
+	}
+
+	for _, dclStruct := range searchTree.DeclaracionesStructs {
+		visitor.Visit(dclStruct)
+	}
+
+	for _, dclStruct2 := range searchTree.DeclaracionesStructs2 {
+		visitor.Visit(dclStruct2)
+	}
+
+	for _, asign := range searchTree.Asignaciones {
+		visitor.Visit(asign)
+	}
+
+	for _, stmt := range searchTree.Funciones {
+		visitor.Visit(stmt)
+	}
+
+	for _, stmtStruct := range searchTree.FunctStruct {
+		visitor.Visit(stmtStruct)
+	}
+
+	for _, stmtMain := range searchTree.FunctMain {
+		visitor.Visit(stmtMain)
+	}
+
+	//visitor.Visit(tree) descomentar si quieres visitar todo el árbol
 
 	fmt.Println("\n SCOPE GLOBAL PARA VER DECLARACIONES \n" + visitor.ReportScope())
 	fmt.Println("\n SCOPE PARA VER FUNCIONES GLOBALES \n" + visitor.ReportFunctions())

@@ -49,7 +49,7 @@ func (s *SearchTree) VisitInicio(ctx *gramAntlr.InicioContext) interface{} {
 
 func (s *SearchTree) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) interface{} {
 	funcion := ctx.Functions()
-	nombre := funcion.GetChild(0).(antlr.ParseTree).GetText()
+	nombre := funcion.GetChild(1).(antlr.ParseTree).GetText()
 	if nombre == "main" {
 		s.FunctMain = append(s.FunctMain, ctx)
 	} else {

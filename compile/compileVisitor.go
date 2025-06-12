@@ -1426,6 +1426,12 @@ func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsig
 // -------------------------------- FUNCIONES ------------------------------------
 // VisitFuncionStmt
 func (v *CompilerVisitor) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) interface{} {
+	if ctx.Functions().GetChild(1).(antlr.ParseTree).GetText() == "main" {
+		v.Visit(ctx.Functions())
+		varFunc, _ := v.currentEnv.GetFuncion("main")
+		body := varFunc.Body
+		return v.Visit(body)
+	}
 	return v.Visit(ctx.Functions())
 }
 

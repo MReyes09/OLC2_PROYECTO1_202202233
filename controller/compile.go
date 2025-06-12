@@ -85,6 +85,7 @@ func CompileCode(code string) string {
 	}
 
 	for _, stmtMain := range searchTree.FunctMain {
+		fmt.Println("Visitando función main")
 		visitor.Visit(stmtMain)
 	}
 

@@ -39,6 +39,14 @@ func (s *SearchTree) Visit(tree antlr.ParseTree) interface{} {
 	return tree.Accept(s)
 }
 
+// Sobrescribiendo un método del visitor
+func (s *SearchTree) VisitInicio(ctx *gramAntlr.InicioContext) interface{} {
+	for _, stmtCtx := range ctx.AllInstrucciones() {
+		s.Visit(stmtCtx)
+	}
+	return nil
+}
+
 func (s *SearchTree) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) interface{} {
 	funcion := ctx.Functions()
 	nombre := funcion.GetChild(0).(antlr.ParseTree).GetText()

@@ -1,6 +1,8 @@
 // compile/miFunct.go
 package compile
 
+import "OLC2CLIENTE/gramatica/gramAntlr"
+
 // TupleStringSymbol simula una tupla (string, *Symbol)
 type TupleStringSymbol struct {
 	Key   string
@@ -17,12 +19,12 @@ func NewTupleStringSymbol(key string, value *Symbol) *TupleStringSymbol {
 // MiFunct representa una función definida por el usuario
 type MiFunct struct {
 	Parameters []*TupleStringSymbol
-	Body       interface{} // gramaticaParser.BlockContext en tu parser
+	Body       gramAntlr.IBlockContext
 	ValRet     SymbolType
 	IsSlice    bool
 }
 
-func NewMiFunct(parameters []*TupleStringSymbol, body interface{}, valRet SymbolType) *MiFunct {
+func NewMiFunct(parameters []*TupleStringSymbol, body gramAntlr.IBlockContext, valRet SymbolType) *MiFunct {
 	return &MiFunct{
 		Parameters: parameters,
 		Body:       body,

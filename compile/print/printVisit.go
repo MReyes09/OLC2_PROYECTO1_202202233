@@ -35,10 +35,10 @@ func (pv *PrintVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{} 
 func (pv *PrintVisitor) handlePrintExprs(exprs []gramAntlr.IExprContext, newline bool) {
 	for _, expr := range exprs {
 		value := pv.Visit(expr)
+		fmt.Println("Valor obtenido:", value)
 		if value == nil {
 			continue
 		}
-
 		// Si es slice, lo mostramos bonito
 		if slice, ok := value.([]interface{}); ok {
 			*pv.Salida += "{" + getStringSlice(slice, "") + "}"

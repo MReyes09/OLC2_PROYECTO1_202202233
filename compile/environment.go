@@ -2,6 +2,7 @@
 package compile
 
 import (
+	"OLC2CLIENTE/gramatica/gramAntlr"
 	"errors"
 	"fmt"
 	"strings"
@@ -22,12 +23,6 @@ const (
 	STRUCT
 	VOID
 )
-
-type StructDefinition struct {
-	Name   string
-	Fields map[string]SymbolType
-	Order  []string
-}
 
 type StructInstance struct {
 	StructName string
@@ -83,13 +78,18 @@ func (e *Environment) GetVariable(id string) (*Symbol, error) {
 	return nil, errors.New("variable " + id + " not found")
 }
 
+func (e *Environment) ExistsVariableLocal(id string) bool {
+	_, ok := e.Variables[id]
+	return ok
+}
+
 func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, mutable bool, declaracion bool, token antlr.Token) error {
-	fmt.Println("entrando a setVariable")
+	//fmt.Println("entrando a setVariable")
 
 	// Caso 2: Es una declaración
 	if declaracion {
 		// Verificar si ya existe en cualquier scope superior
-		if e.ExistsVariable(id) {
+		if e.ExistsVariableLocal(id) {
 			fmt.Println("cannot redeclare variable '" + id + "'")
 			return errors.New("cannot redeclare variable '" + id + "'")
 		}
@@ -133,7 +133,7 @@ func (e *Environment) SetVariable(id string, value interface{}, typ SymbolType, 
 	return errors.New("variable " + id + " not found and cannot be assigned without declaration")
 }
 
-func (e *Environment) SetFunciones(id string, parametros []*TupleStringSymbol, body interface{}, typeRet SymbolType, token antlr.Token) {
+func (e *Environment) SetFunciones(id string, parametros []*TupleStringSymbol, body gramAntlr.IBlockContext, typeRet SymbolType, token antlr.Token) {
 	funcion := NewMiFunct(parametros, body, typeRet)
 	if _, ok := e.functions[id]; ok {
 		e.functions[id] = funcion
@@ -241,4 +241,23 @@ func StringToSymbolType(s string) (SymbolType, error) {
 	default:
 		return -1, fmt.Errorf("tipo desconocido: %s", s)
 	}
+}
+
+func (e *Environment) ImprimirScopeFunc() string {
+	var output strings.Builder
+
+	output.WriteString("=== Funciones Definidas ===\n")
+	for id, fn := range e.functions {
+		paramStr := make([]string, len(fn.Parameters))
+		for i, param := range fn.Parameters {
+			paramStr[i] = fmt.Sprintf("%s %s", param.Key, SymbolTypeToString(param.Value.Type))
+		}
+		output.WriteString(fmt.Sprintf(
+			"ID: %-10s | Parámetros: [%s] | Retorno: %s\n",
+			id,
+			strings.Join(paramStr, ", "),
+			SymbolTypeToString(fn.ValRet),
+		))
+	}
+	return output.String()
 }

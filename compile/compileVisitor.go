@@ -379,26 +379,34 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 		return nil
 	}
 
-	for i := 0; i < len(ctx.AllExpr()); i++ {
-		index := v.Visit(ctx.AllExpr()[i])
-		if idx, ok := index.(int); ok {
-			if i == len(ctx.AllExpr())-2 {
-				// Asignar valor en la posición final
-				value := v.Visit(ctx.AllExpr()[i+1])
-				listaBase[idx] = value
-				return nil
-			} else {
-				// Ir al siguiente nivel del arreglo anidado
-				nextLevel, ok := listaBase[idx].([]interface{})
-				if !ok {
-					v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
-					return nil
-				}
-				listaBase = nextLevel
-			}
-		} else {
+	exprs := ctx.AllExpr()
+	for i := 0; i < len(exprs); i++ {
+		index := v.Visit(exprs[i])
+		idx, ok := index.(int)
+		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
 			return nil
+		}
+
+		// Verificación de rango
+		if idx < 0 || idx >= len(listaBase) {
+			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			return nil
+		}
+
+		if i == len(exprs)-2 {
+			// Asignar valor en la posición final
+			value := v.Visit(exprs[i+1])
+			listaBase[idx] = value
+			return nil
+		} else {
+			// Ir al siguiente nivel del arreglo anidado
+			nextLevel, ok := listaBase[idx].([]interface{})
+			if !ok {
+				v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+				return nil
+			}
+			listaBase = nextLevel
 		}
 	}
 
@@ -420,25 +428,33 @@ func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpl
 		return nil
 	}
 
-	contador := 0
-	for _, expr := range ctx.AllExpr() {
+	exprs := ctx.AllExpr()
+	for i, expr := range exprs {
 		index := v.Visit(expr)
-		if idx, ok := index.(int); ok {
-			dataList := listaBase[idx]
-			if contador == len(ctx.AllExpr())-1 {
-				return dataList
-			}
-
-			if nextList, ok := dataList.([]interface{}); ok {
-				listaBase = nextList
-			} else {
-				return dataList
-			}
-			contador++
-		} else {
+		idx, ok := index.(int)
+		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
 			return nil
 		}
+
+		// Verificación de rango
+		if idx < 0 || idx >= len(listaBase) {
+			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			return nil
+		}
+
+		if i == len(exprs)-1 {
+			// Retornar el valor final del acceso
+			return listaBase[idx]
+		}
+
+		// Continuar con el siguiente nivel del arreglo anidado
+		nextLevel, ok := listaBase[idx].([]interface{})
+		if !ok {
+			v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+			return nil
+		}
+		listaBase = nextLevel
 	}
 
 	return nil

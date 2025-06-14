@@ -22,15 +22,15 @@ func CompileCode(code string) string {
 	tree := parser.Inicio() // O el rule root de tu gramática
 
 	//Imprimir el arbol
-	fmt.Println("\n ARBOL NO FORMATEADO \n" + tree.ToStringTree(nil, parser))
+	//fmt.Println("\n ARBOL NO FORMATEADO \n" + tree.ToStringTree(nil, parser))
 
 	// --- Print the formatted tree ---
-	fmt.Println("Árbol FORMATEADO:")
+	//fmt.Println("Árbol FORMATEADO:")
 	// Get the raw string from ANTLR
-	rawTreeString := tree.ToStringTree(nil, parser)
+	//rawTreeString := tree.ToStringTree(nil, parser)
 	// Format it using our new function
-	formattedOutput := FormatAntlrTree(rawTreeString)
-	fmt.Println(formattedOutput) // Print the nicely formatted tree
+	//formattedOutput := FormatAntlrTree(rawTreeString)
+	//fmt.Println(formattedOutput) // Print the nicely formatted tree
 
 	/*
 		// --- Generación del archivo .dot ---
@@ -47,9 +47,10 @@ func CompileCode(code string) string {
 		}
 	*/
 	// Con esto:
-	dotFilePath := "salida.dot"
-	err := GenerateDotFromFormattedTreeString(formattedOutput, dotFilePath)
-	println(err)
+	//dotFilePath := "salida.dot"
+	//err := GenerateDotFromFormattedTreeString(formattedOutput, dotFilePath)
+	//println(err)
+
 	var searchTree SearchTree = *NewSearchTree()
 	searchTree.Visit(tree)
 	// Visitor

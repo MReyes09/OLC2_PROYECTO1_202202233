@@ -248,7 +248,7 @@ func (v *CompilerVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) in
 	return v.Visit(ctx.VarDcl())
 }
 
-// 'var' ID type '=' expr ';'
+// 'mut' ID type '=' expr ';'
 func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
@@ -286,11 +286,15 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 
-// 'var' ID type ';'
+// 'mut' ID type ';'
 func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
@@ -320,11 +324,15 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, defaultValue, symbolType, false, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, defaultValue, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 
-// 'var' ID ':=' expr ';'
+// 'mut' ID ':=' expr ';'
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
@@ -347,7 +355,11 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, symbolType, true, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 

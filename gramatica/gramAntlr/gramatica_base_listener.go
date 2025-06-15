@@ -224,6 +224,12 @@ func (s *BasegramaticaListener) EnterSliceVacio(ctx *SliceVacioContext) {}
 // ExitSliceVacio is called when production SliceVacio is exited.
 func (s *BasegramaticaListener) ExitSliceVacio(ctx *SliceVacioContext) {}
 
+// EnterSliceDcl_Asign is called when production SliceDcl_Asign is entered.
+func (s *BasegramaticaListener) EnterSliceDcl_Asign(ctx *SliceDcl_AsignContext) {}
+
+// ExitSliceDcl_Asign is called when production SliceDcl_Asign is exited.
+func (s *BasegramaticaListener) ExitSliceDcl_Asign(ctx *SliceDcl_AsignContext) {}
+
 // EnterAssign is called when production assign is entered.
 func (s *BasegramaticaListener) EnterAssign(ctx *AssignContext) {}
 

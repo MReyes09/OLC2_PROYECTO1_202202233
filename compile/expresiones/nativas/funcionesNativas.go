@@ -85,13 +85,13 @@ func (nv *NativasVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 	//case map[string]interface{}:
 	//	return "struct"
 	case []interface{}:
-		return getDimensionSlice(v, "[]", false)
+		return nv.GetDimensionSlice(v, "[]", false)
 	default:
 		return "desconocido"
 	}
 }
 
-func getDimensionSlice(listBase []interface{}, cadena string, onlyType bool) string {
+func (nv *NativasVisitor) GetDimensionSlice(listBase []interface{}, cadena string, onlyType bool) string {
 	if len(listBase) == 0 {
 		return cadena + "interface{}" // En caso de slice vacío
 	}
@@ -99,9 +99,9 @@ func getDimensionSlice(listBase []interface{}, cadena string, onlyType bool) str
 	switch contenido := listBase[0].(type) {
 	case []interface{}:
 		if onlyType {
-			return getDimensionSlice(contenido, cadena, onlyType)
+			return nv.GetDimensionSlice(contenido, cadena, onlyType)
 		} else {
-			return getDimensionSlice(contenido, cadena+"[]", onlyType)
+			return nv.GetDimensionSlice(contenido, cadena+"[]", onlyType)
 		}
 	case int:
 		cadena += "int"

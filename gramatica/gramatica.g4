@@ -78,7 +78,8 @@ varDcl: 'mut' ID_VARIABLE type assign expr # VarDclWithTypeAndValue
 ;
 
 varDclSlice: ID_VARIABLE assign (nuevoSlice)+ type '{' contenidoSlice '}' # SliceValores
-    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type assign expr                    # SliceDcl_Asign 
 ;
 
 assign: ':=' 

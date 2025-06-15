@@ -23,7 +23,6 @@ type CompilerVisitor struct {
 	funcionesNativasVisitor         *nativas.NativasVisitor         // Visitor para funciones nativas
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
-	structDefinitions               map[string]*StructDefinition
 	StructRelational                map[string][]string
 }
 
@@ -32,8 +31,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 	v := &CompilerVisitor{
 		BasegramaticaVisitor: &gramAntlr.BasegramaticaVisitor{},
 		Salida:               "",
-		currentEnv:           NewEnvironment(nil), // Entorno raíz
-		structDefinitions:    make(map[string]*StructDefinition),
+		currentEnv:           NewEnvironment(nil),       // Entorno raíz
 		StructRelational:     make(map[string][]string), // <--- NUEVO campo agregado
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
@@ -46,6 +44,11 @@ func NewCompilerVisitor() *CompilerVisitor {
 // ReportScope imprime el contenido del scope actual
 func (v *CompilerVisitor) ReportScope() string {
 	return v.currentEnv.ImprimirScope()
+}
+
+// ReportFunctions imprime las funciones globales
+func (v *CompilerVisitor) ReportFunctions() string {
+	return v.currentEnv.ImprimirScopeFunc()
 }
 
 //------------------------------------------------------------------------------------------
@@ -69,14 +72,61 @@ func (v *CompilerVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interf
 }
 
 func (v *CompilerVisitor) VisitPrint(ctx *gramAntlr.PrintContext) interface{} {
-	return v.printVisitor.VisitPrint(ctx)
+	v.handlePrintExprs(ctx.AllExpr(), false)
+	return nil
 }
 
 func (v *CompilerVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{} {
-	return v.printVisitor.VisitPrintln(ctx)
+	v.handlePrintExprs(ctx.AllExpr(), true)
+	return nil
 }
 
-// ----------------------------- Final de print -----------------------------
+func (pv *CompilerVisitor) handlePrintExprs(exprs []gramAntlr.IExprContext, newline bool) {
+	for _, expr := range exprs {
+		value := pv.Visit(expr)
+		fmt.Println("Valor obtenido:", value)
+		if value == nil {
+			continue
+		}
+		// Si es slice, lo mostramos bonito
+		if slice, ok := value.([]interface{}); ok {
+			pv.Salida += "{" + getStringSlice(slice, "") + "}"
+		} else if valStruct, ok := value.(map[string]Symbol); ok {
+			pv.Salida += "{ "
+			first := true
+			for key, sym := range valStruct {
+				if !first {
+					pv.Salida += ", "
+				}
+				pv.Salida += fmt.Sprintf("%s: %v", key, sym.Value)
+				first = false
+			}
+			pv.Salida += "}"
+		} else {
+			pv.Salida += fmt.Sprintf("%v", value)
+		}
+		pv.Salida += " "
+	}
+	if newline {
+		pv.Salida += "\n"
+	}
+}
+
+func getStringSlice(lista []interface{}, cadena string) string {
+	for _, item := range lista {
+		switch v := item.(type) {
+		case []interface{}:
+			cadena += "\n\t{"
+			cadena = getStringSlice(v, cadena)
+			cadena += " },\n"
+		default:
+			cadena += " " + fmt.Sprintf("%v", v)
+		}
+	}
+	return cadena
+}
+
+// ----------------------------- Final de print --------------.---------------
 
 // ----------------------------- Expresiones -----------------------------
 // VisitParens
@@ -128,6 +178,7 @@ func (v *CompilerVisitor) VisitChar(ctx *gramAntlr.CharContext) interface{} {
 	texto := ctx.GetText() // e.g. `'a'`
 	texto = strings.Trim(texto, "'")
 	r, _ := utf8.DecodeRuneInString(texto)
+	fmt.Println("Rune:", r)
 	return r
 }
 
@@ -197,7 +248,7 @@ func (v *CompilerVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) in
 	return v.Visit(ctx.VarDcl())
 }
 
-// 'var' ID type '=' expr ';'
+// 'mut' ID type '=' expr ';'
 func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
@@ -235,11 +286,15 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 
-// 'var' ID type ';'
+// 'mut' ID type ';'
 func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
@@ -269,11 +324,15 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, defaultValue, symbolType, false, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, defaultValue, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 
-// 'var' ID ':=' expr ';'
+// 'mut' ID ':=' expr ';'
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
@@ -296,7 +355,11 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, symbolType, true, true, ctx.GetStart())
+	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
+	if miError != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		return nil
+	}
 	return nil
 }
 
@@ -316,26 +379,34 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 		return nil
 	}
 
-	for i := 0; i < len(ctx.AllExpr()); i++ {
-		index := v.Visit(ctx.AllExpr()[i])
-		if idx, ok := index.(int); ok {
-			if i == len(ctx.AllExpr())-2 {
-				// Asignar valor en la posición final
-				value := v.Visit(ctx.AllExpr()[i+1])
-				listaBase[idx] = value
-				return nil
-			} else {
-				// Ir al siguiente nivel del arreglo anidado
-				nextLevel, ok := listaBase[idx].([]interface{})
-				if !ok {
-					v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
-					return nil
-				}
-				listaBase = nextLevel
-			}
-		} else {
+	exprs := ctx.AllExpr()
+	for i := 0; i < len(exprs); i++ {
+		index := v.Visit(exprs[i])
+		idx, ok := index.(int)
+		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
 			return nil
+		}
+
+		// Verificación de rango
+		if idx < 0 || idx >= len(listaBase) {
+			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			return nil
+		}
+
+		if i == len(exprs)-2 {
+			// Asignar valor en la posición final
+			value := v.Visit(exprs[i+1])
+			listaBase[idx] = value
+			return nil
+		} else {
+			// Ir al siguiente nivel del arreglo anidado
+			nextLevel, ok := listaBase[idx].([]interface{})
+			if !ok {
+				v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+				return nil
+			}
+			listaBase = nextLevel
 		}
 	}
 
@@ -357,25 +428,33 @@ func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpl
 		return nil
 	}
 
-	contador := 0
-	for _, expr := range ctx.AllExpr() {
+	exprs := ctx.AllExpr()
+	for i, expr := range exprs {
 		index := v.Visit(expr)
-		if idx, ok := index.(int); ok {
-			dataList := listaBase[idx]
-			if contador == len(ctx.AllExpr())-1 {
-				return dataList
-			}
-
-			if nextList, ok := dataList.([]interface{}); ok {
-				listaBase = nextList
-			} else {
-				return dataList
-			}
-			contador++
-		} else {
+		idx, ok := index.(int)
+		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
 			return nil
 		}
+
+		// Verificación de rango
+		if idx < 0 || idx >= len(listaBase) {
+			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			return nil
+		}
+
+		if i == len(exprs)-1 {
+			// Retornar el valor final del acceso
+			return listaBase[idx]
+		}
+
+		// Continuar con el siguiente nivel del arreglo anidado
+		nextLevel, ok := listaBase[idx].([]interface{})
+		if !ok {
+			v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+			return nil
+		}
+		listaBase = nextLevel
 	}
 
 	return nil
@@ -588,30 +667,43 @@ func (v *CompilerVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interf
 func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-	sym, _ := v.currentEnv.GetVariable(id)
-	mutabilidad := sym.Mutable
 
-	context_start := ctx.GetStart()
-
-	if value == nil {
-		v.Salida += "Error-semántico: al asignar el valor a la variable, el valor es nulo."
+	sym, err := v.currentEnv.GetVariable(id)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: variable %s no encontrada.\n", id)
 		return nil
 	}
 
-	// validar cuando es un slice
-	if !isValidType(value, sym.Type) {
+	mutabilidad := sym.Mutable
+	tipo := sym.Type
+	contextStart := ctx.GetStart()
 
-		if mutabilidad {
-			v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
+	if value == nil {
+		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable '%s', el valor es nulo.\n", id)
+		return nil
+	}
+
+	// Validar si es un slice
+	if slice, ok := value.([]interface{}); ok {
+		if len(slice) == 0 || isValidType(slice[0], tipo) {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 			return nil
 		}
+		v.Salida += fmt.Sprintf("Error-semántico: tipos no compatibles para el slice asignado a %s.\n", id)
+		return nil
+	}
 
+	// Validación normal
+	if !isValidType(value, tipo) {
+		if mutabilidad {
+			v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
+			return nil
+		}
 		v.Salida += fmt.Sprintf("Error-semántico: la variable %s no es mutable y no se puede asignar un nuevo valor.\n", id)
 		return nil
 	}
 
-	v.currentEnv.SetVariable(id, value, sym.Type, mutabilidad, false, context_start)
-
+	v.currentEnv.SetVariable(id, value, tipo, mutabilidad, false, contextStart)
 	return nil
 }
 
@@ -710,7 +802,6 @@ func (v *CompilerVisitor) VisitIfStmt(ctx *gramAntlr.IfStmtContext) interface{} 
 
 // -------------------- Produccion IF ELSE --------------------
 func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} {
-	fmt.Println("ENTRE EN VISIT IF ONLY")
 
 	// Evaluar la condición
 	value := v.Visit(ctx.Expr())
@@ -732,8 +823,8 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 
 		// Visitar el bloque del 'if'
 		result := v.Visit(ctx.Block(0))
-		fmt.Println("RESULTADO DEL IF:", result)
 
+		//fmt.Println("SCOPE DEL IF antes de restaurar padre \n", v.currentEnv.ImprimirScope())
 		// Restaurar el entorno
 		v.currentEnv = v.currentEnv.Parent
 
@@ -752,7 +843,13 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 		blocks := ctx.AllBlock()
 		if len(blocks) > 1 {
 			// Visitar el bloque del 'else'
+			// Nuevo entorno anidado
+			newEnv := NewEnvironment(v.currentEnv)
+			v.currentEnv = newEnv
+
 			result := v.Visit(blocks[1])
+			// Restaurar el entorno
+			v.currentEnv = v.currentEnv.Parent
 			if str, ok := result.(string); ok {
 				if str == "break" || str == "continue" || str == "Excepcion___Return_Void" {
 					return str
@@ -763,8 +860,6 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 			}
 		}
 	}
-
-	fmt.Println("SALI NIL EN VISIT IF ONLY")
 	return nil
 }
 
@@ -824,6 +919,16 @@ func (v *CompilerVisitor) VisitContinueStmt(ctx *gramAntlr.ContinueStmtContext) 
 	return "continue"
 }
 
+// -------------------- VisitReturnStmt --------------------
+func (v *CompilerVisitor) VisitReturnStmt(ctx *gramAntlr.ReturnStmtContext) interface{} {
+	var valueRet = ctx.Retorno()
+	if valueRet.Expr() != nil {
+		return v.Visit(valueRet.Expr())
+	} else {
+		return "Excepcion___Return_Void" // Retorno vacío
+	}
+}
+
 // -------------------- VisitBlockStmt --------------------
 func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interface{} {
 	for _, instrCtx := range ctx.AllInstrucciones() {
@@ -833,6 +938,13 @@ func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interf
 			if str == "break" || str == "continue" {
 				return str
 			}
+			if str == "Excepcion___Return_Void" {
+				return str // Retorno vacío
+			}
+		}
+		if value != nil {
+			// Si hay un valor de retorno, devolverlo
+			return value
 		}
 	}
 	return nil
@@ -878,6 +990,9 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 				} else {
 					return str
 				}
+			}
+			if result != nil {
+				return result
 			}
 
 			// Recalcular la condición
@@ -927,6 +1042,10 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 			}
 		}
 
+		if result != nil {
+			return result
+		}
+
 		// Ejecutar asignación final del for
 		v.Visit(ctx.VarAsign())
 
@@ -936,6 +1055,53 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
 		}
 	}
+
+	return nil
+}
+
+// VisitForRange
+func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interface{} {
+	sym, _ := v.currentEnv.GetVariable(ctx.ID_VARIABLE(2).GetText())
+
+	slice, err := sym.Value.([]interface{})
+	if !err {
+		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
+		return nil
+	}
+
+	index := ctx.ID_VARIABLE(0).GetText()
+	value := ctx.ID_VARIABLE(1).GetText()
+
+	v.currentEnv.SetVariable(index, 0, sym.Type, false, true, ctx.GetStart())         // Inicializar índice
+	v.currentEnv.SetVariable(value, nil, sym.Type, sym.Mutable, true, ctx.GetStart()) // Inicializar valor
+
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	for i, val := range slice {
+		v.currentEnv.SetVariable(index, i, INT, false, false, ctx.GetStart())
+		v.currentEnv.SetVariable(value, val, sym.Type, false, false, ctx.GetStart())
+
+		result := v.Visit(ctx.Block())
+
+		if resStr, ok := result.(string); ok {
+			if resStr == "break" {
+				break
+			} else if resStr == "continue" {
+				continue
+			} else if resStr == "Excepcion___Return_Void" {
+				return result
+			} else {
+				return result
+			}
+		}
+
+		if result != nil {
+			return result
+		}
+	}
+	// Restaurar el entorno anterior
+	v.currentEnv = newEnv.Parent
 
 	return nil
 }
@@ -1014,6 +1180,11 @@ func (v *CompilerVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext
 
 // VisitReflectType
 func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
+	value := v.Visit(ctx.Expr())
+	if _, ok := value.(map[string]Symbol); ok {
+		return "struct"
+	}
+
 	return v.funcionesNativasVisitor.VisitReflectType(ctx)
 }
 
@@ -1075,6 +1246,7 @@ func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataConte
 func (v *CompilerVisitor) VisitVarStructDclStmt(ctx *gramAntlr.VarStructDclStmtContext) interface{} {
 	return v.Visit(ctx.VarStructDcl())
 }
+
 func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTypeInferenceContext) interface{} {
 	idStruct := ctx.ID_VARIABLE(1).GetText()
 	baseStruct, _ := v.currentEnv.GetVariable(idStruct)
@@ -1276,6 +1448,376 @@ func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsig
 
 	}
 
+	return nil
+}
+
+// -------------------------------- FUNCIONES ------------------------------------
+// VisitFuncionStmt
+func (v *CompilerVisitor) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) interface{} {
+	if ctx.Functions().GetChild(1).(antlr.ParseTree).GetText() == "main" {
+		v.Visit(ctx.Functions())
+		varFunc, _ := v.currentEnv.GetFuncion("main")
+		body := varFunc.Body
+		return v.Visit(body)
+	}
+	return v.Visit(ctx.Functions())
+}
+
+// VisitFunciones
+func (v *CompilerVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interface{} {
+	id := ctx.ID_VARIABLE(0).GetText() // Nombre de la función
+
+	// Mapa de parámetros: id -> Symbol
+	parametros := []*TupleStringSymbol{}
+
+	for i := 1; i < len(ctx.AllID_VARIABLE()); i++ {
+		idParam := ctx.ID_VARIABLE(i).GetText()
+		typeText := ctx.Type_(i - 1).GetText()
+
+		var tipo SymbolType
+		switch strings.ToLower(typeText) {
+		case "int":
+			tipo = INT
+			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{0, tipo, true}})
+		case "float64":
+			tipo = FLOAT64
+			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{0.0, tipo, true}})
+		case "string":
+			tipo = STRING
+			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{"", tipo, true}})
+		case "bool":
+			tipo = BOOL
+			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{false, tipo, true}})
+		case "rune":
+			tipo = RUNE
+			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{'\x00', tipo, true}})
+		default:
+			v.Salida += fmt.Sprintf("Error semántico: tipo de parámetro no reconocido: %s\n", typeText)
+			return nil
+		}
+	}
+
+	// Tipo de retorno
+	var tipoRet SymbolType = VOID
+	if ctx.ValRet() != nil {
+		typeText := ctx.ValRet().Type_().GetText()
+		switch strings.ToLower(typeText) {
+		case "int":
+			tipoRet = INT
+		case "float64":
+			tipoRet = FLOAT64
+		case "string":
+			tipoRet = STRING
+		case "bool":
+			tipoRet = BOOL
+		case "rune":
+			tipoRet = RUNE
+		default:
+			v.Salida += fmt.Sprintf("Error semántico: tipo de retorno no reconocido: %s\n", typeText)
+			return nil
+		}
+	}
+
+	// Guardar la función en el entorno actual
+	v.currentEnv.SetFunciones(id, parametros, ctx.Block(), tipoRet, ctx.GetStart())
+	return nil
+}
+
+// VisitCallFunctionStmt
+func (v *CompilerVisitor) VisitCallFunctionStmt(ctx *gramAntlr.CallFunctionStmtContext) interface{} {
+	return v.Visit(ctx.VarCallStatement())
+}
+
+// VisitCallFunction
+func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	parametros := []*TupleStringSymbol{}
+	for i := 0; i < len(ctx.AllExpr()); i++ {
+		value := v.Visit(ctx.Expr(i))
+
+		if value == nil {
+			v.Salida += fmt.Sprintf("Error-semántico: al llamar a la función %s, el parámetro %d es nulo.\n", id, i+1)
+			return nil
+		}
+		switch value.(type) {
+		case int:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, INT, false}})
+		case float64:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, FLOAT64, false}})
+		case string:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, STRING, false}})
+		case bool:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, BOOL, false}})
+		case rune:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, RUNE, false}})
+		default:
+			v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro no reconocido para la función %s.\n", id)
+			return nil
+		}
+	}
+	funcion, error := v.currentEnv.GetFuncion(id)
+	if error != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: función %s no encontrada.\n", id)
+		return nil
+	}
+
+	parameters := funcion.Parameters
+	var body gramAntlr.IBlockContext = funcion.Body
+	tipoReturn := funcion.ValRet
+
+	if len(parameters) != len(parametros) {
+		v.Salida += fmt.Sprintf("Error-semántico: número de parámetros incorrecto al llamar a la función %s. Se esperaban %d, pero se recibieron %d.\n", id, len(parameters), len(parametros))
+		return nil
+	}
+
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	if tipoReturn != 7 {
+		// Verificar tipos de parámetros
+		for i := 0; i < len(parametros); i++ {
+			if parametros[i].Value.Type != parameters[i].Value.Type {
+				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s.\n",
+					parametros[i].Value.Type, parameters[i].Value.Type, id)
+				return nil
+			}
+			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, false, true, ctx.GetStart())
+		}
+		valRet := v.Visit(body)
+		fmt.Println("VALRET:", valRet, "TIPORETURN:", tipoReturn)
+		fmt.Println("isValidType:", isValidType(valRet, tipoReturn))
+		if isValidType(valRet, tipoReturn) {
+			v.currentEnv = v.currentEnv.Parent // Restaurar el entorno anterior
+			return valRet
+		} else {
+			v.Salida += fmt.Sprintf("Error-semántico: tipo de retorno %v no coincide con el tipo esperado %v en la función %s.\n",
+				tipoReturn, fmt.Sprintf("%T", valRet), id)
+			return nil
+		}
+	} else {
+		for i := 0; i < len(parametros); i++ {
+			if parametros[i].Value.Type != parameters[i].Value.Type {
+				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s.\n",
+					parametros[i].Value.Type, parameters[i].Value.Type, id)
+				return nil
+			}
+			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parameters[i].Value.Type, parameters[i].Value.Mutable, true, ctx.GetStart())
+		}
+		v.Visit(body) // Ejecutar el cuerpo de la función
+	}
+	v.currentEnv = v.currentEnv.Parent // Restaurar el entorno anterior
+	return nil
+}
+
+// VisitCallFunctionValue
+func (v *CompilerVisitor) VisitCallFunctionValue(ctx *gramAntlr.CallFunctionValueContext) interface{} {
+	return v.Visit(ctx.VarCallStatement())
+}
+
+// ----------------------------- FUNCION DE STRUCT --------------------------------
+func (v *CompilerVisitor) VisitFunctionStructStmt(ctx *gramAntlr.FunctionStructStmtContext) interface{} {
+	return v.Visit(ctx.FunctionStruct())
+}
+
+// Declaracion de función de struct
+func (v *CompilerVisitor) VisitFuncionesStructsNativas(ctx *gramAntlr.FuncionesStructsNativasContext) interface{} {
+	nombreFunc := ctx.ID_VARIABLE(2).GetText()
+	var parametroDef gramAntlr.IDefParamsContext = ctx.DefParams()
+	parametros := []*TupleStringSymbol{}
+
+	if parametroDef != nil {
+		for i := 0; i < len(parametroDef.AllID_VARIABLE()); i++ {
+			id := parametroDef.ID_VARIABLE(i).GetText()
+			tipo := parametroDef.Type_(i).GetText()
+			switch tipo {
+			case "int":
+				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{0, INT, true}})
+			case "float64":
+				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{0.0, FLOAT64, true}})
+			case "string":
+				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{"", STRING, true}})
+			case "bool":
+				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{false, BOOL, true}})
+			case "rune":
+				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{rune(0), RUNE, true}})
+			default:
+				v.Salida += fmt.Sprintf("Error semántico: tipo de parámetro no reconocido: %s\n", tipo)
+				return nil
+			}
+		}
+	}
+	var tipoRetorno SymbolType
+	var err error
+	if ctx.ValRet() != nil {
+		valRet := ctx.ValRet().GetText()
+		tipoRetorno, err = StringToSymbolType(valRet)
+		if err != nil {
+			v.Salida += fmt.Sprintf("Error semántico: tipo de retorno no reconocido: %s\n", valRet)
+			return nil
+		}
+	} else {
+		tipoRetorno = VOID // Si no hay tipo de retorno, es void
+	}
+	// ------- Variable definida en el struct -------
+	idVar := ctx.ID_VARIABLE(0).GetText()
+	idStruct := ctx.ID_VARIABLE(1).GetText()
+
+	structVar, _ := v.currentEnv.GetVariable(idStruct)
+	if structVar == nil || structVar.Type != STRUCT {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct o no existe.\n", idStruct)
+		return nil
+	}
+	parametros = append(parametros, &TupleStringSymbol{idVar, structVar}) // Agregar el struct como parámetro
+	var body gramAntlr.IBlockContext = ctx.Block()
+	v.currentEnv.SetFunciones(nombreFunc, parametros, body, tipoRetorno, ctx.GetStart())
+
+	if v.StructRelational[idStruct] != nil {
+		v.StructRelational[idStruct] = append(v.StructRelational[idStruct], nombreFunc)
+	} else {
+		v.StructRelational[idStruct] = []string{nombreFunc}
+	}
+
+	return nil
+}
+
+// Llamada a función de struct
+func (v *CompilerVisitor) VisitCallFunctionStructStmt(ctx *gramAntlr.CallFunctionStructStmtContext) interface{} {
+	return v.Visit(ctx.VarCallFuncStruct())
+}
+
+func (v *CompilerVisitor) VisitCallFunctionStructValue(ctx *gramAntlr.CallFunctionStructValueContext) interface{} {
+	return v.Visit(ctx.VarCallFuncStruct())
+}
+
+func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStructContext) interface{} {
+	nameStruct := ctx.ID_VARIABLE(0).GetText()     // Nombre del struct
+	nameFuncStruct := ctx.ID_VARIABLE(1).GetText() // Nombre de la función del struct
+
+	structVar, _ := v.currentEnv.GetVariable(nameStruct)
+	if structVar == nil || structVar.Type != STRUCT {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct o no existe.\n", nameStruct)
+		return nil
+	}
+
+	var structVarBase string
+	var findStructVar bool = false
+
+	for key, value := range v.StructRelational {
+		structVarBase = key
+
+		for _, value2 := range value {
+			if value2 == nameStruct {
+				findStructVar = true
+				break
+			}
+		}
+
+	}
+
+	if !findStructVar {
+		v.Salida += fmt.Sprintf("Error semántico: función %s no encontrada en el struct %s.\n", nameFuncStruct, nameStruct)
+		return nil
+	}
+
+	findStructVar = false
+
+	var funcionesStruct []string = v.StructRelational[structVarBase]
+
+	for _, funcName := range funcionesStruct {
+		if funcName == nameFuncStruct {
+			findStructVar = true
+			break
+		}
+	}
+
+	if !findStructVar {
+		v.Salida += fmt.Sprintf("Error semántico: función %s no encontrada en el struct %s.\n", nameFuncStruct, nameStruct)
+		return nil
+	}
+
+	parametros := []*TupleStringSymbol{}
+
+	for i := 0; i < len(ctx.AllExpr()); i++ {
+		value := v.Visit(ctx.Expr(i))
+
+		if value == nil {
+			v.Salida += fmt.Sprintf("Error-semántico: al llamar a la función %s del struct %s, el parámetro %d es nulo.\n", nameFuncStruct, nameStruct, i+1)
+			return nil
+		}
+
+		switch value.(type) {
+		case int:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, INT, false}})
+		case float64:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, FLOAT64, false}})
+		case string:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, STRING, false}})
+		case bool:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, BOOL, false}})
+		case rune:
+			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, RUNE, false}})
+		default:
+			v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro no reconocido para la función %s del struct %s.\n", nameFuncStruct, nameStruct)
+			return nil
+		}
+	}
+
+	funcion, err := v.currentEnv.GetFuncion(nameFuncStruct)
+	if err != nil {
+		v.Salida += err.Error()
+		return nil
+	}
+
+	parameters := funcion.Parameters
+	var body gramAntlr.IBlockContext = funcion.Body
+	tipoReturn := funcion.ValRet
+
+	parametros = append(parametros, &TupleStringSymbol{parameters[len(parameters)-1].Key, structVar}) // Agregar el struct como parámetro
+	if len(parameters) != len(parametros) {
+		v.Salida += fmt.Sprintf("Error-semántico: número de parámetros incorrecto al llamar a la función %s del struct %s. Se esperaban %d, pero se recibieron %d.\n", nameFuncStruct, nameStruct, len(parameters), len(parametros))
+		return nil
+	}
+
+	enviroment := NewEnvironment(v.currentEnv)
+	v.currentEnv = enviroment
+
+	if tipoReturn != 7 {
+		for i := 0; i < len(parametros); i++ {
+			if parametros[i].Value.Type != parameters[i].Value.Type {
+				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
+					parametros[i].Value.Type, parameters[i].Value.Type, nameFuncStruct, nameStruct)
+				return nil
+			}
+			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, parametros[i].Value.Mutable, true, ctx.GetStart())
+		}
+		posicionFinal := len(parameters) - 1
+		v.currentEnv.SetVariable(parameters[posicionFinal].Key, structVar.Value, structVar.Type, structVar.Mutable, true, ctx.GetStart())
+
+		valRet := v.Visit(body)
+
+		if isValidType(valRet, tipoReturn) {
+			v.currentEnv = v.currentEnv.Parent // Restaurar el entorno anterior
+			return valRet
+		} else {
+			v.Salida += fmt.Sprintf("Error-semántico: tipo de retorno %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
+				tipoReturn, fmt.Sprintf("%T", valRet), nameFuncStruct, nameStruct)
+			return nil
+		}
+	} else {
+		for i := 0; i < len(parametros); i++ {
+			if parametros[i].Value.Type != parameters[i].Value.Type {
+				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
+					parametros[i].Value.Type, parameters[i].Value.Type, nameFuncStruct, nameStruct)
+				return nil
+			}
+			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, parametros[i].Value.Mutable, true, ctx.GetStart())
+		}
+		posicionFinal := len(parameters) - 1
+		v.currentEnv.SetVariable(parameters[posicionFinal].Key, structVar.Value, structVar.Type, structVar.Mutable, true, ctx.GetStart())
+
+		v.Visit(body) // Ejecutar el cuerpo de la función
+	}
+	v.currentEnv = v.currentEnv.Parent // Restaurar el entorno anterior
 	return nil
 }
 

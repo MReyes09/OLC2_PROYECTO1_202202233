@@ -1120,7 +1120,7 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 	}
 
 	// Restauramos el entorno original al finalizar el for
-	v.currentEnv = outerEnv
+	v.currentEnv = outerEnv.Parent
 	return nil
 }
 

@@ -1044,7 +1044,7 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 			if condBool, ok = condition.(bool); !ok {
 				v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
 			}
-			v.currentEnv = newEnv // Restaurar el entorno
+			v.currentEnv = newEnv.Parent // Restaurar el entorno
 		}
 	}
 	return nil

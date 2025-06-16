@@ -462,43 +462,17 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-
 	var symbolType SymbolType
 	switch value.(type) {
 	case int:
 		symbolType = INT
-		nombre := ctx.GetText() // Obtén el nombre correctamente
-		tipo := "int"           // Obtén el tipo real
-		ambito := "global"      // Obtén el ámbito real
-		linea := ctx.GetStart().GetLine()
-		v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	case float64:
-		nombre := ctx.GetText() // Obtén el nombre correctamente
-		tipo := "float"         // Obtén el tipo real
-		ambito := "global"      // Obtén el ámbito real
-		linea := ctx.GetStart().GetLine()
-		v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 		symbolType = FLOAT64
 	case string:
-		nombre := ctx.GetText() // Obtén el nombre correctamente
-		tipo := "string"        // Obtén el tipo real
-		ambito := "global"      // Obtén el ámbito real
-		linea := ctx.GetStart().GetLine()
-		v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 		symbolType = STRING
 	case bool:
-		nombre := ctx.GetText() // Obtén el nombre correctamente
-		tipo := "bool"          // Obtén el tipo real
-		ambito := "global"      // Obtén el ámbito real
-		linea := ctx.GetStart().GetLine()
-		v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 		symbolType = BOOL
 	case rune:
-		nombre := ctx.GetText() // Obtén el nombre correctamente
-		tipo := "nil"           // Obtén el tipo real
-		ambito := "global"      // Obtén el ámbito real
-		linea := ctx.GetStart().GetLine()
-		v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 		symbolType = RUNE
 	default:
 		v.Salida += fmt.Sprintf("Error: tipo no reconocido para variable %s\n", id)

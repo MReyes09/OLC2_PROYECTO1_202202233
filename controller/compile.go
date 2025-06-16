@@ -3,6 +3,8 @@ package controller
 
 import (
 	"OLC2CLIENTE/compile"
+	"os"
+	"os/exec"
 
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
@@ -21,6 +23,33 @@ func CompileCode(code string) string {
 	parser.BuildParseTrees = true
 
 	tree := parser.Inicio() // O el rule root de tu gramática
+
+	// Obtener el árbol en texto desde ANTLR
+	rawTreeString := tree.ToStringTree(nil, parser)
+
+	// Formatear el árbol (usa tu función personalizada)
+	formattedOutput := FormatAntlrTree(rawTreeString)
+
+	// Imprimir el árbol formateado (opcional)
+	fmt.Println("Árbol FORMATEADO:")
+	fmt.Println(formattedOutput)
+
+	// Generar el archivo DOT
+	dotFilePath := "reports/ast.dot"
+	err := GenerateDotFromFormattedTreeString(formattedOutput, dotFilePath)
+	if err != nil {
+		fmt.Println("Error al generar el archivo DOT:", err)
+	} else {
+		pdfFilePath := "reports/ast.pdf"
+		cmd := exec.Command("dot", "-Tpdf", dotFilePath, "-o", pdfFilePath)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
+		if err != nil {
+			fmt.Println("Error al convertir DOT a PDF:", err)
+		}
+		fmt.Printf("Archivo PDF '%s' generado exitosamente.\n", pdfFilePath)
+	}
 
 	//Imprimir el arbol
 	//fmt.Println("\n ARBOL NO FORMATEADO \n" + tree.ToStringTree(nil, parser))
@@ -96,9 +125,9 @@ func CompileCode(code string) string {
 	fmt.Println("\n SCOPE GLOBAL PARA VER DECLARACIONES \n" + visitor.ReportScope())
 	fmt.Println("\n SCOPE PARA VER FUNCIONES GLOBALES \n" + visitor.ReportFunctions())
 
-	err := compile.GenerarReporteHTML(visitor.Errores, "reports/reporte_errores.html")
-	if err != nil {
-		fmt.Println("Error al generar reporte:", err)
+	erro := compile.GenerarReporteHTML(visitor.Errores, "reports/reporte_errores.html")
+	if erro != nil {
+		fmt.Println("Error al generar reporte:", erro)
 	}
 
 	return visitor.Salida

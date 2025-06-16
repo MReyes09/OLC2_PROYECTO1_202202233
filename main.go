@@ -79,6 +79,24 @@ func main() {
 			dialog.ShowError(err, myWindow)
 		}
 	}
+
+	// Abrir Reporte
+	abrirAST := func() {
+		filePath := "reports/ast.pdf"
+		var cmd *exec.Cmd
+		switch runtime.GOOS {
+		case "windows":
+			cmd = exec.Command("cmd", "/c", "start", filePath)
+		case "darwin":
+			cmd = exec.Command("open", filePath)
+		default: // linux y otros
+			cmd = exec.Command("xdg-open", filePath)
+		}
+		err := cmd.Start()
+		if err != nil {
+			dialog.ShowError(err, myWindow)
+		}
+	}
 	// Función para ejecutar código (simulación)
 	ejecutar := func() {
 		codigo := codigoEntry.Text
@@ -92,10 +110,11 @@ func main() {
 	}
 
 	// Crear los botones
-	btnAbrirArchivo := widget.NewButton("📁 Abrir Archivo", abrirArchivo)
+	btnAbrirArchivo := widget.NewButton("📂 Abrir Archivo", abrirArchivo)
 	btnBorrarDatos := widget.NewButton("🗑️ Borrar datos", borrarDatos)
 	btnEjecutar := widget.NewButton("▶️ Ejecutar", ejecutar)
-	btnReporte := widget.NewButton("📄 Reporte Errores", abrirErrores)
+	btnReporte := widget.NewButton("📑 Reporte Errores", abrirErrores)
+	btnAST := widget.NewButton("📊 Reporte AST", abrirAST)
 
 	// Crear container para los botones
 	botonesContainer := container.NewHBox(
@@ -103,6 +122,7 @@ func main() {
 		btnBorrarDatos,
 		btnEjecutar,
 		btnReporte,
+		btnAST,
 	)
 
 	// Crear labels para las secciones

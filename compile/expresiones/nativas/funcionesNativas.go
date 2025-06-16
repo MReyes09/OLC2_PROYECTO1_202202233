@@ -69,7 +69,9 @@ func (nv *NativasVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext
 }
 
 func (nv *NativasVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
+	fmt.Println("-------------- ReflectType --------------")
 	value := nv.Visit(ctx.Expr())
+	fmt.Println("Valor recibido:", value)
 
 	switch v := value.(type) {
 	case int:
@@ -82,16 +84,14 @@ func (nv *NativasVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 		return "rune"
 	case string:
 		return "string"
-	//case map[string]interface{}:
-	//	return "struct"
 	case []interface{}:
-		return getDimensionSlice(v, "[]", false)
+		return nv.GetDimensionSlice(v, "[]", false)
 	default:
 		return "desconocido"
 	}
 }
 
-func getDimensionSlice(listBase []interface{}, cadena string, onlyType bool) string {
+func (nv *NativasVisitor) GetDimensionSlice(listBase []interface{}, cadena string, onlyType bool) string {
 	if len(listBase) == 0 {
 		return cadena + "interface{}" // En caso de slice vacío
 	}
@@ -99,9 +99,9 @@ func getDimensionSlice(listBase []interface{}, cadena string, onlyType bool) str
 	switch contenido := listBase[0].(type) {
 	case []interface{}:
 		if onlyType {
-			return getDimensionSlice(contenido, cadena, onlyType)
+			return nv.GetDimensionSlice(contenido, cadena, onlyType)
 		} else {
-			return getDimensionSlice(contenido, cadena+"[]", onlyType)
+			return nv.GetDimensionSlice(contenido, cadena+"[]", onlyType)
 		}
 	case int:
 		cadena += "int"

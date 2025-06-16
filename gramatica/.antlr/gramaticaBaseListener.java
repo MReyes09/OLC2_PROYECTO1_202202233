@@ -424,6 +424,18 @@ public class gramaticaBaseListener implements gramaticaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSliceDcl_Asign(gramaticaParser.SliceDcl_AsignContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSliceDcl_Asign(gramaticaParser.SliceDcl_AsignContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAssign(gramaticaParser.AssignContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -479,18 +491,6 @@ public class gramaticaBaseListener implements gramaticaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDeclStructData(gramaticaParser.DeclStructDataContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStructVarType(gramaticaParser.StructVarTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStructVarType(gramaticaParser.StructVarTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

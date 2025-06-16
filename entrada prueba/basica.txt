@@ -1,4 +1,4 @@
-//fn main() {
+func main() {
 	mut puntos = 0
 	println("=== Archivo de prueba básico ===")
 
@@ -25,10 +25,19 @@
 	}
 
 	println("\nDeclaración explícita con tipo y sin valor")
-	mut entero_sin_valor = 0
-	mut decimal_sin_valor = 0.0
-	mut texto_sin_valor = ""
-	mut booleano_sin_valor = false
+	
+	// Cambiar 
+	/*
+	
+	
+	Corregido
+	
+	*/
+	mut entero_sin_valor int = 0
+	mut decimal_sin_valor float = 0.0
+	mut texto_sin_valor string = ""
+	mut booleano_sin_valor bool = false
+
 
 	println("enteroSinValor:", entero_sin_valor)
 	println("decimalSinValor:", decimal_sin_valor)
@@ -36,7 +45,7 @@
 	println("booleanoSinValor:", booleano_sin_valor)
 
     // ---> Pendiente de Revision con Enunciado
-	if entero_sin_valor == 0 && decimal_sin_valor == 0.0 && texto_sin_valor == '' && booleano_sin_valor == false {
+	if entero_sin_valor == 0 && decimal_sin_valor == 0.0 && texto_sin_valor == "" && booleano_sin_valor == false {
 		puntos_declaracion += 1
 		println("OK Declaración explícita con tipo y sin valor: correcto")
 	} else {
@@ -55,6 +64,12 @@
 	// 2. Asignación
 	println("\n==== Asignación de variables ====")
 	mut puntos_asignacion = 0
+	/*
+	NOTA: Si trabajaste con mut puntos_asignacion = 0 
+	o trabajste con puntos_asignacion = 0; 
+	Ambos estan bien, solo indicame en la calificacion cual usaste.
+	
+	*/
 
 	println("Asignación con tipo correcto")
 	entero = 99
@@ -83,8 +98,7 @@
 	println("\n==== Operaciones Aritméticas ====")
 	mut puntos_ari = 0
 
-
-	mut resultado_suma_1 = 10 + 5
+	resultado_suma_1 = 10 + 5
 	resultado_suma_2 = 10.5 + 5.5
 	resultado_suma_3 = 10 + 5.5
 	resultado_suma_4 = 10.5 + 5
@@ -101,10 +115,10 @@
 		println("X Suma: incorrecto")
 	}
 
-	mut resultado_resta_1 = 10 - 5
-	mut resultado_resta_2 = 10.5 - 5.5
-	mut resultado_resta_3 = 10 - 5.5
-	mut resultado_resta_4 = 10.5 - 5
+	resultado_resta_1 = 10 - 5
+	resultado_resta_2 = 10.5 - 5.5
+	resultado_resta_3 = 10 - 5.5
+	resultado_resta_4 = 10.5 - 5
 
 	println("10 - 5 =", resultado_resta_1)
 	println("10.5 - 5.5 =", resultado_resta_2)
@@ -157,9 +171,9 @@
 	// 8. Punto y coma
 	println("\n==== Punto y coma opcional ====")
 	mut puntos_semicolon = 2
-	mut a = 10
-	mut b = 20
-	mut c = a + b
+	a = 10
+	b = 20
+	c = a + b
 	println("a =", a)
 	println("b =", b)
 	println("c = a + b =", c)
@@ -186,4 +200,4 @@
 	println(puntos_semicolon)
 	println("| TOTAL                    |")
 	println(puntos)
-//}
+}

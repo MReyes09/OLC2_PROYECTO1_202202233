@@ -117,10 +117,10 @@ func main() {
     mut puntosIndex int = 0
 
     println("Búsqueda de elementos con indexOf:") //VERIFICAR
-    numeros = []int {10, 20, 30, 40, 50}
-    println(numeros)
-    mut indice1 int = indexOf(numeros, 30)
-    mut indice2 int = indexOf(numeros, 60) // No existe, debería retornar -1
+    numeros2 = []int {10, 20, 30, 40, 50}
+    println(numeros2)
+    mut indice1 int = indexOf(numeros2, 30)
+    mut indice2 int = indexOf(numeros2, 60) // No existe, debería retornar -1
     println("Índice de 30:", indice1)
     println("Índice de 60:", indice2)
 

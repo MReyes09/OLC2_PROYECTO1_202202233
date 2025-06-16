@@ -81,6 +81,24 @@ func main() {
 	}
 
 	// Abrir Reporte
+	abrirSimbolos := func() {
+		filePath := "reports/tabla_simbolos.html"
+		var cmd *exec.Cmd
+		switch runtime.GOOS {
+		case "windows":
+			cmd = exec.Command("cmd", "/c", "start", filePath)
+		case "darwin":
+			cmd = exec.Command("open", filePath)
+		default: // linux y otros
+			cmd = exec.Command("xdg-open", filePath)
+		}
+		err := cmd.Start()
+		if err != nil {
+			dialog.ShowError(err, myWindow)
+		}
+	}
+
+	// Abrir Reporte
 	abrirAST := func() {
 		filePath := "reports/ast.pdf"
 		var cmd *exec.Cmd
@@ -113,14 +131,16 @@ func main() {
 	btnAbrirArchivo := widget.NewButton("📂 Abrir Archivo", abrirArchivo)
 	btnBorrarDatos := widget.NewButton("🗑️ Borrar datos", borrarDatos)
 	btnEjecutar := widget.NewButton("▶️ Ejecutar", ejecutar)
-	btnReporte := widget.NewButton("📑 Reporte Errores", abrirErrores)
-	btnAST := widget.NewButton("📊 Reporte AST", abrirAST)
+	btnReporte := widget.NewButton("⛔ Tabla de Errores", abrirErrores)
+	btnSimbolos := widget.NewButton("🏷️ Tabla de Simbolos", abrirSimbolos)
+	btnAST := widget.NewButton("📊 Arbol AST", abrirAST)
 
 	// Crear container para los botones
 	botonesContainer := container.NewHBox(
 		btnAbrirArchivo,
 		btnBorrarDatos,
 		btnEjecutar,
+		btnSimbolos,
 		btnReporte,
 		btnAST,
 	)

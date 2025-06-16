@@ -125,6 +125,10 @@ func CompileCode(code string) string {
 	fmt.Println("\n SCOPE GLOBAL PARA VER DECLARACIONES \n" + visitor.ReportScope())
 	fmt.Println("\n SCOPE PARA VER FUNCIONES GLOBALES \n" + visitor.ReportFunctions())
 
+	erri := visitor.TablaSimbolos.GenerarReporteHTML("reports/tabla_simbolos.html")
+	if err != nil {
+		fmt.Println("Error al generar reporte:", erri)
+	}
 	erro := compile.GenerarReporteHTML(visitor.Errores, "reports/reporte_errores.html")
 	if erro != nil {
 		fmt.Println("Error al generar reporte:", erro)

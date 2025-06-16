@@ -404,7 +404,6 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
 
-	// Determinar tipo basado en valor
 	var symbolType SymbolType
 	switch value.(type) {
 	case int:

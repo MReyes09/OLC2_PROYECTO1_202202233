@@ -2,6 +2,8 @@ package main
 
 import (
 	"io"
+	"os/exec"
+	"runtime"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -17,7 +19,7 @@ func main() {
 	// Crear la aplicación
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Compiladores 2")
-	myWindow.Resize(fyne.NewSize(800, 600))
+	myWindow.Resize(fyne.NewSize(1400, 800))
 
 	// Variables globales para los widgets
 	var codigoEntry *widget.Entry
@@ -60,6 +62,23 @@ func main() {
 		consolaEntry.SetText("")
 	}
 
+	// Abrir Reporte
+	abrirErrores := func() {
+		filePath := "reports/reporte_errores.html"
+		var cmd *exec.Cmd
+		switch runtime.GOOS {
+		case "windows":
+			cmd = exec.Command("cmd", "/c", "start", filePath)
+		case "darwin":
+			cmd = exec.Command("open", filePath)
+		default: // linux y otros
+			cmd = exec.Command("xdg-open", filePath)
+		}
+		err := cmd.Start()
+		if err != nil {
+			dialog.ShowError(err, myWindow)
+		}
+	}
 	// Función para ejecutar código (simulación)
 	ejecutar := func() {
 		codigo := codigoEntry.Text
@@ -76,12 +95,14 @@ func main() {
 	btnAbrirArchivo := widget.NewButton("📁 Abrir Archivo", abrirArchivo)
 	btnBorrarDatos := widget.NewButton("🗑️ Borrar datos", borrarDatos)
 	btnEjecutar := widget.NewButton("▶️ Ejecutar", ejecutar)
+	btnReporte := widget.NewButton("📄 Reporte Errores", abrirErrores)
 
 	// Crear container para los botones
 	botonesContainer := container.NewHBox(
 		btnAbrirArchivo,
 		btnBorrarDatos,
 		btnEjecutar,
+		btnReporte,
 	)
 
 	// Crear labels para las secciones
@@ -117,5 +138,6 @@ func main() {
 
 	// Configurar y mostrar la ventana
 	myWindow.SetContent(content)
+	myWindow.CenterOnScreen()
 	myWindow.ShowAndRun()
 }

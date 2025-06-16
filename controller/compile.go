@@ -3,6 +3,7 @@ package controller
 
 import (
 	"OLC2CLIENTE/compile"
+
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
 
@@ -94,6 +95,11 @@ func CompileCode(code string) string {
 
 	fmt.Println("\n SCOPE GLOBAL PARA VER DECLARACIONES \n" + visitor.ReportScope())
 	fmt.Println("\n SCOPE PARA VER FUNCIONES GLOBALES \n" + visitor.ReportFunctions())
+
+	err := compile.GenerarReporteHTML(visitor.Errores, "reports/reporte_errores.html")
+	if err != nil {
+		fmt.Println("Error al generar reporte:", err)
+	}
 
 	return visitor.Salida
 }

@@ -403,8 +403,6 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-	fmt.Println("VisitVarDclWithInference - ID:", id, "Value:", value)
-
 	var symbolType SymbolType
 	switch value.(type) {
 	case int:

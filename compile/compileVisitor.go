@@ -24,6 +24,7 @@ type CompilerVisitor struct {
 	currentEnv                      *Environment                    // scope
 	conditionExpr                   interface{}                     // Added for switch statement
 	StructRelational                map[string][]string
+	Errores                         []ErrorReport
 }
 
 // Constructor opcional
@@ -51,6 +52,7 @@ func (v *CompilerVisitor) ReportFunctions() string {
 	return v.currentEnv.ImprimirScopeFunc()
 }
 
+// -----------------------
 //------------------------------------------------------------------------------------------
 
 func (v *CompilerVisitor) Visit(tree antlr.ParseTree) interface{} {
@@ -128,6 +130,17 @@ func getStringSlice(lista []interface{}, cadena string) string {
 
 // ----------------------------- Final de print --------------.---------------
 
+// ----------------------------- Manejo de Errores ---------------------------
+func (v *CompilerVisitor) AgregarError(mensaje string, linea, columna int, tipo string) {
+	v.Errores = append(v.Errores, ErrorReport{
+		No:      len(v.Errores) + 1,
+		Mensaje: mensaje,
+		Linea:   linea,
+		Columna: columna,
+		Tipo:    tipo,
+	})
+}
+
 // ----------------------------- Expresiones -----------------------------
 // VisitParens
 func (v *CompilerVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{} {
@@ -140,6 +153,12 @@ func (v *CompilerVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{
 	numero, err := strconv.Atoi(ctx.GetText())
 	if err != nil {
 		v.Salida += "Error en la conversión de número: " + ctx.GetText()
+		v.AgregarError(
+			"Error en la conversión de número",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	} else {
 		return numero
@@ -152,6 +171,12 @@ func (v *CompilerVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} 
 	numero, err := strconv.ParseFloat(texto, 64)
 	if err != nil {
 		v.Salida += "Error en la conversión de double: " + texto
+		v.AgregarError(
+			"Error en la conversión de double",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	return numero
@@ -196,6 +221,12 @@ func (v *CompilerVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{
 		return false
 	}
 	v.Salida += "Error en el valor booleano: " + texto
+	v.AgregarError(
+		"Error en el valor booleano",
+		ctx.GetStart().GetLine(),
+		ctx.GetStart().GetColumn(),
+		"semántico",
+	)
 	return nil
 }
 
@@ -259,6 +290,12 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 	symbolType, err := parseSymbolType(typeStr)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		v.AgregarError(
+			"Error tipo de dato no valido"+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -283,12 +320,24 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 		value = float64(num)
 	} else if !isValidType(value, symbolType) {
 		v.Salida += fmt.Sprintf("Error semántico: tipos incompatibles para variable %s\n", id)
+		v.AgregarError(
+			"Error tipo de dato no valido"+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
 	if miError != nil {
 		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		v.AgregarError(
+			"Error Intento redeclarar la variable "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	return nil
@@ -302,6 +351,12 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 	symbolType, err := parseSymbolType(typeStr)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		v.AgregarError(
+			"Error tipo no valido"+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -321,12 +376,24 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		return nil
 	default:
 		v.Salida += fmt.Sprintf("Error: tipo %s no soporta valor por defecto\n", typeStr)
+		v.AgregarError(
+			"Error tipo no soporta valor por defecto"+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	miError := v.currentEnv.SetVariable(id, defaultValue, symbolType, false, true, ctx.GetStart())
 	if miError != nil {
 		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		v.AgregarError(
+			"Error Intento redeclarar una variable "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	return nil
@@ -352,12 +419,24 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		symbolType = RUNE
 	default:
 		v.Salida += fmt.Sprintf("Error: tipo no reconocido para variable %s\n", id)
+		v.AgregarError(
+			"Error tipo no reconocido para variable "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	miError := v.currentEnv.SetVariable(id, value, symbolType, false, true, ctx.GetStart())
 	if miError != nil {
 		v.Salida += fmt.Sprintf("Error-semántico: Intento redeclarar la variable %s", id)
+		v.AgregarError(
+			"Error intento redeclarar la variable "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	return nil
@@ -370,12 +449,24 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error variable no declarada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	listaBase, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder a arreglo, variable no es de un arreglo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -385,12 +476,24 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 		idx, ok := index.(int)
 		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
+			v.AgregarError(
+				"Error el índice debe ser un entero",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 
 		// Verificación de rango
 		if idx < 0 || idx >= len(listaBase) {
 			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			v.AgregarError(
+				"Error indice fuera de rango",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 
@@ -404,6 +507,12 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 			nextLevel, ok := listaBase[idx].([]interface{})
 			if !ok {
 				v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+				v.AgregarError(
+					"Error al acceder al arreglo, posicion no es un arreglo",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			listaBase = nextLevel
@@ -419,12 +528,24 @@ func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpl
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error  variable no declarada",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	listaBase, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, variable no es un arreglo",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -434,12 +555,24 @@ func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpl
 		idx, ok := index.(int)
 		if !ok {
 			v.Salida += "Error-semántico: índice debe ser un entero.\n"
+			v.AgregarError(
+				"Error el índice debe ser un entero",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 
 		// Verificación de rango
 		if idx < 0 || idx >= len(listaBase) {
 			v.Salida += fmt.Sprintf("Error-semántico: índice %d fuera de rango (tamaño del arreglo: %d)\n", idx, len(listaBase))
+			v.AgregarError(
+				"Error indice fuera de rango",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 
@@ -452,6 +585,12 @@ func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpl
 		nextLevel, ok := listaBase[idx].([]interface{})
 		if !ok {
 			v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la posición %d no es un arreglo.\n", idx)
+			v.AgregarError(
+				"Error al acceder a arreglo, posicion no es un arreglo",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 		listaBase = nextLevel
@@ -468,12 +607,24 @@ func (v *CompilerVisitor) VisitArrayFindIndex(ctx *gramAntlr.ArrayFindIndexConte
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error variable no declarada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	tempList, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, variable no es un arreglo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -496,12 +647,24 @@ func (v *CompilerVisitor) VisitArrayJoin(ctx *gramAntlr.ArrayJoinContext) interf
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error varible no declarda "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	tempList, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, variable no es un arreglo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -510,6 +673,12 @@ func (v *CompilerVisitor) VisitArrayJoin(ctx *gramAntlr.ArrayJoinContext) interf
 		return result
 	} else {
 		v.Salida += "Error-semántico: al unir el arreglo, el valor no es un string.\n"
+		v.AgregarError(
+			"Error al unir el arreglo, el valor no es un string",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 }
@@ -520,12 +689,24 @@ func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) in
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error variable no declarada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	tempList, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, variable no es un arreglo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -540,6 +721,12 @@ func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) in
 			if idx, ok := index.(int); ok {
 				if idx >= len(listaBase) {
 					v.Salida += "Error-semántico: índice fuera de rango.\n"
+					v.AgregarError(
+						"Error índice fuera de rango",
+						ctx.GetStart().GetLine(),
+						ctx.GetStart().GetColumn(),
+						"semántico",
+					)
 					return nil
 				}
 				nextItem := listaBase[idx]
@@ -547,10 +734,22 @@ func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) in
 					listaBase = nextList
 				} else {
 					v.Salida += "Error-semántico: al acceder al arreglo, la posición no es un arreglo.\n"
+					v.AgregarError(
+						"Error al acceder al arreglo, la posición no es un arreglo",
+						ctx.GetStart().GetLine(),
+						ctx.GetStart().GetColumn(),
+						"semántico",
+					)
 					return nil
 				}
 			} else {
 				v.Salida += "Error-semántico: índice debe ser un entero.\n"
+				v.AgregarError(
+					"Error índice debe ser un entero",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 		}
@@ -568,12 +767,24 @@ func (v *CompilerVisitor) VisitArrayAppend(ctx *gramAntlr.ArrayAppendContext) in
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error variable no declarada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	tempList, ok := variable.Value.([]interface{})
 	if !ok {
 		v.Salida += fmt.Sprintf("Error-semántico: al acceder al arreglo, la variable %s no es un arreglo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, variable no es un arreglo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -588,6 +799,12 @@ func (v *CompilerVisitor) VisitArrayAppend(ctx *gramAntlr.ArrayAppendContext) in
 	}
 
 	v.Salida += "Error-semántico: al agregar valor al arreglo, los tipos no son compatibles.\n"
+	v.AgregarError(
+		"Error al agregar valor al arreglo, los tipos no son compatibles",
+		ctx.GetStart().GetLine(),
+		ctx.GetStart().GetColumn(),
+		"semántico",
+	)
 	return nil
 }
 
@@ -605,6 +822,12 @@ func (v *CompilerVisitor) VisitSliceValores(ctx *gramAntlr.SliceValoresContext) 
 	typo, err := parseSymbolType(typeStr)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		v.AgregarError(
+			"Error tipo no valido "+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -627,6 +850,12 @@ func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) inte
 	symbolType, err := parseSymbolType(typeStr)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		v.AgregarError(
+			"Error tipo de dato no valido "+typeStr,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -671,6 +900,12 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 	sym, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error-semántico: variable %s no encontrada.\n", id)
+		v.AgregarError(
+			"Error variable no encontrada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -680,6 +915,12 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 
 	if value == nil {
 		v.Salida += fmt.Sprintf("Error-semántico: al asignar el valor a la variable '%s', el valor es nulo.\n", id)
+		v.AgregarError(
+			"Error al acceder al arreglo, valor es nulo "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -690,6 +931,12 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 			return nil
 		}
 		v.Salida += fmt.Sprintf("Error-semántico: tipos no compatibles para el slice asignado a %s.\n", id)
+		v.AgregarError(
+			"Error tipo no compatible slice "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -700,6 +947,12 @@ func (v *CompilerVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{
 			return nil
 		}
 		v.Salida += fmt.Sprintf("Error-semántico: la variable %s no es mutable y no se puede asignar un nuevo valor.\n", id)
+		v.AgregarError(
+			"Error variable no mutable "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -739,6 +992,12 @@ func (v *CompilerVisitor) VisitVarAdd(ctx *gramAntlr.VarAddContext) interface{} 
 	case 2: // STRING
 		if ctx.GetOp().GetText() == "-=" {
 			v.Salida += "Error-semántico: al operar -= no se pueden operar strings."
+			v.AgregarError(
+				"Error al operar -= no se pueden operar strings.",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 		}
 		if val, ok := value.(string); ok {
 			v.currentEnv.SetVariable(id, sym.Value.(string)+val, typ, sym.Mutable, false, token)
@@ -757,6 +1016,12 @@ func (v *CompilerVisitor) VisitVarAdd(ctx *gramAntlr.VarAddContext) interface{} 
 	}
 
 	v.Salida = "Error-semántico: al asignar el valor a la variable, los tipos no son compatibles."
+	v.AgregarError(
+		"Error asignacion de valor a la variable, no compatible "+id,
+		ctx.GetStart().GetLine(),
+		ctx.GetStart().GetColumn(),
+		"semántico",
+	)
 	return nil
 }
 
@@ -771,6 +1036,12 @@ func (v *CompilerVisitor) VisitVarInc(ctx *gramAntlr.VarIncContext) interface{} 
 	// Solo se permite ++ y -- para INT (0) y FLOAT64 (1)
 	if typ != 0 && typ != 1 {
 		v.Salida += "Error-semántico: el tipo de variable no acepta operador ++ o --."
+		v.AgregarError(
+			"Error el tipo de variable no acepta operador ++ o --.",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -807,11 +1078,23 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 	value := v.Visit(ctx.Expr())
 	if value == nil {
 		v.Salida += "Error semántico: condición del if es nil\n"
+		v.AgregarError(
+			"Error condición del if es nil",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	cond, ok := value.(bool)
 	if !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
+		v.AgregarError(
+			"Error al evaluar la condición del if, no es un booleano.",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -870,6 +1153,12 @@ func (v *CompilerVisitor) VisitIfAnidado(ctx *gramAntlr.IfAnidadoContext) interf
 	cond, ok := value.(bool)
 	if !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del if, no es un booleano.\n"
+		v.AgregarError(
+			"Error al evaluar la condición del if, no es un booleano.",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -956,6 +1245,12 @@ func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) inte
 	sym, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
+		v.AgregarError(
+			"Error variable no declarada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	return sym.Value
@@ -972,6 +1267,12 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 
 	if condBool, ok := condition.(bool); !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
+		v.AgregarError(
+			"Error al evaluar la condición del if, no es un booleano.",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 	} else {
 		for condBool {
 			result := v.Visit(ctx.Block())
@@ -983,6 +1284,12 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 					condition = v.Visit(ctx.Expr())
 					if condBool, ok = condition.(bool); !ok {
 						v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
+						v.AgregarError(
+							"Error al reevaluar la condición del for tras un 'continue', no es un booleano.",
+							ctx.GetStart().GetLine(),
+							ctx.GetStart().GetColumn(),
+							"semántico",
+						)
 					}
 					continue
 				} else if str == "Excepcion___Return_Void" {
@@ -999,6 +1306,12 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 			condition = v.Visit(ctx.Expr())
 			if condBool, ok = condition.(bool); !ok {
 				v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
+				v.AgregarError(
+					"Error al reevaluar la condición del for, no es un booleano.",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 			}
 		}
 	}
@@ -1017,6 +1330,12 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 	condBool, ok := condition.(bool)
 	if !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
+		v.AgregarError(
+			"Error al evaluar la condición del for, no es un booleano.",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 	}
 
 	for condBool {
@@ -1033,6 +1352,12 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 				condition = v.Visit(ctx.Expr())
 				if condBool, ok = condition.(bool); !ok {
 					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
+					v.AgregarError(
+						"Error al reevaluar la condición del for tras un 'continue', no es un booleano.",
+						ctx.GetStart().GetLine(),
+						ctx.GetStart().GetColumn(),
+						"semántico",
+					)
 				}
 				continue
 			} else if str == "Excepcion___Return_Void" {
@@ -1053,6 +1378,12 @@ func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext
 		condition = v.Visit(ctx.Expr())
 		if condBool, ok = condition.(bool); !ok {
 			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
+			v.AgregarError(
+				"Error al reevaluar la condición del for, no es un booleano.",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 		}
 	}
 
@@ -1066,6 +1397,12 @@ func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interfac
 	slice, err := sym.Value.([]interface{})
 	if !err {
 		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
+		v.AgregarError(
+			"Error al iterar sobre el rango",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1143,6 +1480,12 @@ func (v *CompilerVisitor) VisitCase(ctx *gramAntlr.CaseContext) interface{} {
 		}
 	} else {
 		v.Salida += fmt.Sprintf("Error semántico: al evaluar la condición del case, los tipos no son compatibles. Linea: %d, Columna: %d\n", ctx.GetStart().GetLine(), ctx.GetStart().GetColumn())
+		v.AgregarError(
+			"Error al evaluar la condicion case",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil // Or propagate an error
 	}
 
@@ -1233,6 +1576,12 @@ func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataConte
 				variableStruct[variable.GetText()] = Symbol{rune(0), RUNE, false}
 			default:
 				v.Salida += fmt.Sprintf("Error semántico: tipo no compatible para variable: %s", ctx.AllType_()[tipoValor].GetText())
+				v.AgregarError(
+					"Error tipo no compatible para variable "+id,
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 			}
 			tipoValor++
 		}
@@ -1253,16 +1602,34 @@ func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTy
 
 	if baseStruct.Type != 6 {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct\n", idStruct)
+		v.AgregarError(
+			"Error variable no es Struct "+idStruct,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	bodyStruct, ok := baseStruct.Value.(map[string]Symbol)
 	if !ok {
 		v.Salida += fmt.Sprintf("Error semántico: el contenido de %s no es un struct válido (map[string]Symbol)\n", idStruct)
+		v.AgregarError(
+			"Error no es un struct valido "+idStruct,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
 	if len(bodyStruct) != len(ctx.AllID_VARIABLE())-2 {
 		v.Salida += fmt.Sprintf("Error semántico: número de campos en la declaración de struct %s no coincide con el número de campos definidos\n", idStruct)
+		v.AgregarError(
+			"Error numero de campos en la declaracion Struct ",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 	}
 	//Agregar copia de datoStructBase a una nueva instancia de struct
 	// ✅ Deep Copy del struct base
@@ -1300,6 +1667,12 @@ func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTy
 		if !exist {
 			v.Salida += fmt.Sprintf("Error semántico: campo %s no existe en struct base %s\n",
 				ctx.ID_VARIABLE(i).GetText(), idStruct)
+			v.AgregarError(
+				"Error campo no existe en Struct",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 		expVisit := v.Visit(ctx.Expr(i - 2))
@@ -1316,6 +1689,12 @@ func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTy
 			continue
 		} else {
 			v.Salida += fmt.Sprintf("Error semántico: tipo incompatible para campo %s\n", ctx.ID_VARIABLE(i).GetText())
+			v.AgregarError(
+				"Error tipo incompatible para campo",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	}
@@ -1346,6 +1725,12 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 			symbol, found := v.currentEnv.GetVariable(idStruct)
 			if found != nil || symbol.Type != STRUCT {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct o no existe.\n", idStruct)
+				v.AgregarError(
+					"Error variable no es Struct o no existe",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			varStruct = *symbol
@@ -1354,6 +1739,12 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 			castedMap, ok := varStruct.Value.(map[string]Symbol)
 			if !ok {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				v.AgregarError(
+					"Error la variable no contiene struct",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			datosStruct = castedMap
@@ -1367,11 +1758,23 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 						datosStruct = nestedMap
 					} else {
 						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						v.AgregarError(
+							"Error variable no es un struct",
+							ctx.GetStart().GetLine(),
+							ctx.GetStart().GetColumn(),
+							"semántico",
+						)
 						return nil
 					}
 				}
 			} else {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				v.AgregarError(
+					"Error el Struct no existe",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 		} else {
@@ -1386,10 +1789,22 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 					datosStruct = nestedMap
 				} else {
 					v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+					v.AgregarError(
+						"Error la variable no es un Struct",
+						ctx.GetStart().GetLine(),
+						ctx.GetStart().GetColumn(),
+						"semántico",
+					)
 					return nil
 				}
 			} else {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, ctx.ID_VARIABLE(i).GetText())
+				v.AgregarError(
+					"Error la variable no existe en el Struct",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 		}
@@ -1414,12 +1829,24 @@ func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsig
 			}
 			if varStruct.Type != 6 {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct.\n", idStruct)
+				v.AgregarError(
+					"Error la variable no es un struct",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			datosStruct = make(map[string]Symbol)
 			castedMap, ok := varStruct.Value.(map[string]Symbol)
 			if !ok {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no contiene un struct válido.\n", idStruct)
+				v.AgregarError(
+					"Error la variable no contiene struct",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			datosStruct = castedMap
@@ -1436,11 +1863,23 @@ func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsig
 						datosStruct = nestedMap
 					} else {
 						v.Salida += fmt.Sprintf("Error semántico: la variable %s no es un struct (anidado).\n", idVar)
+						v.AgregarError(
+							"Error la variable no es un struct",
+							ctx.GetStart().GetLine(),
+							ctx.GetStart().GetColumn(),
+							"semántico",
+						)
 						return nil
 					}
 				}
 			} else {
 				v.Salida += fmt.Sprintf("Error semántico: la variable %s no existe en el struct %s.\n", idVar, idStruct)
+				v.AgregarError(
+					"Error variable no existe en el Struct",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 
@@ -1493,6 +1932,12 @@ func (v *CompilerVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interf
 			parametros = append(parametros, &TupleStringSymbol{idParam, &Symbol{'\x00', tipo, true}})
 		default:
 			v.Salida += fmt.Sprintf("Error semántico: tipo de parámetro no reconocido: %s\n", typeText)
+			v.AgregarError(
+				"Error tipo de parametro no reconocido",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	}
@@ -1514,6 +1959,12 @@ func (v *CompilerVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interf
 			tipoRet = RUNE
 		default:
 			v.Salida += fmt.Sprintf("Error semántico: tipo de retorno no reconocido: %s\n", typeText)
+			v.AgregarError(
+				"Error tipo de retorno no reconocido",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	}
@@ -1537,6 +1988,12 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 
 		if value == nil {
 			v.Salida += fmt.Sprintf("Error-semántico: al llamar a la función %s, el parámetro %d es nulo.\n", id, i+1)
+			v.AgregarError(
+				"Error al llamar funcion",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 		switch value.(type) {
@@ -1552,12 +2009,24 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, RUNE, false}})
 		default:
 			v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro no reconocido para la función %s.\n", id)
+			v.AgregarError(
+				"Error topo de parametro no reconocido "+id,
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	}
 	funcion, error := v.currentEnv.GetFuncion(id)
 	if error != nil {
 		v.Salida += fmt.Sprintf("Error-semántico: función %s no encontrada.\n", id)
+		v.AgregarError(
+			"Error funcion no encontrada "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1567,6 +2036,12 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 
 	if len(parameters) != len(parametros) {
 		v.Salida += fmt.Sprintf("Error-semántico: número de parámetros incorrecto al llamar a la función %s. Se esperaban %d, pero se recibieron %d.\n", id, len(parameters), len(parametros))
+		v.AgregarError(
+			"Error numero de parametros incorrecto "+id,
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1579,6 +2054,12 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 			if parametros[i].Value.Type != parameters[i].Value.Type {
 				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s.\n",
 					parametros[i].Value.Type, parameters[i].Value.Type, id)
+				v.AgregarError(
+					"Error tipo de parametro no coincide "+id,
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, false, true, ctx.GetStart())
@@ -1592,6 +2073,12 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 		} else {
 			v.Salida += fmt.Sprintf("Error-semántico: tipo de retorno %v no coincide con el tipo esperado %v en la función %s.\n",
 				tipoReturn, fmt.Sprintf("%T", valRet), id)
+			v.AgregarError(
+				"Error tipo de retorno no coincide "+id,
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	} else {
@@ -1599,6 +2086,12 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 			if parametros[i].Value.Type != parameters[i].Value.Type {
 				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s.\n",
 					parametros[i].Value.Type, parameters[i].Value.Type, id)
+				v.AgregarError(
+					"Error tipo de parametro no coincide "+id,
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parameters[i].Value.Type, parameters[i].Value.Mutable, true, ctx.GetStart())
@@ -1642,6 +2135,12 @@ func (v *CompilerVisitor) VisitFuncionesStructsNativas(ctx *gramAntlr.FuncionesS
 				parametros = append(parametros, &TupleStringSymbol{id, &Symbol{rune(0), RUNE, true}})
 			default:
 				v.Salida += fmt.Sprintf("Error semántico: tipo de parámetro no reconocido: %s\n", tipo)
+				v.AgregarError(
+					"Error tipo de parametro no coincide "+id,
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 		}
@@ -1653,6 +2152,12 @@ func (v *CompilerVisitor) VisitFuncionesStructsNativas(ctx *gramAntlr.FuncionesS
 		tipoRetorno, err = StringToSymbolType(valRet)
 		if err != nil {
 			v.Salida += fmt.Sprintf("Error semántico: tipo de retorno no reconocido: %s\n", valRet)
+			v.AgregarError(
+				"Error tipo de retorno no reconocido",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	} else {
@@ -1665,6 +2170,12 @@ func (v *CompilerVisitor) VisitFuncionesStructsNativas(ctx *gramAntlr.FuncionesS
 	structVar, _ := v.currentEnv.GetVariable(idStruct)
 	if structVar == nil || structVar.Type != STRUCT {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct o no existe.\n", idStruct)
+		v.AgregarError(
+			"Error variable no es un struct",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 	parametros = append(parametros, &TupleStringSymbol{idVar, structVar}) // Agregar el struct como parámetro
@@ -1696,6 +2207,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 	structVar, _ := v.currentEnv.GetVariable(nameStruct)
 	if structVar == nil || structVar.Type != STRUCT {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no es un struct o no existe.\n", nameStruct)
+		v.AgregarError(
+			"Error variable no es un struct",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1716,6 +2233,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 
 	if !findStructVar {
 		v.Salida += fmt.Sprintf("Error semántico: función %s no encontrada en el struct %s.\n", nameFuncStruct, nameStruct)
+		v.AgregarError(
+			"Error funcion no encontrado en el struct",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1732,6 +2255,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 
 	if !findStructVar {
 		v.Salida += fmt.Sprintf("Error semántico: función %s no encontrada en el struct %s.\n", nameFuncStruct, nameStruct)
+		v.AgregarError(
+			"Error funcion no encontrada",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1742,6 +2271,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 
 		if value == nil {
 			v.Salida += fmt.Sprintf("Error-semántico: al llamar a la función %s del struct %s, el parámetro %d es nulo.\n", nameFuncStruct, nameStruct, i+1)
+			v.AgregarError(
+				"Error llamar a la funcion",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 
@@ -1758,6 +2293,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 			parametros = append(parametros, &TupleStringSymbol{ctx.Expr(i).GetText(), &Symbol{value, RUNE, false}})
 		default:
 			v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro no reconocido para la función %s del struct %s.\n", nameFuncStruct, nameStruct)
+			v.AgregarError(
+				"Error tipo de parametro no reconocido",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	}
@@ -1775,6 +2316,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 	parametros = append(parametros, &TupleStringSymbol{parameters[len(parameters)-1].Key, structVar}) // Agregar el struct como parámetro
 	if len(parameters) != len(parametros) {
 		v.Salida += fmt.Sprintf("Error-semántico: número de parámetros incorrecto al llamar a la función %s del struct %s. Se esperaban %d, pero se recibieron %d.\n", nameFuncStruct, nameStruct, len(parameters), len(parametros))
+		v.AgregarError(
+			"Error numeor de parametros incorrecto",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
 		return nil
 	}
 
@@ -1786,6 +2333,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 			if parametros[i].Value.Type != parameters[i].Value.Type {
 				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
 					parametros[i].Value.Type, parameters[i].Value.Type, nameFuncStruct, nameStruct)
+				v.AgregarError(
+					"Error tipo de parametros no coincide",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, parametros[i].Value.Mutable, true, ctx.GetStart())
@@ -1801,6 +2354,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 		} else {
 			v.Salida += fmt.Sprintf("Error-semántico: tipo de retorno %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
 				tipoReturn, fmt.Sprintf("%T", valRet), nameFuncStruct, nameStruct)
+			v.AgregarError(
+				"Error tipo de retorno no coincide",
+				ctx.GetStart().GetLine(),
+				ctx.GetStart().GetColumn(),
+				"semántico",
+			)
 			return nil
 		}
 	} else {
@@ -1808,6 +2367,12 @@ func (v *CompilerVisitor) VisitCallFunctionStruct(ctx *gramAntlr.CallFunctionStr
 			if parametros[i].Value.Type != parameters[i].Value.Type {
 				v.Salida += fmt.Sprintf("Error-semántico: tipo de parámetro %v no coincide con el tipo esperado %v en la función %s del struct %s.\n",
 					parametros[i].Value.Type, parameters[i].Value.Type, nameFuncStruct, nameStruct)
+				v.AgregarError(
+					"Error tipo de parametros no coincide",
+					ctx.GetStart().GetLine(),
+					ctx.GetStart().GetColumn(),
+					"semántico",
+				)
 				return nil
 			}
 			v.currentEnv.SetVariable(parameters[i].Key, parametros[i].Value.Value, parametros[i].Value.Type, parametros[i].Value.Mutable, true, ctx.GetStart())

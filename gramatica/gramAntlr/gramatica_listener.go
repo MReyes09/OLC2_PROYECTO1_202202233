@@ -109,6 +109,9 @@ type gramaticaListener interface {
 	// EnterSliceVacio is called when entering the SliceVacio production.
 	EnterSliceVacio(c *SliceVacioContext)
 
+	// EnterSliceDcl_Asign is called when entering the SliceDcl_Asign production.
+	EnterSliceDcl_Asign(c *SliceDcl_AsignContext)
+
 	// EnterAssign is called when entering the assign production.
 	EnterAssign(c *AssignContext)
 
@@ -354,6 +357,9 @@ type gramaticaListener interface {
 
 	// ExitSliceVacio is called when exiting the SliceVacio production.
 	ExitSliceVacio(c *SliceVacioContext)
+
+	// ExitSliceDcl_Asign is called when exiting the SliceDcl_Asign production.
+	ExitSliceDcl_Asign(c *SliceDcl_AsignContext)
 
 	// ExitAssign is called when exiting the assign production.
 	ExitAssign(c *AssignContext)

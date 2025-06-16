@@ -109,6 +109,9 @@ type gramaticaVisitor interface {
 	// Visit a parse tree produced by gramaticaParser#SliceVacio.
 	VisitSliceVacio(ctx *SliceVacioContext) interface{}
 
+	// Visit a parse tree produced by gramaticaParser#SliceDcl_Asign.
+	VisitSliceDcl_Asign(ctx *SliceDcl_AsignContext) interface{}
+
 	// Visit a parse tree produced by gramaticaParser#assign.
 	VisitAssign(ctx *AssignContext) interface{}
 

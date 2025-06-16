@@ -143,6 +143,10 @@ func (v *BasegramaticaVisitor) VisitSliceVacio(ctx *SliceVacioContext) interface
 	return v.VisitChildren(ctx)
 }
 
+func (v *BasegramaticaVisitor) VisitSliceDcl_Asign(ctx *SliceDcl_AsignContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BasegramaticaVisitor) VisitAssign(ctx *AssignContext) interface{} {
 	return v.VisitChildren(ctx)
 }

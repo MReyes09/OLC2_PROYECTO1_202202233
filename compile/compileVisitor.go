@@ -7,6 +7,7 @@ import (
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -86,7 +87,6 @@ func (v *CompilerVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{
 func (pv *CompilerVisitor) handlePrintExprs(exprs []gramAntlr.IExprContext, newline bool) {
 	for _, expr := range exprs {
 		value := pv.Visit(expr)
-		fmt.Println("Valor obtenido:", value)
 		if value == nil {
 			continue
 		}
@@ -403,6 +403,7 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
+	fmt.Println("VisitVarDclWithInference - ID:", id, "Value:", value)
 
 	var symbolType SymbolType
 	switch value.(type) {
@@ -842,6 +843,47 @@ func (v *CompilerVisitor) VisitSliceValores(ctx *gramAntlr.SliceValoresContext) 
 	return nil
 }
 
+// VisitSliceDcl_Asign
+func (v *CompilerVisitor) VisitSliceDcl_Asign(ctx *gramAntlr.SliceDcl_AsignContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	typeVar, err := parseSymbolType(typeStr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
+		return nil
+	}
+
+	numDimensiones := 0
+	for range ctx.AllNuevoSlice() {
+		numDimensiones++
+	}
+
+	valueSlice := v.Visit(ctx.Expr())
+
+	slice, ok := valueSlice.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: se intenta asignar %v a un slice.\n", valueSlice)
+	}
+
+	dimensionSliceExpr := v.funcionesNativasVisitor.GetDimensionSlice(slice, "[]", false)
+
+	typeExpr, dimensionExpr, err := getDimension_type(dimensionSliceExpr)
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error-semántico: al obtener la dimensión del slice %s, %v\n", id, err)
+		return nil
+	}
+
+	typeVarString := SymbolTypeToString(typeVar)
+
+	if numDimensiones != dimensionExpr || typeVarString != typeExpr {
+		v.Salida += fmt.Sprintf("Error-semántico: al asignar el slice a la variable %s, las dimensiones o tipos no coinciden.\n", id)
+		return nil
+	}
+
+	v.currentEnv.SetVariable(id, slice, typeVar, false, true, ctx.GetStart())
+	return nil
+}
+
 // VisitSliceVacio - 'ID_VARIABLE' ':' type '=' sliceVacio
 func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
@@ -1274,6 +1316,8 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 		)
 	} else {
 		for condBool {
+			newEnv := NewEnvironment(v.currentEnv)
+			v.currentEnv = newEnv
 			result := v.Visit(ctx.Block())
 
 			if str, ok := result.(string); ok {
@@ -1312,131 +1356,154 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 					"semántico",
 				)
 			}
+			v.currentEnv = newEnv.Parent // Restaurar el entorno
 		}
 	}
-
 	return nil
 }
 
 // VisitForAsignacion
+// VisitForAsignacion
 func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext) interface{} {
-	// Declaración inicial
+	// Crear nuevo entorno para el for
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	// Declaración inicial del for
 	v.Visit(ctx.VarDcl())
 
 	// Evaluación inicial de la condición
 	condition := v.Visit(ctx.Expr())
-
 	condBool, ok := condition.(bool)
 	if !ok {
-		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
-		v.AgregarError(
-			"Error al evaluar la condición del for, no es un booleano.",
-			ctx.GetStart().GetLine(),
-			ctx.GetStart().GetColumn(),
-			"semántico",
-		)
+		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano.\n"
+		// Restaurar entorno padre antes de salir
+		v.currentEnv = newEnv.Parent
+		return nil
 	}
 
 	for condBool {
-		// Ejecutar bloque del for
+		// Ejecutar bloque
 		result := v.Visit(ctx.Block())
-		fmt.Println("Resultado del bloque del for:", result)
 
+		// Control de flujo: break, continue, return
 		if str, ok := result.(string); ok {
 			if str == "break" {
 				break
 			} else if str == "continue" {
-				// Evaluar la asignación y la nueva condición
+				// Ejecutar asignación y reevaluar la condición
 				v.Visit(ctx.VarAsign())
 				condition = v.Visit(ctx.Expr())
 				if condBool, ok = condition.(bool); !ok {
 					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
-					v.AgregarError(
-						"Error al reevaluar la condición del for tras un 'continue', no es un booleano.",
-						ctx.GetStart().GetLine(),
-						ctx.GetStart().GetColumn(),
-						"semántico",
-					)
 				}
 				continue
 			} else if str == "Excepcion___Return_Void" {
+				v.currentEnv = newEnv.Parent
 				return str
 			} else {
+				v.currentEnv = newEnv.Parent
 				return str
 			}
 		}
 
 		if result != nil {
+			v.currentEnv = newEnv.Parent
 			return result
 		}
 
-		// Ejecutar asignación final del for
+		// Ejecutar asignación final
 		v.Visit(ctx.VarAsign())
 
 		// Reevaluar condición
 		condition = v.Visit(ctx.Expr())
 		if condBool, ok = condition.(bool); !ok {
 			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
-			v.AgregarError(
-				"Error al reevaluar la condición del for, no es un booleano.",
-				ctx.GetStart().GetLine(),
-				ctx.GetStart().GetColumn(),
-				"semántico",
-			)
 		}
 	}
 
+	// Restaurar entorno
+	v.currentEnv = newEnv.Parent
 	return nil
 }
 
 // VisitForRange
 func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interface{} {
-	sym, _ := v.currentEnv.GetVariable(ctx.ID_VARIABLE(2).GetText())
-
-	slice, err := sym.Value.([]interface{})
-	if !err {
-		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
-		v.AgregarError(
-			"Error al iterar sobre el rango",
-			ctx.GetStart().GetLine(),
-			ctx.GetStart().GetColumn(),
-			"semántico",
-		)
-		return nil
-	}
-
-	index := ctx.ID_VARIABLE(0).GetText()
-	value := ctx.ID_VARIABLE(1).GetText()
-
-	v.currentEnv.SetVariable(index, 0, sym.Type, false, true, ctx.GetStart())         // Inicializar índice
-	v.currentEnv.SetVariable(value, nil, sym.Type, sym.Mutable, true, ctx.GetStart()) // Inicializar valor
-
+	// Crear nuevo entorno para el for
 	newEnv := NewEnvironment(v.currentEnv)
 	v.currentEnv = newEnv
 
-	for i, val := range slice {
-		v.currentEnv.SetVariable(index, i, INT, false, false, ctx.GetStart())
-		v.currentEnv.SetVariable(value, val, sym.Type, false, false, ctx.GetStart())
+	// Obtenemos el arreglo a iterar
+	idSlice := ctx.ID_VARIABLE(2).GetText()
 
+	// Verificamos que el idSlice sea un []interface{}
+	sliceVar, err := v.currentEnv.GetVariable(idSlice)
+	// Si no existe, mostramos un error
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", idSlice)
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+	// si no es un slice, mostramos un error
+	sliceValue, ok := sliceVar.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al iterar, la variable %s no es un slice.\n", idSlice)
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+
+	// Inicializamos variable que recibe el valor del slice
+	switch sliceVar.Type {
+	case 0:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), 0, INT, false, true, ctx.GetStart())
+	case 1:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), 0.0, FLOAT64, false, true, ctx.GetStart())
+	case 2:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), "", STRING, false, true, ctx.GetStart())
+	case 3:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), false, BOOL, false, true, ctx.GetStart())
+	case 4:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), rune(0), RUNE, false, true, ctx.GetStart())
+	default:
+		v.Salida += fmt.Sprintf("Error-semántico: tipo de variable %s no soportado para iteración.\n", ctx.ID_VARIABLE(1).GetText())
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+
+	// Inicializamos la variable de índice
+	v.currentEnv.SetVariable(ctx.ID_VARIABLE(0).GetText(), 0, INT, false, true, ctx.GetStart())
+
+	// Iteramos con range en el slice
+	for i, item := range sliceValue {
+		// Actualizamos tanto el indice como el valor del slice
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(0).GetText(), i, INT, false, false, ctx.GetStart())
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), item, sliceVar.Type, false, false, ctx.GetStart())
+
+		// Ejecutamos el bloque del for
 		result := v.Visit(ctx.Block())
 
-		if resStr, ok := result.(string); ok {
-			if resStr == "break" {
-				break
-			} else if resStr == "continue" {
-				continue
-			} else if resStr == "Excepcion___Return_Void" {
-				return result
+		// Control de flujo: break, continue, return
+		if str, ok := result.(string); ok {
+			if str == "break" {
+				break // Salir del for
+			} else if str == "continue" {
+				continue // Continuar con la siguiente iteración
+			} else if str == "Excepcion___Return_Void" {
+				v.currentEnv = newEnv.Parent // Restaurar entorno padre
+				return str                   // Retorno vacío
 			} else {
-				return result
+				v.currentEnv = newEnv.Parent // Restaurar entorno padre
+				return str                   // Retornar cualquier otro valor
 			}
 		}
 
+		// Si hay un valor de retorno, devolverlo
 		if result != nil {
+			v.currentEnv = newEnv.Parent // Restaurar entorno padre
 			return result
 		}
 	}
-	// Restaurar el entorno anterior
+	// Recuperar el entorno padre
 	v.currentEnv = newEnv.Parent
 
 	return nil
@@ -2422,4 +2489,26 @@ func convertToStringSlice(list []interface{}) []string {
 		}
 	}
 	return result
+}
+
+// Función para analizar el tipo, como "[][]string", "[]int", etc.
+func getDimension_type(typeStr string) (string, int, error) {
+	// Contar las apariciones de "[]"
+	re := regexp.MustCompile(`\[\]`)
+	dimensions := len(re.FindAllString(typeStr, -1))
+
+	// Eliminar todos los "[]" para obtener el tipo base
+	baseType := re.ReplaceAllString(typeStr, "")
+	baseType = strings.TrimSpace(baseType)
+
+	// Validación opcional de tipos conocidos (puedes expandir esta lista)
+	validTypes := map[string]bool{
+		"int": true, "float": true, "string": true, "bool": true,
+	}
+
+	if _, ok := validTypes[baseType]; !ok {
+		return "", 0, fmt.Errorf("tipo base '%s' no es válido", baseType)
+	}
+
+	return baseType, dimensions, nil
 }

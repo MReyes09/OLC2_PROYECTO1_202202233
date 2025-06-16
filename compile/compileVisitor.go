@@ -1434,9 +1434,15 @@ func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interfac
 	newEnv := NewEnvironment(v.currentEnv)
 	v.currentEnv = newEnv
 
-	slice, err := sym.Value.([]interface{})
-	if !err {
-		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
+	// Obtenemos el arreglo a iterar
+	idSlice := ctx.ID_VARIABLE(2).GetText()
+
+	// Verificamos que el idSlice sea un []interface{}
+	sliceVar, err := v.currentEnv.GetVariable(idSlice)
+	// Si no existe, mostramos un error
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", idSlice)
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
 		return nil
 	}
 	// si no es un slice, mostramos un error

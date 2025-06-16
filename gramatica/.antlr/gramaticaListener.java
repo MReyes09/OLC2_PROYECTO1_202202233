@@ -413,6 +413,18 @@ public interface gramaticaListener extends ParseTreeListener {
 	 */
 	void exitSliceVacio(gramaticaParser.SliceVacioContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code SliceDcl_Asign}
+	 * labeled alternative in {@link gramaticaParser#varDclSlice}.
+	 * @param ctx the parse tree
+	 */
+	void enterSliceDcl_Asign(gramaticaParser.SliceDcl_AsignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SliceDcl_Asign}
+	 * labeled alternative in {@link gramaticaParser#varDclSlice}.
+	 * @param ctx the parse tree
+	 */
+	void exitSliceDcl_Asign(gramaticaParser.SliceDcl_AsignContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link gramaticaParser#assign}.
 	 * @param ctx the parse tree
 	 */
@@ -468,18 +480,6 @@ public interface gramaticaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDeclStructData(gramaticaParser.DeclStructDataContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code StructVarType}
-	 * labeled alternative in {@link gramaticaParser#varStructDcl}.
-	 * @param ctx the parse tree
-	 */
-	void enterStructVarType(gramaticaParser.StructVarTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code StructVarType}
-	 * labeled alternative in {@link gramaticaParser#varStructDcl}.
-	 * @param ctx the parse tree
-	 */
-	void exitStructVarType(gramaticaParser.StructVarTypeContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code StructVarTypeInference}
 	 * labeled alternative in {@link gramaticaParser#varStructDcl}.

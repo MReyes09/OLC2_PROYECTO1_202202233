@@ -74,11 +74,13 @@ sFor: 'for' expr block                              # ForCondicion
 // ----------------- Declaracion de variables -----------------
 varDcl: 'mut' ID_VARIABLE type assign expr # VarDclWithTypeAndValue
       | 'mut' ID_VARIABLE type          # VarDclWithTypeOnly
-      | 'mut'? ID_VARIABLE assign expr           # VarDclWithInference
+      | 'mut'? ID_VARIABLE ':=' expr           # VarDclWithInference
 ;
 
 varDclSlice: ID_VARIABLE assign (nuevoSlice)+ type '{' contenidoSlice '}' # SliceValores
-    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                  # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type                                # SliceVacio
+    | 'mut' ID_VARIABLE (nuevoSlice)+ type assign expr                    # SliceDcl_Asign
+    
 ;
 
 assign: ':=' 

@@ -1,10 +1,10 @@
 func main() {
-	mut puntos = 0
+	mut puntos int = 0
 	println("=== Archivo de prueba básico ===")
 
 	// 1. Declaración de variables
 	println("==== Declaración de variables ====")
-	mut puntos_declaracion = 0
+	mut puntos_declaracion int = 0
 
 	println("Declaración explícita con tipo y valor")
 	mut entero int = 42
@@ -33,10 +33,10 @@ func main() {
 	Corregido
 	
 	*/
-	mut entero_sin_valor = 0
-	mut decimal_sin_valor = 0.0
-	mut texto_sin_valor = ""
-	mut booleano_sin_valor = false
+	mut entero_sin_valor := 0
+	mut decimal_sin_valor := 0.0
+	mut texto_sin_valor := ""
+	mut booleano_sin_valor := false
 
 
 	println("enteroSinValor:", entero_sin_valor)
@@ -54,6 +54,7 @@ func main() {
 
 	println("\nErrores de redeclaración")
 	mut entero int = 100 // ! ERROR de redeclaración si se activa  || NO SE VE, pero funciona, no permite redeclaracion
+	println()
 	if entero == 100 {
 		puntos_declaracion -= 1
 		println("X Errores de redeclaración: incorrecto")
@@ -134,7 +135,7 @@ func main() {
 
 	// 4. Relacionales
 	println("\n==== Operaciones Relacionales ====")
-	mut puntos_rel = 0
+	mut puntos_rel := 0
 
 	if 10 == 10 && 10 != 5 && 10.5 == 10.5 && 10.5 != 5.5 {
 		puntos_rel += 2
@@ -145,7 +146,7 @@ func main() {
 
 	// 5. Lógicas
 	println("\n==== Operaciones Lógicas ====")
-	mut puntos_log = 0
+	mut puntos_log := 0
 
 	if true && true && !(false && true) && (10 == 10 && 5 == 5) && (true || false) && !(false || false) {
 		puntos_log += 2
@@ -156,7 +157,7 @@ func main() {
 
 	// 6. Println
 	println("\n==== println ====")
-	mut puntos_print = 2
+	mut puntos_print := 2
 	println(42)
 	println(3.14)
 	println("Texto de prueba")
@@ -165,12 +166,12 @@ func main() {
 
 	// 7. Manejo de nulo
 	println("\n==== Manejo de valor nulo ====")
-	mut puntos_nil = 2
+	mut puntos_nil := 2
 	// V no permite nil a menos que sea opcional o puntero
 
 	// 8. Punto y coma
 	println("\n==== Punto y coma opcional ====")
-	mut puntos_semicolon = 2
+	mut puntos_semicolon := 2
 	a := 10
 	b := 20
 	c := a + b

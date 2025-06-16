@@ -85,7 +85,6 @@ func (v *CompilerVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{
 func (pv *CompilerVisitor) handlePrintExprs(exprs []gramAntlr.IExprContext, newline bool) {
 	for _, expr := range exprs {
 		value := pv.Visit(expr)
-		fmt.Println("Valor obtenido:", value)
 		if value == nil {
 			continue
 		}
@@ -337,6 +336,7 @@ func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
+	fmt.Println("VisitVarDclWithInference - ID:", id, "Value:", value)
 
 	// Determinar tipo basado en valor
 	var symbolType SymbolType
@@ -1053,119 +1053,149 @@ func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) 
 // VisitForAsignacion
 // VisitForAsignacion
 func (v *CompilerVisitor) VisitForAsignacion(ctx *gramAntlr.ForAsignacionContext) interface{} {
-	// Declaración inicial
+	// Crear nuevo entorno para el for
+	newEnv := NewEnvironment(v.currentEnv)
+	v.currentEnv = newEnv
+
+	// Declaración inicial del for
 	v.Visit(ctx.VarDcl())
 
 	// Evaluación inicial de la condición
 	condition := v.Visit(ctx.Expr())
 	condBool, ok := condition.(bool)
 	if !ok {
-		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
+		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano.\n"
+		// Restaurar entorno padre antes de salir
+		v.currentEnv = newEnv.Parent
 		return nil
 	}
 
-	// Guardamos el entorno actual como padre
-	outerEnv := v.currentEnv
-
 	for condBool {
-		// Creamos un nuevo entorno por iteración, hijo del original
-		newEnv := NewEnvironment(outerEnv)
-		v.currentEnv = newEnv
-
-		// Ejecutar el bloque del for
+		// Ejecutar bloque
 		result := v.Visit(ctx.Block())
-		fmt.Println("Resultado del bloque del for:", result)
 
-		// Manejo de control de flujo
+		// Control de flujo: break, continue, return
 		if str, ok := result.(string); ok {
 			if str == "break" {
-				v.currentEnv = outerEnv // restauramos antes de salir
 				break
 			} else if str == "continue" {
-				v.currentEnv = outerEnv // restauramos antes de continuar
+				// Ejecutar asignación y reevaluar la condición
 				v.Visit(ctx.VarAsign())
 				condition = v.Visit(ctx.Expr())
 				if condBool, ok = condition.(bool); !ok {
-					v.Salida += "Error-semántico: al reevaluar la condición del for tras un 'continue', no es un booleano."
+					v.Salida += "Error-semántico: al reevaluar la condición tras 'continue', no es un booleano.\n"
+					v.currentEnv = newEnv.Parent
 					return nil
 				}
 				continue
 			} else if str == "Excepcion___Return_Void" {
-				v.currentEnv = outerEnv
+				v.currentEnv = newEnv.Parent
 				return str
 			} else {
-				v.currentEnv = outerEnv
+				v.currentEnv = newEnv.Parent
 				return str
 			}
 		}
 
 		if result != nil {
-			v.currentEnv = outerEnv
+			v.currentEnv = newEnv.Parent
 			return result
 		}
 
-		// Ejecutar asignación final del for
+		// Ejecutar asignación final
 		v.Visit(ctx.VarAsign())
 
 		// Reevaluar condición
 		condition = v.Visit(ctx.Expr())
 		if condBool, ok = condition.(bool); !ok {
-			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano."
-			v.currentEnv = outerEnv
+			v.Salida += "Error-semántico: al reevaluar la condición del for, no es un booleano.\n"
+			v.currentEnv = newEnv.Parent
 			return nil
 		}
-
-		// Restauramos el entorno para la siguiente iteración
-		v.currentEnv = outerEnv
 	}
 
-	// Restauramos el entorno original al finalizar el for
-	v.currentEnv = outerEnv.Parent
+	// Restaurar entorno
+	v.currentEnv = newEnv.Parent
 	return nil
 }
 
 // VisitForRange
 func (v *CompilerVisitor) VisitForRange(ctx *gramAntlr.ForRangeContext) interface{} {
-	sym, _ := v.currentEnv.GetVariable(ctx.ID_VARIABLE(2).GetText())
-
-	slice, err := sym.Value.([]interface{})
-	if !err {
-		v.Salida += fmt.Sprintf("Error-semántico: al iterar sobre el rango, la variable %s no es un slice.\n", ctx.ID_VARIABLE(2).GetText())
-		return nil
-	}
-
-	index := ctx.ID_VARIABLE(0).GetText()
-	value := ctx.ID_VARIABLE(1).GetText()
-
-	v.currentEnv.SetVariable(index, 0, sym.Type, false, true, ctx.GetStart())         // Inicializar índice
-	v.currentEnv.SetVariable(value, nil, sym.Type, sym.Mutable, true, ctx.GetStart()) // Inicializar valor
-
+	// Crear nuevo entorno para el for
 	newEnv := NewEnvironment(v.currentEnv)
 	v.currentEnv = newEnv
 
-	for i, val := range slice {
-		v.currentEnv.SetVariable(index, i, INT, false, false, ctx.GetStart())
-		v.currentEnv.SetVariable(value, val, sym.Type, false, false, ctx.GetStart())
+	// Obtenemos el arreglo a iterar
+	idSlice := ctx.ID_VARIABLE(2).GetText()
 
+	// Verificamos que el idSlice sea un []interface{}
+	sliceVar, err := v.currentEnv.GetVariable(idSlice)
+	// Si no existe, mostramos un error
+	if err != nil {
+		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", idSlice)
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+	// si no es un slice, mostramos un error
+	sliceValue, ok := sliceVar.Value.([]interface{})
+	if !ok {
+		v.Salida += fmt.Sprintf("Error-semántico: al iterar, la variable %s no es un slice.\n", idSlice)
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+
+	// Inicializamos variable que recibe el valor del slice
+	switch sliceVar.Type {
+	case 0:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), 0, INT, false, true, ctx.GetStart())
+	case 1:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), 0.0, FLOAT64, false, true, ctx.GetStart())
+	case 2:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), "", STRING, false, true, ctx.GetStart())
+	case 3:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), false, BOOL, false, true, ctx.GetStart())
+	case 4:
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), rune(0), RUNE, false, true, ctx.GetStart())
+	default:
+		v.Salida += fmt.Sprintf("Error-semántico: tipo de variable %s no soportado para iteración.\n", ctx.ID_VARIABLE(1).GetText())
+		v.currentEnv = newEnv.Parent // Restaurar entorno padre
+		return nil
+	}
+
+	// Inicializamos la variable de índice
+	v.currentEnv.SetVariable(ctx.ID_VARIABLE(0).GetText(), 0, INT, false, true, ctx.GetStart())
+
+	// Iteramos con range en el slice
+	for i, item := range sliceValue {
+		// Actualizamos tanto el indice como el valor del slice
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(0).GetText(), i, INT, false, false, ctx.GetStart())
+		v.currentEnv.SetVariable(ctx.ID_VARIABLE(1).GetText(), item, sliceVar.Type, false, false, ctx.GetStart())
+
+		// Ejecutamos el bloque del for
 		result := v.Visit(ctx.Block())
 
-		if resStr, ok := result.(string); ok {
-			if resStr == "break" {
-				break
-			} else if resStr == "continue" {
-				continue
-			} else if resStr == "Excepcion___Return_Void" {
-				return result
+		// Control de flujo: break, continue, return
+		if str, ok := result.(string); ok {
+			if str == "break" {
+				break // Salir del for
+			} else if str == "continue" {
+				continue // Continuar con la siguiente iteración
+			} else if str == "Excepcion___Return_Void" {
+				v.currentEnv = newEnv.Parent // Restaurar entorno padre
+				return str                   // Retorno vacío
 			} else {
-				return result
+				v.currentEnv = newEnv.Parent // Restaurar entorno padre
+				return str                   // Retornar cualquier otro valor
 			}
 		}
 
+		// Si hay un valor de retorno, devolverlo
 		if result != nil {
+			v.currentEnv = newEnv.Parent // Restaurar entorno padre
 			return result
 		}
 	}
-	// Restaurar el entorno anterior
+	// Recuperar el entorno padre
 	v.currentEnv = newEnv.Parent
 
 	return nil

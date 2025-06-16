@@ -69,7 +69,9 @@ func (nv *NativasVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext
 }
 
 func (nv *NativasVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
+	fmt.Println("-------------- ReflectType --------------")
 	value := nv.Visit(ctx.Expr())
+	fmt.Println("Valor recibido:", value)
 
 	switch v := value.(type) {
 	case int:
@@ -82,8 +84,6 @@ func (nv *NativasVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 		return "rune"
 	case string:
 		return "string"
-	//case map[string]interface{}:
-	//	return "struct"
 	case []interface{}:
 		return nv.GetDimensionSlice(v, "[]", false)
 	default:

@@ -14,7 +14,7 @@ struct Empleado {
 
 
 func main() {
-	mut puntos = 0
+	mut puntos := 0
 	println("=== Archivo de prueba de structs ===")
 
 	// 1. Declaración

@@ -1648,6 +1648,7 @@ func (v *CompilerVisitor) VisitSwitchInstruccion(ctx *gramAntlr.SwitchInstruccio
 
 // Produccion de switch
 func (v *CompilerVisitor) VisitSwitchStmt(ctx *gramAntlr.SwitchStmtContext) interface{} {
+	v.conditionExpr = v.Visit(ctx.Expr()) // Evaluar la condicion-tipo del switch
 	return v.Visit(ctx.Cases())
 }
 

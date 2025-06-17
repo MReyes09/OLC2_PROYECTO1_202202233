@@ -8,11 +8,18 @@
 **Catedratico: Luis Fernando Espino**  
 **Tutor Academico: Estuardo Sebastian Valle**  
 
-**Nombre:** Dilan Conaher Suy Miranda  
-**Carné:** 201801194
+| Nombre                                | Carné      |
+|---------------------------------------|------------|
+| Matthew Emmanuel Reyes Melgar         | 202202233  |
+| Daniel Abraham Gálvez Solorzano       | 202203361  |
+| Dilan Conaher Suy Miranda             | 201801194  |
+
+---  
 
 
-# **COMPILE  |  V-LANG CHERRY**
+
+
+# **COMPILE  |  MANUAL TECNICO**
 
 
 

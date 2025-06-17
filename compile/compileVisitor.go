@@ -26,6 +26,7 @@ type CompilerVisitor struct {
 	conditionExpr                   interface{}                     // Added for switch statement
 	StructRelational                map[string][]string
 	Errores                         []ErrorReport
+	TablaSimbolos                   *TablaSimbolos
 }
 
 // Constructor opcional
@@ -35,6 +36,7 @@ func NewCompilerVisitor() *CompilerVisitor {
 		Salida:               "",
 		currentEnv:           NewEnvironment(nil),       // Entorno raíz
 		StructRelational:     make(map[string][]string), // <--- NUEVO campo agregado
+		TablaSimbolos:        NewTablaSimbolos(),
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
@@ -150,6 +152,11 @@ func (v *CompilerVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{} 
 // ----------------------------- TIPOS DE DATOS -----------------------------
 // VisitNumber
 func (v *CompilerVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "int"           // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	numero, err := strconv.Atoi(ctx.GetText())
 	if err != nil {
 		v.Salida += "Error en la conversión de número: " + ctx.GetText()
@@ -167,6 +174,11 @@ func (v *CompilerVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{
 
 // VisitFloat
 func (v *CompilerVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "float"         // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	texto := ctx.GetText()
 	numero, err := strconv.ParseFloat(texto, 64)
 	if err != nil {
@@ -184,6 +196,12 @@ func (v *CompilerVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} 
 
 // VisitString
 func (v *CompilerVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "string"        // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	texto := ctx.GetText()
 	if strings.HasPrefix(texto, "\"") && strings.HasSuffix(texto, "\"") {
 		texto = texto[1 : len(texto)-1] // eliminar comillas
@@ -200,6 +218,12 @@ func (v *CompilerVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} 
 
 // VisitChar - Run
 func (v *CompilerVisitor) VisitChar(ctx *gramAntlr.CharContext) interface{} {
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "char"          // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, nil)
 	texto := ctx.GetText() // e.g. `'a'`
 	texto = strings.Trim(texto, "'")
 	r, _ := utf8.DecodeRuneInString(texto)
@@ -209,11 +233,21 @@ func (v *CompilerVisitor) VisitChar(ctx *gramAntlr.CharContext) interface{} {
 
 // VisitNull
 func (v *CompilerVisitor) VisitNil(ctx *gramAntlr.NilContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "nil"           // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	return "nil"
 }
 
 // VisitBoolean
 func (v *CompilerVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "bool"          // Obtén el tipo real
+	ambito := "global"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 	texto := ctx.GetText() // e.g. "true" o "false"
 	if texto == "true" {
 		return true
@@ -235,6 +269,7 @@ func (v *CompilerVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{
 // ------------------------------ OPERADORES ARITMÉTICOS -----------------------------
 // VisitNegate
 func (v *CompilerVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} {
+
 	return v.operacionesVisitor.VisitNegate(ctx)
 }
 
@@ -303,14 +338,39 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 	if value == nil {
 		switch symbolType {
 		case INT:
+			nombre := ctx.GetText() // Obtén el nombre correctamente
+			tipo := "int"           // Obtén el tipo real
+			ambito := "global"      // Obtén el ámbito real
+			linea := ctx.GetStart().GetLine()
+			v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 			value = 0
 		case FLOAT64:
+			nombre := ctx.GetText() // Obtén el nombre correctamente
+			tipo := "float"         // Obtén el tipo real
+			ambito := "global"      // Obtén el ámbito real
+			linea := ctx.GetStart().GetLine()
+			v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 			value = 0.0
 		case STRING:
+			nombre := ctx.GetText() // Obtén el nombre correctamente
+			tipo := "string"        // Obtén el tipo real
+			ambito := "global"      // Obtén el ámbito real
+			linea := ctx.GetStart().GetLine()
+			v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 			value = ""
 		case BOOL:
+			nombre := ctx.GetText() // Obtén el nombre correctamente
+			tipo := "bool"          // Obtén el tipo real
+			ambito := "global"      // Obtén el ámbito real
+			linea := ctx.GetStart().GetLine()
+			v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 			value = false
 		case RUNE:
+			nombre := ctx.GetText() // Obtén el nombre correctamente
+			tipo := "nil"           // Obtén el tipo real
+			ambito := "global"      // Obtén el ámbito real
+			linea := ctx.GetStart().GetLine()
+			v.TablaSimbolos.Insertar(nombre, tipo, ambito, linea, "variable")
 			value = '\000'
 		}
 	}
@@ -347,7 +407,6 @@ func (v *CompilerVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 func (v *CompilerVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
-
 	symbolType, err := parseSymbolType(typeStr)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
@@ -445,6 +504,12 @@ func (v *CompilerVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	variable, err := v.currentEnv.GetVariable(id)
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Arreglos"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
 		v.AgregarError(
@@ -524,6 +589,12 @@ func (v *CompilerVisitor) VisitArrayAccess(ctx *gramAntlr.ArrayAccessContext) in
 func (v *CompilerVisitor) VisitArrayAccessSimple(ctx *gramAntlr.ArrayAccessSimpleContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	variable, err := v.currentEnv.GetVariable(id)
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Arreglos"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
 		v.AgregarError(
@@ -602,6 +673,11 @@ func (v *CompilerVisitor) VisitArrayFindIndex(ctx *gramAntlr.ArrayFindIndexConte
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
 
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Arreglos"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
+
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
@@ -641,6 +717,11 @@ func (v *CompilerVisitor) VisitArrayFindIndex(ctx *gramAntlr.ArrayFindIndexConte
 func (v *CompilerVisitor) VisitArrayJoin(ctx *gramAntlr.ArrayJoinContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Arreglos"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
 
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
@@ -685,6 +766,7 @@ func (v *CompilerVisitor) VisitArrayJoin(ctx *gramAntlr.ArrayJoinContext) interf
 func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	variable, err := v.currentEnv.GetVariable(id)
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
 		v.AgregarError(
@@ -761,7 +843,6 @@ func (v *CompilerVisitor) VisitArrayLength(ctx *gramAntlr.ArrayLengthContext) in
 func (v *CompilerVisitor) VisitArrayAppend(ctx *gramAntlr.ArrayAppendContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	value := v.Visit(ctx.Expr())
-
 	variable, err := v.currentEnv.GetVariable(id)
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
@@ -810,6 +891,12 @@ func (v *CompilerVisitor) VisitArrayAppend(ctx *gramAntlr.ArrayAppendContext) in
 
 // VisitVarDeclSliceStmt - 'var' ID_VARIABLE slice '=' sliceValores ';'
 func (v *CompilerVisitor) VisitVarDeclSliceStmt(ctx *gramAntlr.VarDeclSliceStmtContext) interface{} {
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Arreglos"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "slice")
+
 	return v.Visit(ctx.VarDclSlice())
 }
 
@@ -818,6 +905,12 @@ func (v *CompilerVisitor) VisitSliceValores(ctx *gramAntlr.SliceValoresContext) 
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
 	typo, err := parseSymbolType(typeStr)
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := typeStr         // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
 		v.AgregarError(
@@ -887,6 +980,12 @@ func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) inte
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
 	symbolType, err := parseSymbolType(typeStr)
+
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := typeStr         // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, id, linea, "slice")
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error: tipo %s no válido\n", typeStr)
 		v.AgregarError(
@@ -906,6 +1005,12 @@ func (v *CompilerVisitor) VisitSliceVacio(ctx *gramAntlr.SliceVacioContext) inte
 // VisitSliceContenido - contenido de un slice con expresiones
 func (v *CompilerVisitor) VisitSliceContenido(ctx *gramAntlr.SliceContenidoContext) interface{} {
 	arrayTemp := []interface{}{}
+
+	nombre := ctx.GetText()    // Obtén el nombre correctamente
+	tipo := "Contendio Slices" // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "slice")
+
 	for _, expr := range ctx.AllExpr() {
 		arrayTemp = append(arrayTemp, v.Visit(expr))
 	}
@@ -915,6 +1020,12 @@ func (v *CompilerVisitor) VisitSliceContenido(ctx *gramAntlr.SliceContenidoConte
 // VisitSliceContenidoSlice - contenido de un slice anidado
 func (v *CompilerVisitor) VisitSliceContenidoSlice(ctx *gramAntlr.SliceContenidoSliceContext) interface{} {
 	arrayTemp := []interface{}{}
+
+	nombre := ctx.GetText()    // Obtén el nombre correctamente
+	tipo := "Contendio Slices" // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "slice")
+
 	for _, slice := range ctx.AllContenidoSlice() {
 		sliceValue := v.Visit(slice)
 		if sliceList, ok := sliceValue.([]interface{}); ok {
@@ -1069,6 +1180,11 @@ func (v *CompilerVisitor) VisitVarInc(ctx *gramAntlr.VarIncContext) interface{} 
 	id := ctx.ID_VARIABLE().GetText()
 	token := ctx.GetStart()
 
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "variable"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
+
 	sym, _ := v.currentEnv.GetVariable(id)
 	typ := sym.Type
 
@@ -1182,6 +1298,7 @@ func (v *CompilerVisitor) VisitIfOnly(ctx *gramAntlr.IfOnlyContext) interface{} 
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -1233,17 +1350,24 @@ func (v *CompilerVisitor) VisitIfAnidado(ctx *gramAntlr.IfAnidadoContext) interf
 			return result
 		}
 	}
-
 	return nil
 }
 
 // -------------------- VisitBreakStmt --------------------
 func (v *CompilerVisitor) VisitBreakStmt(ctx *gramAntlr.BreakStmtContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "break"         // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
 	return "break"
 }
 
 // -------------------- VisitContinue --------------------
 func (v *CompilerVisitor) VisitContinueStmt(ctx *gramAntlr.ContinueStmtContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "continue"      // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
 	return "continue"
 }
 
@@ -1251,8 +1375,16 @@ func (v *CompilerVisitor) VisitContinueStmt(ctx *gramAntlr.ContinueStmtContext) 
 func (v *CompilerVisitor) VisitReturnStmt(ctx *gramAntlr.ReturnStmtContext) interface{} {
 	var valueRet = ctx.Retorno()
 	if valueRet.Expr() != nil {
+		nombre := ctx.GetText() // Obtén el nombre correctamente
+		tipo := "return"        // Obtén el ámbito real
+		linea := ctx.GetStart().GetLine()
+		v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
 		return v.Visit(valueRet.Expr())
 	} else {
+		nombre := ctx.GetText() // Obtén el nombre correctamente
+		tipo := "return"        // Obtén el ámbito real
+		linea := ctx.GetStart().GetLine()
+		v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
 		return "Excepcion___Return_Void" // Retorno vacío
 	}
 }
@@ -1282,6 +1414,7 @@ func (v *CompilerVisitor) VisitBlockStmt(ctx *gramAntlr.BlockStmtContext) interf
 func (v *CompilerVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
 	sym, err := v.currentEnv.GetVariable(id)
+
 	if err != nil {
 		v.Salida += fmt.Sprintf("Error semántico: variable %s no declarada\n", id)
 		v.AgregarError(
@@ -1303,7 +1436,6 @@ func (v *CompilerVisitor) VisitForStmt(ctx *gramAntlr.ForStmtContext) interface{
 // VisitForCondicion
 func (v *CompilerVisitor) VisitForCondicion(ctx *gramAntlr.ForCondicionContext) interface{} {
 	condition := v.Visit(ctx.Expr())
-
 	if condBool, ok := condition.(bool); !ok {
 		v.Salida += "Error-semántico: al evaluar la condición del for, no es un booleano."
 		v.AgregarError(
@@ -1522,6 +1654,7 @@ func (v *CompilerVisitor) VisitSwitchStmt(ctx *gramAntlr.SwitchStmtContext) inte
 
 // Produccion cases
 func (v *CompilerVisitor) VisitCase(ctx *gramAntlr.CaseContext) interface{} {
+
 	caseCondition := v.Visit(ctx.Expr())
 
 	// Implement isEqualType functionality
@@ -1564,7 +1697,10 @@ func (v *CompilerVisitor) VisitCase(ctx *gramAntlr.CaseContext) interface{} {
 func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{} {
 	newEnv := NewEnvironment(v.currentEnv)
 	v.currentEnv = newEnv
-
+	nombre := ctx.GetText()       // Obtén el nombre correctamente
+	tipo := "switch case default" // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "funcion")
 	for _, instruccion := range ctx.AllInstrucciones() {
 		v.Visit(instruccion)
 	}
@@ -1577,11 +1713,19 @@ func (v *CompilerVisitor) VisitDefault(ctx *gramAntlr.DefaultContext) interface{
 // ---------------------------- FUNCIONES NATIVAS -----------------------------
 // VisitIntToString
 func (v *CompilerVisitor) VisitIntToString(ctx *gramAntlr.IntToStringContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Nativa"        // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, "global", linea, "funcion")
 	return v.funcionesNativasVisitor.VisitIntToString(ctx)
 }
 
 // VisitfloatToString
 func (v *CompilerVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext) interface{} {
+	nombre := ctx.GetText() // Obtén el nombre correctamente
+	tipo := "Nativa"        // Obtén el ámbito real
+	linea := ctx.GetStart().GetLine()
+	v.TablaSimbolos.Insertar(nombre, tipo, "global", linea, "funcion")
 	return v.funcionesNativasVisitor.VisitFloatToString(ctx)
 }
 
@@ -1589,6 +1733,7 @@ func (v *CompilerVisitor) VisitFloatToString(ctx *gramAntlr.FloatToStringContext
 func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) interface{} {
 	value := v.Visit(ctx.Expr())
 	if _, ok := value.(map[string]Symbol); ok {
+
 		return "struct"
 	}
 
@@ -1597,6 +1742,7 @@ func (v *CompilerVisitor) VisitReflectType(ctx *gramAntlr.ReflectTypeContext) in
 
 // -------------------------------- STRUCTS -------------------------------------
 func (v *CompilerVisitor) VisitVarDeclStructStmt(ctx *gramAntlr.VarDeclStructStmtContext) interface{} {
+
 	return v.Visit(ctx.VarDclStruct())
 }
 
@@ -1605,7 +1751,6 @@ func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataConte
 	var firstTime bool = true
 	var tipoValor int = 0
 	var id string = ""
-
 	variableStruct := make(map[string]Symbol)
 
 	for _, variable := range ctx.AllID_VARIABLE() {
@@ -1629,14 +1774,34 @@ func (v *CompilerVisitor) VisitDeclStructData(ctx *gramAntlr.DeclStructDataConte
 			symbolType, _ := StringToSymbolType(ctx.AllType_()[tipoValor].GetText())
 			switch symbolType {
 			case INT:
+				nombre := ctx.GetText() // Obtén el nombre correctamente
+				tipo := "int"           // Obtén el ámbito real
+				linea := ctx.GetStart().GetLine()
+				v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "struct")
 				variableStruct[variable.GetText()] = Symbol{0, INT, false}
 			case FLOAT64:
+				nombre := ctx.GetText() // Obtén el nombre correctamente
+				tipo := "float"         // Obtén el ámbito real
+				linea := ctx.GetStart().GetLine()
+				v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "struct")
 				variableStruct[variable.GetText()] = Symbol{0.0, FLOAT64, false}
 			case STRING:
+				nombre := ctx.GetText() // Obtén el nombre correctamente
+				tipo := "string"        // Obtén el ámbito real
+				linea := ctx.GetStart().GetLine()
+				v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "struct")
 				variableStruct[variable.GetText()] = Symbol{"", STRING, false}
 			case BOOL:
+				nombre := ctx.GetText() // Obtén el nombre correctamente
+				tipo := "bool"          // Obtén el ámbito real
+				linea := ctx.GetStart().GetLine()
+				v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "struct")
 				variableStruct[variable.GetText()] = Symbol{false, BOOL, false}
 			case RUNE:
+				nombre := ctx.GetText() // Obtén el nombre correctamente
+				tipo := "nil"           // Obtén el ámbito real
+				linea := ctx.GetStart().GetLine()
+				v.TablaSimbolos.Insertar(nombre, tipo, nombre, linea, "struct")
 				variableStruct[variable.GetText()] = Symbol{rune(0), RUNE, false}
 			default:
 				v.Salida += fmt.Sprintf("Error semántico: tipo no compatible para variable: %s", ctx.AllType_()[tipoValor].GetText())
@@ -1777,6 +1942,7 @@ func (v *CompilerVisitor) VisitStructVarTypeInference(ctx *gramAntlr.StructVarTy
 func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) interface{} {
 	var varStruct Symbol
 	var datosStruct map[string]Symbol
+
 	first := true
 
 	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
@@ -1881,6 +2047,7 @@ func (v *CompilerVisitor) VisitStructAccess(ctx *gramAntlr.StructAccessContext) 
 func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsignContext) interface{} {
 	datosStruct := make(map[string]Symbol)
 	first := true
+
 	for i := 0; i < len(ctx.AllID_VARIABLE())-1; i++ {
 		idStruct := ctx.ID_VARIABLE(i).GetText()
 		idVar := ctx.ID_VARIABLE(i + 1).GetText()
@@ -1957,6 +2124,7 @@ func (v *CompilerVisitor) VisitStructAccessAsign(ctx *gramAntlr.StructAccessAsig
 // -------------------------------- FUNCIONES ------------------------------------
 // VisitFuncionStmt
 func (v *CompilerVisitor) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) interface{} {
+
 	if ctx.Functions().GetChild(1).(antlr.ParseTree).GetText() == "main" {
 		v.Visit(ctx.Functions())
 		varFunc, _ := v.currentEnv.GetFuncion("main")
@@ -1968,6 +2136,7 @@ func (v *CompilerVisitor) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext) 
 
 // VisitFunciones
 func (v *CompilerVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interface{} {
+
 	id := ctx.ID_VARIABLE(0).GetText() // Nombre de la función
 
 	// Mapa de parámetros: id -> Symbol
@@ -2040,11 +2209,13 @@ func (v *CompilerVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interf
 
 // VisitCallFunctionStmt
 func (v *CompilerVisitor) VisitCallFunctionStmt(ctx *gramAntlr.CallFunctionStmtContext) interface{} {
+
 	return v.Visit(ctx.VarCallStatement())
 }
 
 // VisitCallFunction
 func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) interface{} {
+
 	id := ctx.ID_VARIABLE().GetText()
 	parametros := []*TupleStringSymbol{}
 	for i := 0; i < len(ctx.AllExpr()); i++ {
@@ -2168,11 +2339,13 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 
 // VisitCallFunctionValue
 func (v *CompilerVisitor) VisitCallFunctionValue(ctx *gramAntlr.CallFunctionValueContext) interface{} {
+
 	return v.Visit(ctx.VarCallStatement())
 }
 
 // ----------------------------- FUNCION DE STRUCT --------------------------------
 func (v *CompilerVisitor) VisitFunctionStructStmt(ctx *gramAntlr.FunctionStructStmtContext) interface{} {
+
 	return v.Visit(ctx.FunctionStruct())
 }
 
@@ -2257,10 +2430,12 @@ func (v *CompilerVisitor) VisitFuncionesStructsNativas(ctx *gramAntlr.FuncionesS
 
 // Llamada a función de struct
 func (v *CompilerVisitor) VisitCallFunctionStructStmt(ctx *gramAntlr.CallFunctionStructStmtContext) interface{} {
+
 	return v.Visit(ctx.VarCallFuncStruct())
 }
 
 func (v *CompilerVisitor) VisitCallFunctionStructValue(ctx *gramAntlr.CallFunctionStructValueContext) interface{} {
+
 	return v.Visit(ctx.VarCallFuncStruct())
 }
 

@@ -73,7 +73,7 @@ func main() {
 	}
     // borrar
     println("---------- jamas declaro numero asi que jamas entra en el if")
-    puntos_simples += 1
+    //puntos_simples += 1
     //
 
 	// 2. Funciones con parámetros

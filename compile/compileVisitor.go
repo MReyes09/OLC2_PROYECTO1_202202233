@@ -27,6 +27,8 @@ type CompilerVisitor struct {
 	StructRelational                map[string][]string
 	Errores                         []ErrorReport
 	TablaSimbolos                   *TablaSimbolos
+	recursionDepth                  int // recursion actual
+	maxRecursionDepth               int // Límite máximo de profundidad
 }
 
 // Constructor opcional
@@ -37,6 +39,8 @@ func NewCompilerVisitor() *CompilerVisitor {
 		currentEnv:           NewEnvironment(nil),       // Entorno raíz
 		StructRelational:     make(map[string][]string), // <--- NUEVO campo agregado
 		TablaSimbolos:        NewTablaSimbolos(),
+		recursionDepth:       0,   // recursion actual
+		maxRecursionDepth:    100, // Límite de 100 llamadas recursivas
 	}
 	// Inicializa el printVisitor pasándole la función Visit y la referencia a la salida
 	v.printVisitor = print.NewPrintVisitor(&v.Salida, v.Visit)
@@ -2282,6 +2286,21 @@ func (v *CompilerVisitor) VisitCallFunction(ctx *gramAntlr.CallFunctionContext) 
 
 	newEnv := NewEnvironment(v.currentEnv)
 	v.currentEnv = newEnv
+
+	// Verificar profundidad de recursión
+	v.recursionDepth++
+	if v.recursionDepth > v.maxRecursionDepth {
+		v.Salida += fmt.Sprintf("Error semántico: Profundidad máxima de recursión excedida (%d)\n", v.maxRecursionDepth)
+		v.AgregarError(
+			"Profundidad máxima de recursión excedida",
+			ctx.GetStart().GetLine(),
+			ctx.GetStart().GetColumn(),
+			"semántico",
+		)
+		v.recursionDepth-- // Restablecer antes de retornar
+		return nil
+	}
+	defer func() { v.recursionDepth-- }() // Decrementar al salir
 
 	if tipoReturn != 7 {
 		// Verificar tipos de parámetros

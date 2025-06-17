@@ -8,6 +8,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
@@ -16,16 +17,13 @@ import (
 )
 
 func main() {
-	// Crear la aplicación
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Compiladores 2")
 	myWindow.Resize(fyne.NewSize(1400, 800))
 
-	// Variables globales para los widgets
 	var codigoEntry *widget.Entry
 	var consolaEntry *widget.Entry
 
-	// Crear las áreas de texto
 	codigoEntry = widget.NewMultiLineEntry()
 	codigoEntry.SetPlaceHolder("Escribe tu código esta área...")
 	codigoEntry.Wrapping = fyne.TextWrapWord
@@ -34,7 +32,6 @@ func main() {
 	consolaEntry.SetPlaceHolder("El resultado se mostrará aquí...")
 	consolaEntry.Wrapping = fyne.TextWrapWord
 
-	// Función para abrir archivo
 	abrirArchivo := func() {
 		dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err != nil {
@@ -44,25 +41,21 @@ func main() {
 			if reader == nil {
 				return
 			}
-
 			defer reader.Close()
 			data, err := io.ReadAll(reader)
 			if err != nil {
 				dialog.ShowError(err, myWindow)
 				return
 			}
-
 			codigoEntry.SetText(string(data))
 		}, myWindow)
 	}
 
-	// Función para borrar datos
 	borrarDatos := func() {
 		codigoEntry.SetText("")
 		consolaEntry.SetText("")
 	}
 
-	// Abrir Reporte
 	abrirErrores := func() {
 		filePath := "reports/reporte_errores.html"
 		var cmd *exec.Cmd
@@ -71,7 +64,7 @@ func main() {
 			cmd = exec.Command("cmd", "/c", "start", filePath)
 		case "darwin":
 			cmd = exec.Command("open", filePath)
-		default: // linux y otros
+		default:
 			cmd = exec.Command("xdg-open", filePath)
 		}
 		err := cmd.Start()
@@ -80,7 +73,6 @@ func main() {
 		}
 	}
 
-	// Abrir Reporte
 	abrirSimbolos := func() {
 		filePath := "reports/tabla_simbolos.html"
 		var cmd *exec.Cmd
@@ -89,7 +81,7 @@ func main() {
 			cmd = exec.Command("cmd", "/c", "start", filePath)
 		case "darwin":
 			cmd = exec.Command("open", filePath)
-		default: // linux y otros
+		default:
 			cmd = exec.Command("xdg-open", filePath)
 		}
 		err := cmd.Start()
@@ -98,7 +90,6 @@ func main() {
 		}
 	}
 
-	// Abrir Reporte
 	abrirAST := func() {
 		filePath := "reports/ast.pdf"
 		var cmd *exec.Cmd
@@ -107,7 +98,7 @@ func main() {
 			cmd = exec.Command("cmd", "/c", "start", filePath)
 		case "darwin":
 			cmd = exec.Command("open", filePath)
-		default: // linux y otros
+		default:
 			cmd = exec.Command("xdg-open", filePath)
 		}
 		err := cmd.Start()
@@ -115,19 +106,17 @@ func main() {
 			dialog.ShowError(err, myWindow)
 		}
 	}
-	// Función para ejecutar código (simulación)
+
 	ejecutar := func() {
 		codigo := codigoEntry.Text
 		if strings.TrimSpace(codigo) == "" {
 			consolaEntry.SetText("Error: No hay código para ejecutar")
 			return
-		} else {
-			output := controller.CompileCode(codigo)
-			consolaEntry.SetText(output)
 		}
+		output := controller.CompileCode(codigo)
+		consolaEntry.SetText(output)
 	}
 
-	// Crear los botones
 	btnAbrirArchivo := widget.NewButton("📂 Abrir Archivo", abrirArchivo)
 	btnBorrarDatos := widget.NewButton("🗑️ Borrar datos", borrarDatos)
 	btnEjecutar := widget.NewButton("▶️ Ejecutar", ejecutar)
@@ -135,7 +124,13 @@ func main() {
 	btnSimbolos := widget.NewButton("🏷️ Tabla de Simbolos", abrirSimbolos)
 	btnAST := widget.NewButton("📊 Arbol AST", abrirAST)
 
-	// Crear container para los botones
+	// Imagen con tamaño fijo (200x100)
+	logo := canvas.NewImageFromFile("img/logo.png")
+	logo.FillMode = canvas.ImageFillStretch // Usa Stretch para forzar el tamaño exacto
+	logo.SetMinSize(fyne.NewSize(200, 160)) // ancho x alto
+
+	logoBox := container.NewCenter(logo)
+
 	botonesContainer := container.NewHBox(
 		btnAbrirArchivo,
 		btnBorrarDatos,
@@ -145,14 +140,12 @@ func main() {
 		btnAST,
 	)
 
-	// Crear labels para las secciones
 	labelCodigo := widget.NewLabel("📝 Código")
 	labelCodigo.TextStyle.Bold = true
 
 	labelConsola := widget.NewLabel("💻 Consola")
 	labelConsola.TextStyle.Bold = true
 
-	// Crear containers para cada sección con scroll
 	codigoContainer := container.NewBorder(
 		labelCodigo, nil, nil, nil,
 		container.NewScroll(codigoEntry),
@@ -163,20 +156,22 @@ func main() {
 		container.NewScroll(consolaEntry),
 	)
 
-	// Crear split container horizontal para código y consola
 	splitContainer := container.NewHSplit(codigoContainer, consolaContainer)
-	splitContainer.SetOffset(0.5) // 50% para cada lado
+	splitContainer.SetOffset(0.5)
 
-	// Crear el layout principal usando border layout
-	content := container.NewBorder(
-		botonesContainer, // top
-		nil,              // bottom
-		nil,              // left
-		nil,              // right
-		splitContainer,   // center
+	logoYBotones := container.NewVBox(
+		logoBox,
+		botonesContainer,
 	)
 
-	// Configurar y mostrar la ventana
+	content := container.NewBorder(
+		logoYBotones,
+		nil,
+		nil,
+		nil,
+		splitContainer,
+	)
+
 	myWindow.SetContent(content)
 	myWindow.CenterOnScreen()
 	myWindow.ShowAndRun()

@@ -1,12 +1,16 @@
-func main(){
-  suma := 0
-  numeros = []int{10, 20, 30, 40, 50}
-  sumaIndices := 0
+func fibonacci(n int) int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n-1) + fibonacci(n-2)
+}
 
-  for i, valor in numeros {
-    println("Índice", i, "=", valor)
-		suma = suma + valor
-		sumaIndices = sumaIndices + i
-  }
+
+func main(){
+
+  mut x int = 0
+  println(x)
+  x = fibonacci(1000)
+  println(x)
 
 }

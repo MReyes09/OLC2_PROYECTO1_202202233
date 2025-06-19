@@ -6,3 +6,27 @@ sudo apt install binutils-aarch64-linux-gnu -y
 // COMANDOS DE ENSAMBLADO Y LINKEO
 aarch64-linux-gnu-as -o hello.o hello.s
 aarch64-linux-gnu-ld -o hello hello.o
+
+
+
+// FORMA 2
+sudo apt update && sudo apt upgrade -y
+sudo apt install qemu-system-arm qemu-system-aarch64                                            
+sudo apt install gcc-aarch64-linux-gnu  
+sudo apt install qemu-user
+sudo apt autoremove -y
+
+Como compilar y ejecutar
+    arch64-linux-gnu-as -o hello.o hello.s
+	aarch64-linux-gnu-ld -o hello hello.o
+	qemu-aarch64 ./hello
+
+    Ver valor de salida del programa(como ultimo proceso ejecutado)
+        echo $? 
+            luego de haber ejecutado el programa
+
+Instalar GDB multi-arquitectura(debugger)
+	sudo apt install gdb-multiarch
+
+	Verificar la version del GDB
+		dpkg -l | grep gdb-multiarch

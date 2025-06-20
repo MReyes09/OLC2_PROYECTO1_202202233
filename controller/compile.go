@@ -3,6 +3,7 @@ package controller
 
 import (
 	"OLC2CLIENTE/compile"
+	"OLC2CLIENTE/compile/generatorARM"
 	"os"
 	"os/exec"
 
@@ -50,36 +51,6 @@ func CompileCode(code string) string {
 		}
 		fmt.Printf("Archivo PDF '%s' generado exitosamente.\n", pdfFilePath)
 	}
-
-	//Imprimir el arbol
-	//fmt.Println("\n ARBOL NO FORMATEADO \n" + tree.ToStringTree(nil, parser))
-
-	// --- Print the formatted tree ---
-	//fmt.Println("Árbol FORMATEADO:")
-	// Get the raw string from ANTLR
-	//rawTreeString := tree.ToStringTree(nil, parser)
-	// Format it using our new function
-	//formattedOutput := FormatAntlrTree(rawTreeString)
-	//fmt.Println(formattedOutput) // Print the nicely formatted tree
-
-	/*
-		// --- Generación del archivo .dot ---
-		// Creamos una nueva instancia del parser DOT
-		dotParser := NewTreeStringParser()
-		dotFilePath := "salida.dot" // Define el nombre del archivo .dot de salida
-
-		// Llamamos al método que se encarga de parsear la cadena y generar el archivo DOT
-		err := dotParser.GenerateDotFromParseTreeString(rawTreeString, dotFilePath)
-		if err != nil {
-			fmt.Println("Error al generar o escribir el archivo DOT:", err)
-		} else {
-			fmt.Printf("Archivo DOT '%s' generado exitosamente.\n", dotFilePath)
-		}
-	*/
-	// Con esto:
-	//dotFilePath := "salida.dot"
-	//err := GenerateDotFromFormattedTreeString(formattedOutput, dotFilePath)
-	//println(err)
 
 	var searchTree SearchTree = *NewSearchTree()
 	searchTree.Visit(tree)
@@ -133,6 +104,10 @@ func CompileCode(code string) string {
 	if erro != nil {
 		fmt.Println("Error al generar reporte:", erro)
 	}
+	fmt.Println(" ----------------------- Ejecutamos ARM -----------------------")
+	vistorARM := generatorARM.NewCompileARMVisitor()
+	tree.Accept(vistorARM)
+	fmt.Println(" ----------------------- ARM generado -----------------------")
 
 	return visitor.Salida
 }

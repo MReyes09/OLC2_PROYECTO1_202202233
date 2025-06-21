@@ -13,7 +13,7 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 )
 
-func CompileCode(code string) string {
+func CompileCode(code string) (string, string) {
 	//Inicia y genera lo que necesitamos con antlr
 
 	inputStream := antlr.NewInputStream(code)
@@ -105,9 +105,11 @@ func CompileCode(code string) string {
 		fmt.Println("Error al generar reporte:", erro)
 	}
 	fmt.Println(" ----------------------- Ejecutamos ARM -----------------------")
-	vistorARM := generatorARM.NewCompileARMVisitor()
-	tree.Accept(vistorARM)
+	visitorARM := generatorARM.NewCompileARMVisitor()
+	visitorARM.Visit(tree)
+	codeGenenerateInARM := visitorARM.C.GenerateCodeARM()
+
 	fmt.Println(" ----------------------- ARM generado -----------------------")
 
-	return visitor.Salida
+	return visitor.Salida, codeGenenerateInARM
 }

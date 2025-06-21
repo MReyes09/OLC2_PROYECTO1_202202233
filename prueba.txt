@@ -1,3 +1,5 @@
 func main(){
   println("Hola papu")
+  println("Como estas?")
+  println("Ya salio compi 2")
 }

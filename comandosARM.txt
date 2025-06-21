@@ -4,9 +4,9 @@ sudo apt install binutils-aarch64-linux-gnu -y
 
 
 // COMANDOS DE ENSAMBLADO Y LINKEO
-aarch64-linux-gnu-as -o hello.o hello.s
-aarch64-linux-gnu-ld -o hello hello.o
-
+aarch64-linux-gnu-as -o codeGenerate.o codeGenerate.s
+aarch64-linux-gnu-ld -o codeGenerate codeGenerate.o
+qemu-aarch64 ./codeGenerate
 
 
 // FORMA 2

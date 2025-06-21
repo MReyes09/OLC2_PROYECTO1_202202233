@@ -209,6 +209,7 @@ func (g *GeneratorARMInstructions) GenerateCodeARM() string {
 	sb.WriteString(".text\n")
 	sb.WriteString(".global _start\n")
 	sb.WriteString("_start:\n")
+	sb.WriteString(" mov x29, sp\n") // Inicializar el frame pointer (quitar si da error en main)
 	sb.WriteString(" adr x10, heap\n")
 	//sb.WriteString(" mov sp, x10\n") // Inicializar el stack pointer
 	sb.WriteString(" bl main\n") // Llamar a main

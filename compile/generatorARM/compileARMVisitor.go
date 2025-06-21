@@ -187,6 +187,11 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	v.ReturnLabels = v.C.GetLabel()
 	v.C.SetLabel(nameFunction)
 
+	if nameFunction == "main" {
+		v.C.Instrucciones = append(v.C.Instrucciones, "stp x29, x30, [sp, #-16]!")
+		v.C.Instrucciones = append(v.C.Instrucciones, "mov x29, sp")
+	}
+
 	//Recorremos el bloque de instrucciones
 	for _, child := range ctx.Block().GetChildren() {
 		// Debemos verificar que los hijos sean del tipo ParseTree
@@ -197,11 +202,12 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	}
 
 	v.C.SetLabel(v.ReturnLabels)
-	v.C.Add(registros.X0, registros.FP, registros.XZR)
-	v.C.LDR(registros.LR, registros.X0, 0)
 	if nameFunction != "main" {
+		v.C.Add(registros.X0, registros.FP, registros.XZR)
+		v.C.LDR(registros.LR, registros.X0, 0)
 		v.C.Br(registros.LR)
 	} else {
+		v.C.Instrucciones = append(v.C.Instrucciones, "LDP x29, x30, [sp], #16")
 		v.C.Instrucciones = append(v.C.Instrucciones, "RET")
 	}
 

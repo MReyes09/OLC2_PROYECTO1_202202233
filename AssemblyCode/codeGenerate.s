@@ -8,6 +8,7 @@ heap: .space 4096
 .text
 .global _start
 _start:
+ mov x29, sp
  adr x10, heap
  bl main
 MOV x0, #0
@@ -16,6 +17,8 @@ SVC #0
 
 //Funciones Foraneas:
 main:
+stp x29, x30, [sp, #-16]!
+mov x29, sp
 // Función embebida: println
 // cadena_print: "Hola papu"
 STR x10, [SP, #-8]!
@@ -245,8 +248,7 @@ MOV X2, #1
 MOV W8, #64
 SVC #0
 L1:
-ADD x0, x29, xzr
-LDR x30, [x0, #0]
+LDP x29, x30, [sp], #16
 RET
 
 //Funciones De Impresion:

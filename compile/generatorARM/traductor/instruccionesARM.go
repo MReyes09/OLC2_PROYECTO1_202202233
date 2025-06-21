@@ -90,6 +90,24 @@ func (g *GeneratorARMInstructions) ImprimirCadena(rs string) {
 	g.Instrucciones = append(g.Instrucciones, "BL print_cadena")
 }
 
+func (g *GeneratorARMInstructions) ImprimirEntero(rs string) {
+	g.Estandar.Usar("print_entero")
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))
+	g.Instrucciones = append(g.Instrucciones, "BL print_entero")
+}
+
+func (g *GeneratorARMInstructions) ImprimirDecimal() {
+	g.Estandar.Usar("print_entero")
+	g.Estandar.Usar("print_decimal")
+	g.Instrucciones = append(g.Instrucciones, "BL print_decimal")
+}
+
+func (g *GeneratorARMInstructions) ImprimirBooleano(rs string) {
+	g.Estandar.Usar("print_booleano")
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))
+	g.Instrucciones = append(g.Instrucciones, "BL print_booleano")
+}
+
 func (g *GeneratorARMInstructions) SaltoLinea() {
 	g.Instrucciones = append(g.Instrucciones, "MOV X0, #1")
 	g.Instrucciones = append(g.Instrucciones, "ADR X1, salto_linea_str")
@@ -97,6 +115,16 @@ func (g *GeneratorARMInstructions) SaltoLinea() {
 	g.Instrucciones = append(g.Instrucciones, "MOV W8, #64")
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
 }
+
+func (g *GeneratorARMInstructions) Espaciado() {
+	g.Instrucciones = append(g.Instrucciones, "MOV X0, #1")
+	g.Instrucciones = append(g.Instrucciones, "ADR X1, espacio_str")
+	g.Instrucciones = append(g.Instrucciones, "MOV X2, #1")
+	g.Instrucciones = append(g.Instrucciones, "MOV W8, #64")
+	g.Instrucciones = append(g.Instrucciones, "SVC #0")
+}
+
+// ------------------------ FUNCIONES DE TERMINACION ------------------------
 
 func (g *GeneratorARMInstructions) EndProgram() {
 	g.Mov(registros.X0, 0)
@@ -190,6 +218,33 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 func (g *GeneratorARMInstructions) StrObject() ObjectStack {
 	return ObjectStack{
 		Type_:   StringType,
+		Length_: 8,
+		Depth_:  g.depth,
+		Id_:     "",
+	}
+}
+
+func (g *GeneratorARMInstructions) IntObject() ObjectStack {
+	return ObjectStack{
+		Type_:   Int,
+		Length_: 8,
+		Depth_:  g.depth,
+		Id_:     "",
+	}
+}
+
+func (g *GeneratorARMInstructions) FloatObject() ObjectStack {
+	return ObjectStack{
+		Type_:   Float,
+		Length_: 8,
+		Depth_:  g.depth,
+		Id_:     "",
+	}
+}
+
+func (g *GeneratorARMInstructions) BoolObject() ObjectStack {
+	return ObjectStack{
+		Type_:   Bool,
 		Length_: 8,
 		Depth_:  g.depth,
 		Id_:     "",

@@ -6,6 +6,7 @@ import (
 	"OLC2CLIENTE/compile/generatorARM/traductor"
 	"OLC2CLIENTE/gramatica/gramAntlr"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -69,6 +70,49 @@ func (v *CompileARMVisitor) VisitString(ctx *gramAntlr.StringContext) interface{
 	return nil
 }
 
+func (v *CompileARMVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{} {
+	value, err := strconv.Atoi(ctx.GetText())
+
+	if err != nil {
+		panic(fmt.Sprintf("Error al convertir a entero: %s", ctx.GetText()))
+	}
+
+	v.C.COMENT(fmt.Sprintf("Entero: %d", value))
+
+	IntObject := v.C.IntObject()
+	v.C.PushConst(IntObject, value)
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} {
+	value, err := strconv.ParseFloat(ctx.GetText(), 64)
+	if err != nil {
+		panic(fmt.Sprintf("Error al convertir a float: %s", ctx.GetText()))
+	}
+	v.C.COMENT(fmt.Sprintf("Float: %f", value))
+	floatObject := v.C.FloatObject()
+	v.C.PushConst(floatObject, value)
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{} {
+
+	value := 0
+	valueStr := strings.ToLower(ctx.GetText())
+	if valueStr == "true" {
+		value = 1
+	} else {
+		value = 0
+	}
+
+	v.C.COMENT(fmt.Sprintf("Booleano: %d", value))
+	boolObject := v.C.BoolObject()
+	v.C.PushConst(boolObject, value)
+	return nil
+}
+
 // instrucciones: imprimir         # PrintStmt
 func (v *CompileARMVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	v.Visit(ctx.Imprimir())
@@ -91,18 +135,19 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 
 		switch value.Type_ {
 		case traductor.Int:
-			//v.C.ImprimirEntero(registros.X0)
+			v.C.ImprimirEntero(registros.X0)
 		case traductor.Float:
-			//v.C.ImprimirDecimal()
+			v.C.ImprimirDecimal()
 		case traductor.StringType:
 			v.C.ImprimirCadena(registros.X0)
 		case traductor.Rune:
 			//v.C.ImprimirCaracter(registros.X0)
 		case traductor.Bool:
-			//v.C.ImprimirBooleano(registros.X0)
+			v.C.ImprimirBooleano(registros.X0)
 		case traductor.Slice:
 			//v.C.ImprimirArreglo(value.TipoElemento_)
 		}
+		v.C.Espaciado()
 	}
 	v.C.SaltoLinea()
 	return nil

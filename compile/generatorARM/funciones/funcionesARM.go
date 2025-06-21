@@ -130,25 +130,22 @@ var DefinicionFunciones = map[string]string{
                 stp x29, x30, [sp, #-16]!
                 cmp x0, #0
                 bne print_true
-                adr x1, falso
-                b print_bool_fin
+                adr x0, falso
+                b print_bool_call
             .align 2
             print_true:
-                adr x1, verdadero
+                adr x0, verdadero
             .align 2
-            print_bool_fin:
-                mov x0, #1
-                mov x2, #5
-                mov w8, #64
-                svc #0
+            print_bool_call:
+                bl print_cadena    // Usa tu función existente
                 ldp x29, x30, [sp], #16
                 ret
             .align 2
             verdadero:
-                .ascii ""truee""
+                .asciz "true"      // .asciz añade automáticamente '\0'
             .align 2
             falso:
-                .ascii ""false""
+                .asciz "false"
         `,
 	"print_caracter": `
             .align 2
@@ -370,9 +367,9 @@ var DefinicionFunciones = map[string]string{
             ldp x19, x20, [sp], #16
             ldp x29, x30, [sp], #16
             ret
-            minus_sign: .ascii ""-""
-            dot_char: .ascii "".""
-            zero_char: .ascii ""0""
+            minus_sign: .ascii "-"
+            dot_char: .ascii "."
+            zero_char: .ascii "0"
         
         `,
 }

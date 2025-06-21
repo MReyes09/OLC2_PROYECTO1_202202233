@@ -1,16 +1,10 @@
-func fibonacci(n int) int {
-    if n <= 1 {
-        return n
-    }
-    return fibonacci(n-1) + fibonacci(n-2)
-}
-
-
 func main(){
+  println("Boolean:", true)
+  println("Boolean2:", false)
+  println("Prueba Texto")
+  println("Y numero")
+  println(15)
 
-  mut x int = 0
-  println(x)
-  x = fibonacci(1000)
-  println(x)
-
+  println("string y", 199)
+  println("double:", 1.25)
 }

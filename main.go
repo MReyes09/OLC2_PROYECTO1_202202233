@@ -32,6 +32,10 @@ func main() {
 	consolaEntry.SetPlaceHolder("El resultado se mostrará aquí...")
 	consolaEntry.Wrapping = fyne.TextWrapWord
 
+	// Cambiar entre ver codigo interpretado y compilado
+	var interpretedCode string
+	var compiledCode string
+
 	abrirArchivo := func() {
 		dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err != nil {
@@ -113,8 +117,20 @@ func main() {
 			consolaEntry.SetText("Error: No hay código para ejecutar")
 			return
 		}
-		output := controller.CompileCode(codigo)
-		consolaEntry.SetText(output)
+		interpretedCode, compiledCode = controller.CompileCode(codigo)
+		consolaEntry.SetText(interpretedCode)
+	}
+
+	option := 0
+	changeConsola := func() {
+		if option == 0 {
+			consolaEntry.SetText(compiledCode)
+			option = 1
+		} else {
+			consolaEntry.SetText(interpretedCode)
+			option = 0
+		}
+
 	}
 
 	btnAbrirArchivo := widget.NewButton("📂 Abrir Archivo", abrirArchivo)
@@ -123,6 +139,7 @@ func main() {
 	btnReporte := widget.NewButton("⛔ Tabla de Errores", abrirErrores)
 	btnSimbolos := widget.NewButton("🏷️ Tabla de Simbolos", abrirSimbolos)
 	btnAST := widget.NewButton("📊 Arbol AST", abrirAST)
+	btnCompie_Interpreted := widget.NewButton("🧾 Código Interpretado", changeConsola)
 
 	// Imagen con tamaño fijo (200x100)
 	logo := canvas.NewImageFromFile("img/logo.png")
@@ -138,6 +155,7 @@ func main() {
 		btnSimbolos,
 		btnReporte,
 		btnAST,
+		btnCompie_Interpreted,
 	)
 
 	labelCodigo := widget.NewLabel("📝 Código")

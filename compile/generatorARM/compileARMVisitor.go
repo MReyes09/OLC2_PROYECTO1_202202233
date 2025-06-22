@@ -49,6 +49,8 @@ func (v *CompileARMVisitor) VisitInicio(ctx *gramAntlr.InicioContext) interface{
 	return nil
 }
 
+// --------------------------------- EXPRESIONES -----------------------------------
+
 // --------------------------------- TIPO DE DATOS -----------------------------------
 func (v *CompileARMVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
 	v.C.COMENT(fmt.Sprintf("cadena_print: %s", ctx.STRING().GetText()))
@@ -110,6 +112,195 @@ func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interfac
 	v.C.COMENT(fmt.Sprintf("Booleano: %d", value))
 	boolObject := v.C.BoolObject()
 	v.C.PushConst(boolObject, value)
+	return nil
+}
+
+// -------------------------------- OPERADORES ARITMETICOS --------------------------------
+func (v *CompileARMVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{} {
+	v.Visit(ctx.Expr())
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} {
+	v.Visit(ctx.Expr())
+
+	// Obtener el tipo de la cima de la pila
+	top := v.C.GetTopObjectStack()
+	var reg string
+
+	// Elegir el registro adecuado
+	if top.Type_ == traductor.Float {
+		reg = registros.D0
+	} else {
+		reg = registros.X0
+	}
+
+	// Hacer POP con el registro correcto
+	value := v.C.POPOBJECT(reg)
+
+	// Aplicar la negación según el tipo
+	if value.Type_ == traductor.Int {
+		v.C.Neg(registros.X0, registros.X0)
+		v.C.Push(registros.X0)
+		v.C.PushObjectStack(v.C.CloneObject(value))
+	} else if value.Type_ == traductor.Float {
+		v.C.COMENT("Float64 Negativo")
+		v.C.FNeg(registros.D0, registros.D0)
+		v.C.Push(registros.D0)
+		v.C.PushObjectStack(v.C.CloneObject(value))
+	}
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} {
+
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+
+	operador := ctx.GetChild(1).(antlr.TerminalNode).GetText()
+	DerechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+
+	var Derecha traductor.ObjectStack
+	if DerechaEsFloat {
+		Derecha = v.C.POPOBJECT(registros.D1)
+	} else {
+		Derecha = v.C.POPOBJECT(registros.X1)
+	}
+
+	IzquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	var Izquierda traductor.ObjectStack
+
+	if IzquierdaEsFloat {
+		Izquierda = v.C.POPOBJECT(registros.D0)
+	} else {
+		Izquierda = v.C.POPOBJECT(registros.X0)
+	}
+
+	switch operador {
+	case "+":
+		// int + int
+		if Derecha.Type_ == traductor.Int && Izquierda.Type_ == traductor.Int {
+			v.C.Add(registros.X0, registros.X0, registros.X1)
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(Izquierda))
+		} else if Derecha.Type_ == traductor.StringType && Izquierda.Type_ == traductor.StringType {
+			// string + string
+			v.C.ConcatString()
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(Izquierda))
+		} else if Derecha.Type_ == traductor.Float || Izquierda.Type_ == traductor.Float {
+			// float64 + ...
+			if !DerechaEsFloat {
+				v.C.COMENT("Convertir Derecha a float64")
+				v.C.Scvtf(registros.D1, registros.X1)
+			}
+			if !IzquierdaEsFloat {
+				v.C.COMENT("Convertir Izquierda a float64")
+				v.C.Scvtf(registros.D0, registros.X0)
+			}
+			v.C.COMENT("Suma de float64")
+			v.C.Fadd(registros.D0, registros.D0, registros.D1)
+			v.C.Push(registros.D0)
+			v.C.PushObjectStack(v.C.FloatObject())
+		}
+	case "-":
+		// int - int
+		if Derecha.Type_ == traductor.Int && Izquierda.Type_ == traductor.Int {
+			v.C.Sub(registros.X0, registros.X0, registros.X1)
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(Izquierda))
+		} else if Derecha.Type_ == traductor.Float || Izquierda.Type_ == traductor.Float {
+			// float64 - ...
+			if !DerechaEsFloat {
+				v.C.COMENT("Convertir Derecha a float64")
+				v.C.Scvtf(registros.D1, registros.X1)
+			}
+			if !IzquierdaEsFloat {
+				v.C.COMENT("Convertir Izquierda a float64")
+				v.C.Scvtf(registros.D0, registros.X0)
+			}
+			v.C.Fsub(registros.D0, registros.D0, registros.D1)
+			v.C.Push(registros.D0)
+			v.C.PushObjectStack(v.C.FloatObject())
+		}
+	}
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) interface{} {
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+
+	operador := ctx.GetOp().GetText()
+	derechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+
+	var derecha traductor.ObjectStack
+	if derechaEsFloat {
+		derecha = v.C.POPOBJECT(registros.D1)
+	} else {
+		derecha = v.C.POPOBJECT(registros.X1)
+	}
+
+	izquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	var izquierda traductor.ObjectStack
+	if izquierdaEsFloat {
+		izquierda = v.C.POPOBJECT(registros.D0)
+	} else {
+		izquierda = v.C.POPOBJECT(registros.X0)
+	}
+
+	switch operador {
+	case "*":
+		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
+			v.C.Mul(registros.X0, registros.X0, registros.X1)
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(izquierda))
+		} else if derecha.Type_ == traductor.Float || izquierda.Type_ == traductor.Float {
+			if !izquierdaEsFloat {
+				v.C.Scvtf(registros.D0, registros.X0)
+			}
+			if !derechaEsFloat {
+				v.C.Scvtf(registros.D1, registros.X1)
+			}
+			v.C.FMul(registros.D0, registros.D0, registros.D1)
+			v.C.Push(registros.D0)
+			if izquierdaEsFloat {
+				v.C.PushObjectStack(v.C.CloneObject(izquierda))
+			} else {
+				v.C.PushObjectStack(v.C.CloneObject(derecha))
+			}
+		}
+
+	case "/":
+		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
+			v.C.Div(registros.X0, registros.X0, registros.X1)
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(izquierda))
+		} else if derecha.Type_ == traductor.Float || izquierda.Type_ == traductor.Float {
+			if !izquierdaEsFloat {
+				v.C.Scvtf(registros.D0, registros.X0)
+			}
+			if !derechaEsFloat {
+				v.C.Scvtf(registros.D1, registros.X1)
+			}
+			v.C.FDiv(registros.D0, registros.D0, registros.D1)
+			v.C.Push(registros.D0)
+			if izquierdaEsFloat {
+				v.C.PushObjectStack(v.C.CloneObject(izquierda))
+			} else {
+				v.C.PushObjectStack(v.C.CloneObject(derecha))
+			}
+		}
+
+	case "%":
+		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
+			v.C.Mod(registros.X0, registros.X0, registros.X1)
+			v.C.Push(registros.X0)
+			v.C.PushObjectStack(v.C.CloneObject(izquierda))
+		}
+	}
 	return nil
 }
 

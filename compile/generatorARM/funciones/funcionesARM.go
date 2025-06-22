@@ -274,66 +274,61 @@ var DefinicionFunciones = map[string]string{
 	"print_decimal": `
         .align 2
         print_decimal:
-            stp x29, x30, [sp, #-16]!    
+            // Guardar contexto
+            stp x29, x30, [sp, #-16]!
             stp x19, x20, [sp, #-16]!
             stp x21, x22, [sp, #-16]!
             stp x23, x24, [sp, #-16]!
-            
-            // Check if number is negative
-            fmov x19, d0
-            tst x19, #(1 << 63)       // Comprueba el bit de signo
-            beq skip_minus
 
-            // Print minus sign
+            // Verificar si es negativo
+            fcmp d0, #0.0
+            bge skip_minus
+
+            // Imprimir el signo '-'
             mov x0, #1
             adr x1, minus_sign
             mov x2, #1
             mov x8, #64
             svc #0
 
-            // Make value positive
+            // Convertir a valor positivo
             fneg d0, d0
 
         skip_minus:
-            // Convert integer part
-            fcvtzs x0, d0             // x0 = int(d0)
+            // Parte entera
+            fcvtzs x0, d0         // x0 = int(d0)
             bl print_entero
 
-            // Print dot '.'
+            // Imprimir punto decimal '.'
             mov x0, #1
             adr x1, dot_char
             mov x2, #1
             mov x8, #64
             svc #0
 
-            // Get fractional part: frac = d0 - float(int(d0))
-            frintm d4, d0             // d4 = floor(d0)
-            fsub d2, d0, d4           // d2 = d0 - floor(d0) (exact fraction)
+            // Parte fraccionaria: frac = d0 - floor(d0)
+            frintm d4, d0         // d4 = floor(d0)
+            fsub d2, d0, d4       // d2 = d0 - d4 (solo parte decimal)
 
-            // Para 2.5, d2 debe ser exactamente 0.5
-
-            // Multiplicar por 1_000_000 (6 decimales)
+            // Multiplicar por 1_000_000 (para 6 decimales)
             movz x1, #0x000F, lsl #16
             movk x1, #0x4240, lsl #0   // x1 = 1000000
-            scvtf d3, x1              // d3 = 1000000.0
-            fmul d2, d2, d3           // d2 = frac * 1_000_000
-            
-            // Redondear al entero más cercano para evitar errores de precisión
-            frintn d2, d2             // d2 = round(d2)
-            fcvtzs x0, d2             // x0 = int(d2)
+            scvtf d3, x1               // d3 = 1000000.0
+            fmul d2, d2, d3            // d2 = frac * 1_000_000
+            frintn d2, d2              // redondear
+            fcvtzs x0, d2              // x0 = int(frac * 1_000_000)
 
-            // print ceros a la izquierda si es necesario
-            mov x20, x0               // x20 = fracción entera
+            // Preparar impresión con ceros a la izquierda
+            mov x20, x0                // x20 = valor entero de parte decimal
             movz x21, #0x0001, lsl #16
             movk x21, #0x86A0, lsl #0  // x21 = 100000
-            mov x22, #0               // inicializar contador de ceros
-            mov x23, #10              // constante para división
+            mov x23, #10              // constante para dividir
 
         leading_zero_loop:
             udiv x24, x20, x21        // x24 = x20 / x21
-            cbnz x24, done_leading_zeros  // Si hay un dígito no cero, salir del bucle
+            cbnz x24, done_leading_zeros
 
-            // print '0'
+            // Imprimir '0'
             mov x0, #1
             adr x1, zero_char
             mov x2, #1
@@ -341,35 +336,32 @@ var DefinicionFunciones = map[string]string{
             svc #0
 
             udiv x21, x21, x23        // x21 /= 10
-            add x22, x22, #1          // incrementar contador de ceros
-            cmp x21, #0               // verificar si llegamos al final
-            beq print_remaining       // si divisor es 0, saltar a print el resto
+            cmp x21, #0
+            beq print_remaining
             b leading_zero_loop
 
         done_leading_zeros:
-            // Print the remaining fractional part
             mov x0, x20
             bl print_entero
             b exit_function
 
         print_remaining:
-            // Caso especial cuando la parte fraccionaria es 0 después de print ceros
             cmp x20, #0
             bne exit_function
-            
-            // Ya imprimimos todos los ceros necesarios
-            // No hace falta print nada más
+            // Si parte decimal es cero, no imprimir más
 
         exit_function:
-            // Restore context
+            // Restaurar contexto
             ldp x23, x24, [sp], #16
             ldp x21, x22, [sp], #16
             ldp x19, x20, [sp], #16
             ldp x29, x30, [sp], #16
             ret
-            minus_sign: .ascii "-"
-            dot_char: .ascii "."
-            zero_char: .ascii "0"
-        
+
+        // Constantes utilizadas
+        minus_sign: .ascii "-"
+        dot_char:   .ascii "."
+        zero_char:  .ascii "0"
+
         `,
 }

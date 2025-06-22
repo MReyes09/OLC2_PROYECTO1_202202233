@@ -56,6 +56,32 @@ func (g *GeneratorARMInstructions) Add(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ADD %s, %s, %s", rd, rs1, rs2))
 }
 
+func (g *GeneratorARMInstructions) Sub(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SUB %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Mul(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MUL %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) FMul(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FMUL %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Div(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) FDiv(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FDIV %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Mod(rd string, rs1 string, rs2 string) {
+	temp := registros.X2
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, rs1, rs2))
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, rs2, rs1))
+}
+
 func (g *GeneratorARMInstructions) LDR(rd string, rs1 string, offSet int) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, rs1, offSet))
 }
@@ -84,6 +110,18 @@ func (g *GeneratorARMInstructions) Svc() {
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
 }
 
+func (g *GeneratorARMInstructions) Scvtf(rd string, rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SCVTF %s, %s", rd, rs))
+}
+
+func (g *GeneratorARMInstructions) Fadd(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FADD %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Fsub(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FSUB %s, %s, %s", rd, rs1, rs2))
+}
+
 func (g *GeneratorARMInstructions) ImprimirCadena(rs string) {
 	g.Estandar.Usar("print_cadena")
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))
@@ -108,6 +146,11 @@ func (g *GeneratorARMInstructions) ImprimirBooleano(rs string) {
 	g.Instrucciones = append(g.Instrucciones, "BL print_booleano")
 }
 
+func (g *GeneratorARMInstructions) ConcatString() {
+	g.Estandar.Usar("concatenar_cadena")
+	g.Instrucciones = append(g.Instrucciones, "BL concatenar_cadena")
+}
+
 func (g *GeneratorARMInstructions) SaltoLinea() {
 	g.Instrucciones = append(g.Instrucciones, "MOV X0, #1")
 	g.Instrucciones = append(g.Instrucciones, "ADR X1, salto_linea_str")
@@ -122,6 +165,14 @@ func (g *GeneratorARMInstructions) Espaciado() {
 	g.Instrucciones = append(g.Instrucciones, "MOV X2, #1")
 	g.Instrucciones = append(g.Instrucciones, "MOV W8, #64")
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
+}
+
+func (g *GeneratorARMInstructions) Neg(rd string, rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("NEG %s, %s", rd, rs))
+}
+
+func (g *GeneratorARMInstructions) FNeg(rd string, rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FNEG %s, %s", rd, rs))
 }
 
 // ------------------------ FUNCIONES DE TERMINACION ------------------------
@@ -248,6 +299,17 @@ func (g *GeneratorARMInstructions) BoolObject() ObjectStack {
 		Length_: 8,
 		Depth_:  g.depth,
 		Id_:     "",
+	}
+}
+
+func (g *GeneratorARMInstructions) CloneObject(object ObjectStack) ObjectStack {
+	return ObjectStack{
+		Type_:         object.Type_,
+		Length_:       object.Length_,
+		Depth_:        g.depth,
+		Id_:           object.Id_,
+		TipoElemento_: object.TipoElemento_,
+		//Offset_:       object.Offset_,
 	}
 }
 

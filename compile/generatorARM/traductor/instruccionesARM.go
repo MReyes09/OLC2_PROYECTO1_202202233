@@ -106,6 +106,14 @@ func (g *GeneratorARMInstructions) Srtb(rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STRB %s, [%s]", rs1, rs2))
 }
 
+func (g *GeneratorARMInstructions) Str(rs1 string, rs2 string, offset ...int) {
+	off := 0
+	if len(offset) > 0 {
+		off = offset[0]
+	}
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [%s, #%d]", rs1, rs2, off))
+}
+
 func (g *GeneratorARMInstructions) Svc() {
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
 }
@@ -184,6 +192,22 @@ func (g *GeneratorARMInstructions) EndProgram() {
 }
 
 // ------------------------ FUNCIONES EXTRA ------------------------
+
+func (g *GeneratorARMInstructions) GetFrameLocal(index int) ObjectStack {
+	var voidObjects []ObjectStack
+
+	for _, obj := range g.Stack {
+		if obj.Type_ == Void {
+			voidObjects = append(voidObjects, obj)
+		}
+	}
+
+	if index < 0 || index >= len(voidObjects) {
+		panic(fmt.Sprintf("Índice %d fuera de rango para objetos de tipo Void", index))
+	}
+
+	return voidObjects[index]
+}
 
 func (g *GeneratorARMInstructions) PushObjectStack(ObjectStack ObjectStack) {
 	g.Stack = append(g.Stack, ObjectStack)
@@ -264,6 +288,27 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 		panic("No hay objetos en el stack")
 	}
 	return g.Stack[len(g.Stack)-1]
+}
+
+// GetObject busca un objeto en el Stack por su Id_ y devuelve el desplazamiento (Offset_) y el objeto encontrado
+func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
+	byteOffset := 0
+
+	for i := len(g.Stack) - 1; i >= 0; i-- {
+		if g.Stack[i].Id_ == id {
+			return byteOffset, g.Stack[i]
+		}
+		byteOffset += g.Stack[i].Length_
+	}
+
+	panic(fmt.Sprintf("No se encontró el objeto %s", id))
+}
+
+func (g *GeneratorARMInstructions) TagObjecto(id string) {
+	if len(g.Stack) == 0 {
+		panic("No hay objetos en el stack para etiquetar")
+	}
+	g.Stack[len(g.Stack)-1].Id_ = id
 }
 
 func (g *GeneratorARMInstructions) StrObject() ObjectStack {

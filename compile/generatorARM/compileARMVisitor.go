@@ -49,6 +49,59 @@ func (v *CompileARMVisitor) VisitInicio(ctx *gramAntlr.InicioContext) interface{
 	return nil
 }
 
+// --------------------------------- DECLARACIONES ----------------------------------
+func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	offSet, Object := v.C.GetObject(id)
+	if v.InFunction != "" {
+		v.C.Mov(registros.X0, Object.Offset_*8)
+		v.C.Sub(registros.X0, registros.FP, registros.X0)
+		v.C.LDR(registros.X0, registros.X0, 0) //0 es el por defecto
+		v.C.Push(registros.X0)
+		CloneObject := v.C.CloneObject(Object)
+		CloneObject.Id_ = ""
+		v.C.PushObjectStack(CloneObject)
+		return nil
+
+	}
+	v.C.Mov(registros.X0, offSet)
+	v.C.Add(registros.X0, registros.SP, registros.X0)
+	v.C.LDR(registros.X0, registros.X0, 0)
+	v.C.Push(registros.X0)
+	CloneObject := v.C.CloneObject(Object)
+	CloneObject.Id_ = ""
+	v.C.PushObjectStack(CloneObject)
+	return nil
+}
+
+// VisitVarDcl
+func (v *CompileARMVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) interface{} {
+	return v.Visit(ctx.VarDcl())
+}
+
+// 'mut' ID type '=' expr ';'
+func (v *CompileARMVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	expr := ctx.Expr()
+	v.Visit(expr)
+	v.C.COMENT(fmt.Sprintf("Declaracion explicita: %s con tipo %s", id, typeStr))
+
+	if v.InFunction != "" {
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
+		v.C.Sub(registros.X1, registros.FP, registros.X1)
+		v.C.Str(registros.X0, registros.X1)
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		v.FragmentPointerOffSet++
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
 // --------------------------------- EXPRESIONES -----------------------------------
 
 // --------------------------------- TIPO DE DATOS -----------------------------------

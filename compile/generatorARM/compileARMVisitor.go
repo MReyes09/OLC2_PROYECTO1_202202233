@@ -102,6 +102,70 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWit
 	return nil
 }
 
+// 'mut' ID ':=' expr ';'
+func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	expr := ctx.Expr()
+	v.Visit(expr)
+	v.C.COMENT(fmt.Sprintf("Declaracion implicita: %s", id))
+
+	if v.InFunction != "" {
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
+		v.C.Sub(registros.X1, registros.FP, registros.X1)
+		v.C.Str(registros.X0, registros.X1)
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		v.FragmentPointerOffSet++
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
+// 'mut' ID type ';'
+func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	v.C.COMENT(fmt.Sprintf("Declaracion no inicializada: %s con tipo %s", id, typeStr))
+
+	switch typeStr {
+	case "int":
+		var IntObject = v.C.IntObject()
+		v.C.PushConst(IntObject, 0)
+		break
+	case "float64":
+		var FloatObject = v.C.FloatObject()
+		v.C.PushConst(FloatObject, 0.0)
+		break
+	case "string":
+		var StringObject = v.C.StrObject()
+		v.C.PushConst(StringObject, "")
+		break
+	case "bool":
+		var BoolObject = v.C.BoolObject()
+		v.C.PushConst(BoolObject, 0)
+		break
+	default:
+		panic(fmt.Sprintf("Tipo no soportado: %s", typeStr))
+	}
+
+	if v.InFunction != "" {
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
+		v.C.Sub(registros.X1, registros.FP, registros.X1)
+		v.C.Str(registros.X0, registros.X1)
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		v.FragmentPointerOffSet++
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
 // --------------------------------- EXPRESIONES -----------------------------------
 
 // --------------------------------- TIPO DE DATOS -----------------------------------

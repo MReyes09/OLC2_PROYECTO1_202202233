@@ -110,12 +110,12 @@ func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithIn
 	v.C.COMENT(fmt.Sprintf("Declaracion implicita: %s", id))
 
 	if v.InFunction != "" {
-		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		//ValorObjecto := v.C.POPOBJECT(registros.X0)
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		//LocalObjecto.Type_ = ValorObjecto.Type_
+		LocalObjecto.Type_ = ValorObjecto.Type_
 		v.FragmentPointerOffSet++
 		return nil
 	}
@@ -170,18 +170,18 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTyp
 
 // --------------------------------- TIPO DE DATOS -----------------------------------
 func (v *CompileARMVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
-	v.C.COMENT(fmt.Sprintf("cadena_print: %s", ctx.STRING().GetText()))
+	v.C.COMENT(fmt.Sprintf("cadena: %s", ctx.STRING().GetText()))
 
 	texto := ctx.GetText()
 	if strings.HasPrefix(texto, "\"") && strings.HasSuffix(texto, "\"") {
 		texto = texto[1 : len(texto)-1] // eliminar comillas
 	}
 
+	texto = strings.ReplaceAll(texto, `\\`, `\`)
 	texto = strings.ReplaceAll(texto, `\n`, "\n")
 	texto = strings.ReplaceAll(texto, `\t`, "\t")
 	texto = strings.ReplaceAll(texto, `\r`, "\r")
 	texto = strings.ReplaceAll(texto, `\"`, `"`)
-	texto = strings.ReplaceAll(texto, `\\`, `\`)
 
 	strObject := v.C.StrObject()
 	v.C.PushConst(strObject, texto)
@@ -480,9 +480,6 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	// Creamos el visitor para manejar los fragmentos de código y el manejo de offsets (desplazamientos)
 	fragmentVisitor := fragmentvisitor.NewFragmentVisitor(baseOffSet + paramsOffSet)
 
-	/*
-		FALTA IMPLEMENTAR EL MANEJO DE LOS PARAMETROS CON FRAGMENT!!!!
-	*/
 	for _, child := range ctx.Block().GetChildren() {
 		// Debemos verificar que los hijos sean del tipo ParseTree
 		// y luego visitar cada uno de ellos con el fragmentVisitor

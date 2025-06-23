@@ -14,7 +14,7 @@ type FragmentElement struct {
 
 type FragmentVisitor struct {
 	*gramAntlr.BasegramaticaVisitor
-	Fragment    []*FragmentElement
+	Fragment    []FragmentElement
 	LocalOffSet int
 	BaseOffSet  int
 }
@@ -22,7 +22,7 @@ type FragmentVisitor struct {
 func NewFragmentVisitor(baseOffset int) *FragmentVisitor {
 	f := &FragmentVisitor{
 		BasegramaticaVisitor: &gramAntlr.BasegramaticaVisitor{},
-		Fragment:             make([]*FragmentElement, 0),
+		Fragment:             make([]FragmentElement, 0),
 		LocalOffSet:          0,
 		BaseOffSet:           baseOffset,
 	}
@@ -34,4 +34,20 @@ func (f *FragmentVisitor) Visit(tree antlr.ParseTree) interface{} {
 	return tree.Accept(f)
 }
 
-// Implementacion del VisitBlock
+// -------------------------- DECLARACION DE VARIABLES --------------------------
+// Instrucciones: VarDeclStmt
+func (f *FragmentVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) interface{} {
+	f.Visit(ctx.VarDcl())
+	return nil
+}
+
+// varDcl: 'mut'? ID_VARIABLE ':=' expr           # VarDclWithInference
+func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
+	varName := ctx.ID_VARIABLE().GetText()
+	f.Fragment = append(f.Fragment, FragmentElement{
+		Name:   varName,
+		Offset: f.LocalOffSet + f.BaseOffSet,
+	})
+	f.LocalOffSet += 1
+	return nil
+}

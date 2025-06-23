@@ -1,72 +1,8 @@
 func main(){
-  println("Boolean:", true)
-  println("Boolean2:", false)
-  println("Prueba Texto")
-  println("Y numero")
-  println(15)
-
-  println("string y", 199)
-  println("double:", 1.25)
+  ojoPiojo := "piojoOjo"
+	println("hola")
 }
 
-// Probando aritmeticos
 func main(){
-  println("Suma simple enteros")
-  println(10+15)
-  println("")
-
-  println("Suma simple float")
-  println(1.65 + 0.15)
-  println("")
-
-  println("Suma entre strings")
-  println("Hola" + " ¿Como estas?")
-  println("")
-
-  println("Suma entre tipos distintos")
-  println("15 + 1.5 =",15 + 1.5)
-  println("6.99 + 1 =", 6.99 + 1)
-  println("")
-
-  println("Resta simple enteros")
-  println(10-15)
-  println("")
-
-  println("Resta simple float")
-  println(1.65 - 0.15)
-  println("")
-
-  println("Suma entre tipos distintos")
-  println("15 - 1.5 =",15 - 1.5)
-  println("")
-}
-
-// Negacion
-func main(){
-  println("-1", -1)
-  println("Decimal normal 2.6 =", 2.6)
-
-  //println("-2.3", -2.3)
-  //println("-5.3", -5.3)
-}
-
-// * | / | %
-func main(){
-  // Multiplicación
-    println("5 * 2 =", 5 * 2)
-
-    // División
-    println("10 / 2 =", 10 / 2)
-
-    // Módulo
-    println("9 % 4 =", 9 % 4)
-
-    // Float multiplicación
-    println("5.5 * 2.0 =", 5.5 * 2.0)
-
-    // Float división
-    println("10.0 / 4.0 =", 10.0 / 4.0)
-
-    // Mezcla int + float
-    println("5 * 2.5 =", 5 * 2.5)
+  println("Pasito perron")
 }

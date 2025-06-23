@@ -11,10 +11,6 @@ _start:
  mov x29, sp
  adr x10, heap
  bl main
-// Entero: 1
-MOV x0, #1
-STR x0, [SP, #-8]!
-// Declaracion explicita: miVar1 con tipo int
 MOV x0, #0
 MOV x8, #93
 SVC #0
@@ -23,9 +19,63 @@ SVC #0
 main:
 stp x29, x30, [sp, #-16]!
 mov x29, sp
+// cadena: "piojoOjo"
+SUB SP, SP, #8
+STR x10, [SP, #0]
+// Byte: 112 uso de Heap: 'p'
+MOV w0, #112
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 105 uso de Heap: 'i'
+MOV w0, #105
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 111 uso de Heap: 'o'
+MOV w0, #111
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 106 uso de Heap: 'j'
+MOV w0, #106
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 111 uso de Heap: 'o'
+MOV w0, #111
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 79 uso de Heap: 'O'
+MOV w0, #79
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 106 uso de Heap: 'j'
+MOV w0, #106
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 111 uso de Heap: 'o'
+MOV w0, #111
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Byte: 0 uso de Heap: '\x00'
+MOV w0, #0
+STRB w0, [x10]
+MOV x0, #1
+ADD x10, x10, x0
+// Declaracion implicita: ojoPiojo
+LDR x0, [SP], #8
+MOV x1, #0
+SUB x1, x29, x1
+STR x0, [x1, #0]
 // Función embebida: println
-// cadena_print: "hola-"
-STR x10, [SP, #-8]!
+// cadena: "hola"
+SUB SP, SP, #8
+STR x10, [SP, #0]
 // Byte: 104 uso de Heap: 'h'
 MOV w0, #104
 STRB w0, [x10]
@@ -43,11 +93,6 @@ MOV x0, #1
 ADD x10, x10, x0
 // Byte: 97 uso de Heap: 'a'
 MOV w0, #97
-STRB w0, [x10]
-MOV x0, #1
-ADD x10, x10, x0
-// Byte: 45 uso de Heap: '-'
-MOV w0, #45
 STRB w0, [x10]
 MOV x0, #1
 ADD x10, x10, x0

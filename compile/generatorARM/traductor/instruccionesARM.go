@@ -98,6 +98,14 @@ func (g *GeneratorARMInstructions) Push(rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [SP, #-8]!", rs))
 }
 
+func (g *GeneratorARMInstructions) PushStack0(rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [SP, #0]", rs))
+}
+
+func (g *GeneratorARMInstructions) PushTemp() {
+	g.Instrucciones = append(g.Instrucciones, "SUB SP, SP, #8")
+}
+
 func (g *GeneratorARMInstructions) Pop(rd string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [SP], #8", rd))
 }
@@ -243,7 +251,6 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 	case Int, Bool, Rune:
 		g.Mov(registros.X0, valor.(int))
 		g.Push(registros.X0)
-		break
 
 	case Float:
 		floatBits := math.Float64bits(valor.(float64))
@@ -262,11 +269,12 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 		}
 
 		g.Push(registros.X0)
-		break
 
 	case StringType:
+		g.PushTemp()
+		g.PushStack0(registros.HP)
 		cadena := primitvos.StringToByte(valor.(string))
-		g.Push(registros.HP)
+		//g.Push(registros.HP)
 
 		for _, charCode := range cadena {
 			g.COMENT(fmt.Sprintf("Byte: %d uso de Heap: %q", charCode, charCode))
@@ -275,7 +283,6 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 			g.Mov(registros.X0, 1)
 			g.Add(registros.HP, registros.HP, registros.X0)
 		}
-		break
 	default:
 		panic(fmt.Sprintf("Tipo de objeto no soportado: %v", object.Type_))
 	}

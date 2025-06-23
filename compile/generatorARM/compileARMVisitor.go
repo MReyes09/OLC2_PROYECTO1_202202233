@@ -88,12 +88,12 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWit
 	v.C.COMENT(fmt.Sprintf("Declaracion explicita: %s con tipo %s", id, typeStr))
 
 	if v.InFunction != "" {
-		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		//ValorObjecto := v.C.POPOBJECT(registros.X0)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		LocalObjecto.Type_ = ValorObjecto.Type_
+		//LocalObjecto.Type_ = ValorObjecto.Type_
 		v.FragmentPointerOffSet++
 		return nil
 	}
@@ -110,12 +110,12 @@ func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithIn
 	v.C.COMENT(fmt.Sprintf("Declaracion implicita: %s", id))
 
 	if v.InFunction != "" {
-		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		//ValorObjecto := v.C.POPOBJECT(registros.X0)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		LocalObjecto.Type_ = ValorObjecto.Type_
+		//LocalObjecto.Type_ = ValorObjecto.Type_
 		v.FragmentPointerOffSet++
 		return nil
 	}
@@ -152,12 +152,12 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTyp
 	}
 
 	if v.InFunction != "" {
-		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		//ValorObjecto := v.C.POPOBJECT(registros.X0)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		LocalObjecto.Type_ = ValorObjecto.Type_
+		//LocalObjecto.Type_ = ValorObjecto.Type_
 		v.FragmentPointerOffSet++
 		return nil
 	}

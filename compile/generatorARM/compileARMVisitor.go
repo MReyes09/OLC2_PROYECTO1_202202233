@@ -52,13 +52,14 @@ func (v *CompileARMVisitor) VisitInicio(ctx *gramAntlr.InicioContext) interface{
 // --------------------------------- DECLARACIONES ----------------------------------
 func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
 	id := ctx.ID_VARIABLE().GetText()
-	offSet, Object := v.C.GetObject(id)
+	offSet, object := v.C.GetObject(id)
+	fmt.Println("Encontramos el objeto:", object.Id_, "con tipo:", object.Type_, "y offset:", offSet)
 	if v.InFunction != "" {
-		v.C.Mov(registros.X0, Object.Offset_*8)
+		v.C.Mov(registros.X0, offSet)
 		v.C.Sub(registros.X0, registros.FP, registros.X0)
 		v.C.LDR(registros.X0, registros.X0, 0) //0 es el por defecto
 		v.C.Push(registros.X0)
-		CloneObject := v.C.CloneObject(Object)
+		CloneObject := v.C.CloneObject(object)
 		CloneObject.Id_ = ""
 		v.C.PushObjectStack(CloneObject)
 		return nil
@@ -68,7 +69,7 @@ func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) in
 	v.C.Add(registros.X0, registros.SP, registros.X0)
 	v.C.LDR(registros.X0, registros.X0, 0)
 	v.C.Push(registros.X0)
-	CloneObject := v.C.CloneObject(Object)
+	CloneObject := v.C.CloneObject(object)
 	CloneObject.Id_ = ""
 	v.C.PushObjectStack(CloneObject)
 	return nil
@@ -88,12 +89,12 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWit
 	v.C.COMENT(fmt.Sprintf("Declaracion explicita: %s con tipo %s", id, typeStr))
 
 	if v.InFunction != "" {
-		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		//ValorObjecto := v.C.POPOBJECT(registros.X0)
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		//LocalObjecto.Type_ = ValorObjecto.Type_
+		LocalObjecto.Type_ = ValorObjecto.Type_
 		v.FragmentPointerOffSet++
 		return nil
 	}
@@ -129,7 +130,6 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTyp
 	id := ctx.ID_VARIABLE().GetText()
 	typeStr := ctx.Type_().GetText()
 	v.C.COMENT(fmt.Sprintf("Declaracion no inicializada: %s con tipo %s", id, typeStr))
-
 	switch typeStr {
 	case "int":
 		var IntObject = v.C.IntObject()
@@ -152,12 +152,17 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTyp
 	}
 
 	if v.InFunction != "" {
-		//LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-		//ValorObjecto := v.C.POPOBJECT(registros.X0)
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		fmt.Println("Obtuve var:", LocalObjecto.Id_, "tipo:", LocalObjecto.Type_)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		fmt.Println("En ultima posicion:", ValorObjecto.Id_, "tipo:", ValorObjecto.Type_)
 		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
 		v.C.Sub(registros.X1, registros.FP, registros.X1)
 		v.C.Str(registros.X0, registros.X1)
-		//LocalObjecto.Type_ = ValorObjecto.Type_
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		fmt.Println("Verificamos si actualizo")
+		temp := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		fmt.Println("Obtuve var:", temp.Id_, "tipo:", temp.Type_)
 		v.FragmentPointerOffSet++
 		return nil
 	}
@@ -440,7 +445,6 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 		} else {
 			value = v.C.POPOBJECT(registros.X0)
 		}
-
 		switch value.Type_ {
 		case traductor.Int:
 			v.C.ImprimirEntero(registros.X0)

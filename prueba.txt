@@ -1,8 +1,10 @@
 func main(){
-  ojoPiojo := "piojoOjo"
 	println("hola")
-}
 
-func main(){
-  println("Pasito perron")
+	mut miVar1 int
+	mut miVar2 float64 = 12.2
+	mut miVar3 := 3
+
+  println(miVar1)
+  println(miVar3)
 }

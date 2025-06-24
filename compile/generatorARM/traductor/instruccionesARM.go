@@ -201,24 +201,17 @@ func (g *GeneratorARMInstructions) EndProgram() {
 
 // ------------------------ FUNCIONES EXTRA ------------------------
 
-func (g *GeneratorARMInstructions) GetFrameLocal(index int) ObjectStack {
-	var voidObjects []ObjectStack
+func (g *GeneratorARMInstructions) GetFrameLocal(index int) *ObjectStack {
 
-	for _, obj := range g.Stack {
-		if obj.Type_ == Void {
-			voidObjects = append(voidObjects, obj)
-		}
-	}
-
-	if index < 0 || index >= len(voidObjects) {
+	if index < 0 || index >= len(g.Stack) {
 		panic(fmt.Sprintf("Índice %d fuera de rango para objetos de tipo Void", index))
 	}
+	return &g.Stack[index]
 
-	return voidObjects[index]
 }
 
-func (g *GeneratorARMInstructions) PushObjectStack(ObjectStack ObjectStack) {
-	g.Stack = append(g.Stack, ObjectStack)
+func (g *GeneratorARMInstructions) PushObjectStack(objectStack ObjectStack) {
+	g.Stack = append(g.Stack, objectStack)
 }
 
 func (g *GeneratorARMInstructions) GetLabel() string {
@@ -286,7 +279,6 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 	default:
 		panic(fmt.Sprintf("Tipo de objeto no soportado: %v", object.Type_))
 	}
-
 	g.PushObjectStack(object)
 }
 
@@ -301,7 +293,7 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
 	byteOffset := 0
 
-	for i := len(g.Stack) - 1; i >= 0; i-- {
+	for i := 0; i < len(g.Stack); i++ {
 		if g.Stack[i].Id_ == id {
 			return byteOffset, g.Stack[i]
 		}
@@ -315,6 +307,7 @@ func (g *GeneratorARMInstructions) TagObjecto(id string) {
 	if len(g.Stack) == 0 {
 		panic("No hay objetos en el stack para etiquetar")
 	}
+	fmt.Println("g.Stack[len(g.Stack)-1].Id_:", g.Stack[len(g.Stack)-1].Id_, "con id:", id, "y tipo:", g.Stack[len(g.Stack)-1].Type_)
 	g.Stack[len(g.Stack)-1].Id_ = id
 }
 

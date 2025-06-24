@@ -51,3 +51,23 @@ func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 	f.LocalOffSet += 1
 	return nil
 }
+
+func (f *FragmentVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
+	varName := ctx.ID_VARIABLE().GetText()
+	f.Fragment = append(f.Fragment, FragmentElement{
+		Name:   varName,
+		Offset: f.LocalOffSet + f.BaseOffSet,
+	})
+	f.LocalOffSet += 1
+	return nil
+}
+
+func (f *FragmentVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
+	varName := ctx.ID_VARIABLE().GetText()
+	f.Fragment = append(f.Fragment, FragmentElement{
+		Name:   varName,
+		Offset: f.LocalOffSet + f.BaseOffSet,
+	})
+	f.LocalOffSet += 1
+	return nil
+}

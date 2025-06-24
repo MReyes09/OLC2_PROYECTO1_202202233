@@ -49,6 +49,7 @@ func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
 	f.LocalOffSet += 1
+	f.Visit(ctx.Expr())
 	return nil
 }
 
@@ -59,6 +60,7 @@ func (f *FragmentVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithT
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
 	f.LocalOffSet += 1
+	f.Visit(ctx.Expr())
 	return nil
 }
 
@@ -69,5 +71,28 @@ func (f *FragmentVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
 	f.LocalOffSet += 1
+	return nil
+}
+
+func (f *FragmentVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
+	//Visitamos imprimir
+	f.Visit(ctx.Imprimir())
+	return nil
+}
+
+func (f *FragmentVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{} {
+	// recorremos todas las expresiones dentro del println
+	for _, expr := range ctx.AllExpr() {
+		// recuerda aumentar el offset de la base
+		f.Visit(expr)
+	}
+	return nil
+}
+
+func (f *FragmentVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
+	// Aquí podrías manejar la cadena literal si es necesario
+	// LLegamos a un terminal! ya podemos aumentar el offset pues string necesita su espacio
+	f.LocalOffSet += 1
+
 	return nil
 }

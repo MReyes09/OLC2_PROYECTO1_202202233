@@ -35,9 +35,9 @@ type GeneratorARMInstructions struct {
 	FuncionesInstrucciones []string
 	Estandar               *funciones.EstandarFunc
 	Stack                  []ObjectStack
-
-	depth             int
-	contadorEtiquetas int
+	PositionFramePointer   int
+	depth                  int
+	contadorEtiquetas      int
 }
 
 func NewGeneratorARMInstructions() *GeneratorARMInstructions {
@@ -46,6 +46,7 @@ func NewGeneratorARMInstructions() *GeneratorARMInstructions {
 		FuncionesInstrucciones: []string{},
 		Estandar:               funciones.NewEstandarFunc(),
 		Stack:                  []ObjectStack{},
+		PositionFramePointer:   0,
 		depth:                  0,
 		contadorEtiquetas:      0,
 	}
@@ -94,32 +95,32 @@ func (g *GeneratorARMInstructions) Mov(rd string, valueDirect int) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV %s, #%d", rd, valueDirect))
 }
 
+func (g *GeneratorARMInstructions) MovReg(rd string, rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV %s, %s", rd, rs))
+}
+
 func (g *GeneratorARMInstructions) Push(rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [SP, #-8]!", rs))
 }
 
-func (g *GeneratorARMInstructions) PushStack0(rs string) {
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [SP, #0]", rs))
-}
-
-func (g *GeneratorARMInstructions) PushTemp() {
-	g.Instrucciones = append(g.Instrucciones, "SUB SP, SP, #8")
+func (g *GeneratorARMInstructions) PushInFramePointer(rs string, PositionFramePointer int) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, PositionFramePointer))
 }
 
 func (g *GeneratorARMInstructions) Pop(rd string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [SP], #8", rd))
 }
 
+func (g *GeneratorARMInstructions) PopInStackPointer(PositionFramePointer int) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ADD sp, sp, #%d", PositionFramePointer))
+}
+
 func (g *GeneratorARMInstructions) Srtb(rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STRB %s, [%s]", rs1, rs2))
 }
 
-func (g *GeneratorARMInstructions) Str(rs1 string, rs2 string, offset ...int) {
-	off := 0
-	if len(offset) > 0 {
-		off = offset[0]
-	}
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [%s, #%d]", rs1, rs2, off))
+func (g *GeneratorARMInstructions) Str(rs string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, g.PositionFramePointer*8))
 }
 
 func (g *GeneratorARMInstructions) Svc() {
@@ -183,6 +184,10 @@ func (g *GeneratorARMInstructions) Espaciado() {
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
 }
 
+func (g *GeneratorARMInstructions) SetAsideSizeFrameFunction(size int) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SUB SP, SP, #%d", size))
+}
+
 func (g *GeneratorARMInstructions) Neg(rd string, rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("NEG %s, %s", rd, rs))
 }
@@ -206,6 +211,7 @@ func (g *GeneratorARMInstructions) GetFrameLocal(index int) *ObjectStack {
 	if index < 0 || index >= len(g.Stack) {
 		panic(fmt.Sprintf("Índice %d fuera de rango para objetos de tipo Void", index))
 	}
+
 	return &g.Stack[index]
 
 }
@@ -230,7 +236,7 @@ func (g *GeneratorARMInstructions) COMENT(comentario string) {
 func (g *GeneratorARMInstructions) POPOBJECT(rd string) ObjectStack {
 	object := g.Stack[len(g.Stack)-1]
 	g.POPOBJECT2()
-	g.Pop(rd)
+	//g.Pop(rd) Esto lo quitamos porque manejamos el frame pointer y no stack pointer "CAUSA ERROR SI SE DESCOMENTA!"
 	return object
 
 }
@@ -264,10 +270,9 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 		g.Push(registros.X0)
 
 	case StringType:
-		g.PushTemp()
-		g.PushStack0(registros.HP)
+		// Agregamos STR registro, [x29, #-posicionFramePointer]   // guardar dirección del string en la posicion correcta
+		g.PushInFramePointer(registros.X0, g.PositionFramePointer*8)
 		cadena := primitvos.StringToByte(valor.(string))
-		//g.Push(registros.HP)
 
 		for _, charCode := range cadena {
 			g.COMENT(fmt.Sprintf("Byte: %d uso de Heap: %q", charCode, charCode))
@@ -286,7 +291,9 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 	if len(g.Stack) == 0 {
 		panic("No hay objetos en el stack")
 	}
-	return g.Stack[len(g.Stack)-1]
+	topObjectStack := g.Stack[len(g.Stack)-1]
+	fmt.Println("id_Top:", topObjectStack.Id_, "tipo:", topObjectStack.Type_, "offset:", topObjectStack.Offset_)
+	return topObjectStack
 }
 
 // GetObject busca un objeto en el Stack por su Id_ y devuelve el desplazamiento (Offset_) y el objeto encontrado
@@ -295,7 +302,7 @@ func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
 
 	for i := 0; i < len(g.Stack); i++ {
 		if g.Stack[i].Id_ == id {
-			return byteOffset, g.Stack[i]
+			return g.Stack[i].Offset_, g.Stack[i]
 		}
 		byteOffset += g.Stack[i].Length_
 	}
@@ -354,7 +361,7 @@ func (g *GeneratorARMInstructions) CloneObject(object ObjectStack) ObjectStack {
 		Depth_:        g.depth,
 		Id_:           object.Id_,
 		TipoElemento_: object.TipoElemento_,
-		//Offset_:       object.Offset_,
+		Offset_:       object.Offset_,
 	}
 }
 

@@ -44,12 +44,17 @@ func (f *FragmentVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) in
 // varDcl: 'mut'? ID_VARIABLE ':=' expr           # VarDclWithInference
 func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	varName := ctx.ID_VARIABLE().GetText()
+
+	// Primero visitamos la expresión, para que incremente el offset si es necesario
+	f.Visit(ctx.Expr())
+
+	// Luego asignamos el offset de la variable (después de todo lo que la expresión haya usado)
 	f.Fragment = append(f.Fragment, FragmentElement{
 		Name:   varName,
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
-	f.LocalOffSet += 1
-	f.Visit(ctx.Expr())
+
+	f.LocalOffSet += 1 // para la propia variable
 	return nil
 }
 
@@ -94,5 +99,14 @@ func (f *FragmentVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} 
 	// LLegamos a un terminal! ya podemos aumentar el offset pues string necesita su espacio
 	f.LocalOffSet += 1
 
+	return nil
+}
+
+func (f *FragmentVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{} {
+	/*
+		Agregamos el VisitInteger pero ho hacemos nada especial con él.
+		Usaremos el valor inmediato en el código ARM generado.
+		Evitamos usar el offset aquí porque no necesitamos almacenar un entero
+	*/
 	return nil
 }

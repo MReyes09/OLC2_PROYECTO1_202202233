@@ -56,13 +56,23 @@ func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) in
 	id := ctx.ID_VARIABLE().GetText()
 	// Verificamos si el identificador existe en nuestra tabla de símbolos
 	offSet, object := v.C.GetObject(id)
+	fmt.Println("Mostrando el resultado")
+	fmt.Println("Offset:", offSet, "Object.Id:", object.Id_, "Object.Type:", object.Type_)
 
 	if v.InFunction != "" {
+		//ALTERACION CON IDENTIFIER!!!
+		// MOVILIZAMOS EL VALOR AL REGISTRO SEGUN EL TIPO DE DATO!
+		switch object.Type_ {
+		case traductor.Int, traductor.Bool:
+			// Los tipos enteros van dirigidos al registro x1
+			v.C.LDR(registros.X1, registros.X29, -offSet*8)
+		case traductor.StringType:
+			// Los tipos string van dirigidos al registro x0
+			v.C.LDR(registros.X0, registros.X29, -offSet*8)
+			// Movemos el registro x0 al x11 para que sea manipulado
+			v.C.MovReg(registros.X11, registros.X0)
+		}
 
-		// Hacemos la carga del objecto con el offset y recuperamos el objeto
-		v.C.LDR(registros.X0, registros.X29, -offSet*8)
-		// Movemos el registro x0 al x11 para que sea manipulado
-		v.C.MovReg(registros.X11, registros.X0)
 		// Copiamos el objeto para manipularlo
 		CloneObject := v.C.CloneObject(object)
 		CloneObject.Id_ = ""
@@ -115,15 +125,11 @@ func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithIn
 	expr := ctx.Expr()
 	// Generamos el codigo para la expresion a asignar
 	v.Visit(expr)
-	// Comentario para la declaracion implicita
-	v.C.COMENT(fmt.Sprintf("Declaracion implicita: %s", id))
 
 	// Si estamos dentro de una funcion, guardamos el objeto en el frame local
 	if v.InFunction != "" {
-
-		// Obtenemos el objeto local y el valor del objeto
+		v.C.COMENT(fmt.Sprintf("Declaracion inferida: %s", id))
 		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
-
 		// Evaluamos el ultimo objeto en la pila
 		ValorObjecto := v.C.POPOBJECT(registros.X0)
 		// Movemos el valor anterior al registro x0 que es mi variable que se guardara en frame pointer
@@ -132,6 +138,9 @@ func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithIn
 		case traductor.StringType:
 			v.C.MovReg(registros.X0, registros.X11) // x11 es el registro para strings y el inicio de la cadena
 		case traductor.Int:
+			// Movemos el registro x1 cone el valor al registro x0
+			v.C.MovReg(registros.X0, registros.X1) // x1 es el registro para enteros
+		case traductor.Bool:
 			// Agregar aqui
 		case traductor.Float:
 			// Agregar aqui
@@ -232,6 +241,7 @@ func (v *CompileARMVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interfac
 
 	v.C.COMENT(fmt.Sprintf("Entero: %d", value))
 
+	// Indispensable para reconocimiento de tipo entero en print o cualquier otra operacion!
 	IntObject := v.C.IntObject()
 	v.C.PushConst(IntObject, value)
 
@@ -479,7 +489,8 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 
 		switch value.Type_ {
 		case traductor.Int:
-			v.C.ImprimirEntero(registros.X0)
+			// Mandamos el registro x1 pues anteriormente hicimos un mov x1 con el valor entero
+			v.C.ImprimirEntero(registros.X1)
 		case traductor.Float:
 			v.C.ImprimirDecimal()
 		case traductor.StringType:
@@ -505,8 +516,6 @@ func (v *CompileARMVisitor) VisitFunctionStmt(ctx *gramAntlr.FunctionStmtContext
 
 // functions: 'func' ID_VARIABLE '(' (ID_VARIABLE type (',' ID_VARIABLE type)*)? ')' valRet? block # Funciones
 func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) interface{} {
-	// Reiniciamos el offset del frame pointer
-	v.PositionFramePointer = 1
 	//Manjamos estados de la pila
 	baseOffSet := 2
 	paramsOffSet := 0
@@ -515,6 +524,8 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	if len(ctx.AllID_VARIABLE()) > 1 {
 		paramsOffSet = len(ctx.AllID_VARIABLE()) - 1
 	}
+	// Inicializamos el PositionFramePointer con baseOffSet
+	v.PositionFramePointer = baseOffSet
 
 	// Creamos el visitor para manejar los fragmentos de código y el manejo de offsets (desplazamientos)
 	fragmentVisitor := fragmentvisitor.NewFragmentVisitor(baseOffSet + paramsOffSet)
@@ -523,7 +534,9 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 		// Debemos verificar que los hijos sean del tipo ParseTree
 		// y luego visitar cada uno de ellos con el fragmentVisitor
 		if node, ok := child.(antlr.ParseTree); ok {
+			fmt.Println("Visitando nodo:", node.GetText())
 			fragmentVisitor.Visit(node)
+			fmt.Println("LocalOffset:", fragmentVisitor.LocalOffSet)
 		}
 	}
 
@@ -532,7 +545,9 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	localOffSet := fragmentVisitor.LocalOffSet
 	returnOffSet := 1
 	nameFunction := ctx.ID_VARIABLE(0).GetText()
+	fmt.Println("SizeFragment: baseOffSet", baseOffSet, "paramsOffSet", paramsOffSet, "localOffSet", localOffSet, "returnOffSet", returnOffSet)
 	sizeFragment := baseOffSet + paramsOffSet + localOffSet + returnOffSet
+	fmt.Println("SizeFragment (bytes):", sizeFragment)
 
 	typeReturn := traductor.Void
 
@@ -561,8 +576,9 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 			})
 		}
 	}
-
+	fmt.Println("Generando objetos de fragmento:")
 	for _, instruction := range fragment {
+		fmt.Println("Pushing fragment object:", instruction.Name, "Offset:", instruction.Offset)
 		v.C.PushObjectStack(traductor.ObjectStack{
 			Type_:   traductor.Void,
 			Id_:     instruction.Name,
@@ -585,11 +601,14 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 		v.C.SetAsideSizeFrameFunction(sizeFragment * 8)
 	}
 	//Recorremos el bloque de instrucciones
+	fmt.Println("Instrucciones dentro del bloque")
 	for _, child := range ctx.Block().GetChildren() {
 		// Debemos verificar que los hijos sean del tipo ParseTree
 		// y luego visitar cada uno de ellos con el fragmentVisitor
 		if node, ok := child.(antlr.ParseTree); ok {
+			fmt.Println("Visitando nodo en bloque:", node.GetText())
 			v.Visit(node)
+			fmt.Println("Posicion del Frame Pointer:", v.PositionFramePointer)
 		}
 	}
 

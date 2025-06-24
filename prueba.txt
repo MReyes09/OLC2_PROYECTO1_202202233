@@ -1,8 +1,14 @@
+// NUEVO!
 func main(){
-	x := "Mensaje 1"
-  println("Saludando")
-  y := "Mensaje 2"
-  println(x)
-  println(y)
-  println("FUNCIONOOOOOOOOOOOOOOOOOO")
-}
+  println("Valor numero:", 10)
+  println("Declaracion x := 123")
+  y := "Saludando!"
+  x := 123
+  println("Y ->", y)
+  println("X ->", x)
+
+  println("al reves")
+  println("X ->", x)
+  println("Y ->", y)
+
+}   

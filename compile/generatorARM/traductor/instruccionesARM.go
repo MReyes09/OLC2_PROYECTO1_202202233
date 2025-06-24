@@ -146,7 +146,10 @@ func (g *GeneratorARMInstructions) ImprimirCadena(rs string) {
 }
 
 func (g *GeneratorARMInstructions) ImprimirEntero(rs string) {
+	// Agregamos a la lista de llamadas a la función estándar de impresión de enteros
 	g.Estandar.Usar("print_entero")
+
+	// Preparamos el entero en el registro x0 para su impresion con print_entero
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))
 	g.Instrucciones = append(g.Instrucciones, "BL print_entero")
 }
@@ -248,8 +251,8 @@ func (g *GeneratorARMInstructions) POPOBJECT2() {
 func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface{}) {
 	switch object.Type_ {
 	case Int, Bool, Rune:
-		g.Mov(registros.X0, valor.(int))
-		g.Push(registros.X0)
+		g.Mov(registros.X1, valor.(int))
+		//g.Push(registros.X0)
 
 	case Float:
 		floatBits := math.Float64bits(valor.(float64))
@@ -292,7 +295,7 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 		panic("No hay objetos en el stack")
 	}
 	topObjectStack := g.Stack[len(g.Stack)-1]
-	fmt.Println("id_Top:", topObjectStack.Id_, "tipo:", topObjectStack.Type_, "offset:", topObjectStack.Offset_)
+	//fmt.Println("id_Top:", topObjectStack.Id_, "tipo:", topObjectStack.Type_, "offset:", topObjectStack.Offset_)
 	return topObjectStack
 }
 
@@ -301,6 +304,7 @@ func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
 	byteOffset := 0
 
 	for i := 0; i < len(g.Stack); i++ {
+		fmt.Println("Buscando objeto con id:", id, "en el stack, objeto actual:", g.Stack[i].Id_, "con tipo:", g.Stack[i].Type_, "y offset:", g.Stack[i].Offset_)
 		if g.Stack[i].Id_ == id {
 			return g.Stack[i].Offset_, g.Stack[i]
 		}

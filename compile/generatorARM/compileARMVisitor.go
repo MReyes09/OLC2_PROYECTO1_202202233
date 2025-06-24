@@ -19,6 +19,7 @@ type CompileARMVisitor struct {
 	InFunction            string
 	FragmentPointerOffSet int
 	ReturnLabels          string
+	PositionFramePointer  int
 }
 
 type DataFuncion struct {
@@ -34,6 +35,7 @@ func NewCompileARMVisitor() *CompileARMVisitor {
 		InFunction:            "",
 		FragmentPointerOffSet: 0,
 		ReturnLabels:          "",
+		PositionFramePointer:  1,
 	}
 	return v
 }
@@ -49,26 +51,184 @@ func (v *CompileARMVisitor) VisitInicio(ctx *gramAntlr.InicioContext) interface{
 	return nil
 }
 
+// --------------------------------- DECLARACIONES ----------------------------------
+func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	// Verificamos si el identificador existe en nuestra tabla de símbolos
+	offSet, object := v.C.GetObject(id)
+	fmt.Println("Mostrando el resultado")
+	fmt.Println("Offset:", offSet, "Object.Id:", object.Id_, "Object.Type:", object.Type_)
+
+	if v.InFunction != "" {
+		//ALTERACION CON IDENTIFIER!!!
+		// MOVILIZAMOS EL VALOR AL REGISTRO SEGUN EL TIPO DE DATO!
+		switch object.Type_ {
+		case traductor.Int, traductor.Bool:
+			// Los tipos enteros van dirigidos al registro x1
+			v.C.LDR(registros.X1, registros.X29, -offSet*8)
+		case traductor.StringType:
+			// Los tipos string van dirigidos al registro x0
+			v.C.LDR(registros.X0, registros.X29, -offSet*8)
+			// Movemos el registro x0 al x11 para que sea manipulado
+			v.C.MovReg(registros.X11, registros.X0)
+		}
+
+		// Copiamos el objeto para manipularlo
+		CloneObject := v.C.CloneObject(object)
+		CloneObject.Id_ = ""
+		// Colocamos el objeto clonado en la pila para que sea manipulado
+		v.C.PushObjectStack(CloneObject)
+		return nil
+
+	}
+
+	v.C.Mov(registros.X0, offSet)
+	v.C.Add(registros.X0, registros.SP, registros.X0)
+	v.C.LDR(registros.X0, registros.X0, 0)
+	v.C.Push(registros.X0)
+	CloneObject := v.C.CloneObject(object)
+	v.C.PushObjectStack(CloneObject)
+	return nil
+}
+
+// VisitVarDcl
+func (v *CompileARMVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) interface{} {
+	return v.Visit(ctx.VarDcl())
+}
+
+// 'mut' ID type '=' expr ';'
+func (v *CompileARMVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	expr := ctx.Expr()
+	v.Visit(expr)
+	v.C.COMENT(fmt.Sprintf("Declaracion explicita: %s con tipo %s", id, typeStr))
+
+	if v.InFunction != "" {
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
+		v.C.Sub(registros.X1, registros.FP, registros.X1)
+		//v.C.Str(registros.X0, registros.X1)
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		v.FragmentPointerOffSet++
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
+// 'mut' ID ':=' expr ';'
+func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	expr := ctx.Expr()
+	// Generamos el codigo para la expresion a asignar
+	v.Visit(expr)
+
+	// Si estamos dentro de una funcion, guardamos el objeto en el frame local
+	if v.InFunction != "" {
+		v.C.COMENT(fmt.Sprintf("Declaracion inferida: %s", id))
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		// Evaluamos el ultimo objeto en la pila
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		// Movemos el valor anterior al registro x0 que es mi variable que se guardara en frame pointer
+		// Validamos que tipo de dato  es para saber que registro usar
+		switch ValorObjecto.Type_ {
+		case traductor.StringType:
+			v.C.MovReg(registros.X0, registros.X11) // x11 es el registro para strings y el inicio de la cadena
+		case traductor.Int:
+			// Movemos el registro x1 cone el valor al registro x0
+			v.C.MovReg(registros.X0, registros.X1) // x1 es el registro para enteros
+		case traductor.Bool:
+			// Agregar aqui
+		case traductor.Float:
+			// Agregar aqui
+		}
+		// Reservamos el espacio en el frame pointer
+		v.C.PositionFramePointer = v.PositionFramePointer
+		// Restamos el frame pointer al offset del frame pointer
+		v.C.Str(registros.X0)
+		// Cambiamos el tipo del objeto local al tipo del valor del objeto
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		// Aumentamos el offset del frame pointer
+		v.FragmentPointerOffSet++
+		// Aumentamos el frame pointer para la siguiente variable
+		v.PositionFramePointer += 1
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
+// 'mut' ID type ';'
+func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeOnlyContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	typeStr := ctx.Type_().GetText()
+	v.C.COMENT(fmt.Sprintf("Declaracion no inicializada: %s con tipo %s", id, typeStr))
+	switch typeStr {
+	case "int":
+		var IntObject = v.C.IntObject()
+		v.C.PushConst(IntObject, 0)
+		break
+	case "float64":
+		var FloatObject = v.C.FloatObject()
+		v.C.PushConst(FloatObject, 0.0)
+		break
+	case "string":
+		var StringObject = v.C.StrObject()
+		v.C.PushConst(StringObject, "")
+		break
+	case "bool":
+		var BoolObject = v.C.BoolObject()
+		v.C.PushConst(BoolObject, 0)
+		break
+	default:
+		panic(fmt.Sprintf("Tipo no soportado: %s", typeStr))
+	}
+
+	if v.InFunction != "" {
+		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
+		ValorObjecto := v.C.POPOBJECT(registros.X0)
+		v.C.Mov(registros.X1, v.FragmentPointerOffSet*8)
+		v.C.Sub(registros.X1, registros.FP, registros.X1)
+		//v.C.Str(registros.X0, registros.X1)
+		LocalObjecto.Type_ = ValorObjecto.Type_
+		v.FragmentPointerOffSet++
+		return nil
+	}
+
+	v.C.TagObjecto(id)
+	return nil
+}
+
 // --------------------------------- EXPRESIONES -----------------------------------
 
 // --------------------------------- TIPO DE DATOS -----------------------------------
 func (v *CompileARMVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
-	v.C.COMENT(fmt.Sprintf("cadena_print: %s", ctx.STRING().GetText()))
+	v.C.COMENT(fmt.Sprintf("cadena: %s", ctx.STRING().GetText()))
 
 	texto := ctx.GetText()
 	if strings.HasPrefix(texto, "\"") && strings.HasSuffix(texto, "\"") {
 		texto = texto[1 : len(texto)-1] // eliminar comillas
 	}
 
+	texto = strings.ReplaceAll(texto, `\\`, `\`)
 	texto = strings.ReplaceAll(texto, `\n`, "\n")
 	texto = strings.ReplaceAll(texto, `\t`, "\t")
 	texto = strings.ReplaceAll(texto, `\r`, "\r")
 	texto = strings.ReplaceAll(texto, `\"`, `"`)
-	texto = strings.ReplaceAll(texto, `\\`, `\`)
 
 	strObject := v.C.StrObject()
+	// Pasamos la posicion actual del frame pointer
+	v.C.PositionFramePointer = v.PositionFramePointer
+	//Guardamos el inicio del string antes de juntarlo
+	v.C.MovReg(registros.X11, registros.X10)
+	// Manipulamos el string para unificarlo
 	v.C.PushConst(strObject, texto)
-
+	// Actualizamos la posicion del frame pointer 1 byte mas
+	v.PositionFramePointer += 1
 	return nil
 }
 
@@ -81,6 +241,7 @@ func (v *CompileARMVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interfac
 
 	v.C.COMENT(fmt.Sprintf("Entero: %d", value))
 
+	// Indispensable para reconocimiento de tipo entero en print o cualquier otra operacion!
 	IntObject := v.C.IntObject()
 	v.C.PushConst(IntObject, value)
 
@@ -316,7 +477,9 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 
 	for _, exprCtx := range ctx.AllExpr() {
 		v.Visit(exprCtx)
+		// Extraemos el primer elemento de la pila
 		isFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+
 		var value traductor.ObjectStack
 		if isFloat {
 			value = v.C.POPOBJECT(registros.D0)
@@ -326,10 +489,12 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 
 		switch value.Type_ {
 		case traductor.Int:
-			v.C.ImprimirEntero(registros.X0)
+			// Mandamos el registro x1 pues anteriormente hicimos un mov x1 con el valor entero
+			v.C.ImprimirEntero(registros.X1)
 		case traductor.Float:
 			v.C.ImprimirDecimal()
 		case traductor.StringType:
+			v.C.MovReg(registros.X0, registros.X11)
 			v.C.ImprimirCadena(registros.X0)
 		case traductor.Rune:
 			//v.C.ImprimirCaracter(registros.X0)
@@ -359,27 +524,30 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	if len(ctx.AllID_VARIABLE()) > 1 {
 		paramsOffSet = len(ctx.AllID_VARIABLE()) - 1
 	}
+	// Inicializamos el PositionFramePointer con baseOffSet
+	v.PositionFramePointer = baseOffSet
 
 	// Creamos el visitor para manejar los fragmentos de código y el manejo de offsets (desplazamientos)
 	fragmentVisitor := fragmentvisitor.NewFragmentVisitor(baseOffSet + paramsOffSet)
 
-	/*
-		FALTA IMPLEMENTAR EL MANEJO DE LOS PARAMETROS CON FRAGMENT!!!!
-	*/
 	for _, child := range ctx.Block().GetChildren() {
 		// Debemos verificar que los hijos sean del tipo ParseTree
 		// y luego visitar cada uno de ellos con el fragmentVisitor
 		if node, ok := child.(antlr.ParseTree); ok {
+			fmt.Println("Visitando nodo:", node.GetText())
 			fragmentVisitor.Visit(node)
+			fmt.Println("LocalOffset:", fragmentVisitor.LocalOffSet)
 		}
 	}
 
 	fragment := fragmentVisitor.Fragment
 
-	localOffSet := len(fragment)
+	localOffSet := fragmentVisitor.LocalOffSet
 	returnOffSet := 1
-	sizeFragment := baseOffSet + paramsOffSet + localOffSet + returnOffSet
 	nameFunction := ctx.ID_VARIABLE(0).GetText()
+	fmt.Println("SizeFragment: baseOffSet", baseOffSet, "paramsOffSet", paramsOffSet, "localOffSet", localOffSet, "returnOffSet", returnOffSet)
+	sizeFragment := baseOffSet + paramsOffSet + localOffSet + returnOffSet
+	fmt.Println("SizeFragment (bytes):", sizeFragment)
 
 	typeReturn := traductor.Void
 
@@ -408,8 +576,9 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 			})
 		}
 	}
-
+	fmt.Println("Generando objetos de fragmento:")
 	for _, instruction := range fragment {
+		fmt.Println("Pushing fragment object:", instruction.Name, "Offset:", instruction.Offset)
 		v.C.PushObjectStack(traductor.ObjectStack{
 			Type_:   traductor.Void,
 			Id_:     instruction.Name,
@@ -424,16 +593,22 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 	v.C.SetLabel(nameFunction)
 
 	if nameFunction == "main" {
+		// Agregamos los punteros de x29 y x30 al stack
 		v.C.Instrucciones = append(v.C.Instrucciones, "stp x29, x30, [sp, #-16]!")
+		// Establecemos el frame pointer
 		v.C.Instrucciones = append(v.C.Instrucciones, "mov x29, sp")
+		//Reservamos el espacio necesario para operar en x29, recordemos pasar de bytes a bits
+		v.C.SetAsideSizeFrameFunction(sizeFragment * 8)
 	}
-
 	//Recorremos el bloque de instrucciones
+	fmt.Println("Instrucciones dentro del bloque")
 	for _, child := range ctx.Block().GetChildren() {
 		// Debemos verificar que los hijos sean del tipo ParseTree
 		// y luego visitar cada uno de ellos con el fragmentVisitor
 		if node, ok := child.(antlr.ParseTree); ok {
+			fmt.Println("Visitando nodo en bloque:", node.GetText())
 			v.Visit(node)
+			fmt.Println("Posicion del Frame Pointer:", v.PositionFramePointer)
 		}
 	}
 
@@ -443,6 +618,8 @@ func (v *CompileARMVisitor) VisitFunciones(ctx *gramAntlr.FuncionesContext) inte
 		v.C.LDR(registros.LR, registros.X0, 0)
 		v.C.Br(registros.LR)
 	} else {
+		// Regresamos al stackPointer lo que reservamos para la funcion
+		v.C.PopInStackPointer(sizeFragment * 8)
 		v.C.Instrucciones = append(v.C.Instrucciones, "LDP x29, x30, [sp], #16")
 		v.C.Instrucciones = append(v.C.Instrucciones, "RET")
 	}

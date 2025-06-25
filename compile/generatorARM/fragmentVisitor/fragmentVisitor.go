@@ -110,3 +110,20 @@ func (f *FragmentVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{
 	*/
 	return nil
 }
+
+func (f *FragmentVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{} {
+	/*
+		Agregamos el VisitFloat pero no hacemos nada especial con él.
+		Usaremos el valor inmediato en el código ARM generado.
+		Evitamos usar el offset aquí porque no necesitamos almacenar un float
+	*/
+	return nil
+}
+
+func (f *FragmentVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} {
+	// Agregamos el VisitDouble pero no hacemos nada especial con él.
+	// Usaremos el valor inmediato en el código ARM generado.
+	// Evitamos usar el offset aquí porque no necesitamos almacenar un double
+	//f.LocalOffSet += 1
+	return nil
+}

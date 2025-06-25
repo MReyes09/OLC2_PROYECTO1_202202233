@@ -71,6 +71,10 @@ func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) in
 			v.C.LDR(registros.X0, registros.X29, -offSet*8)
 			// Movemos el registro x0 al x11 para que sea manipulado
 			v.C.MovReg(registros.X11, registros.X0)
+		case traductor.Float:
+			// Los tipos float van dirigidos al registro d0
+			v.C.LDR(registros.D0, registros.X29, -offSet*8)
+			v.C.Fmov(registros.D0, registros.X0)
 		}
 
 		// Copiamos el objeto para manipularlo
@@ -137,18 +141,22 @@ func (v *CompileARMVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithIn
 		switch ValorObjecto.Type_ {
 		case traductor.StringType:
 			v.C.MovReg(registros.X0, registros.X11) // x11 es el registro para strings y el inicio de la cadena
-		case traductor.Int:
+			// Reservamos el espacio en el frame pointer
+			v.C.PositionFramePointer = v.PositionFramePointer
+			// Restamos el frame pointer al offset del frame pointer
+			v.C.Str(registros.X0)
+		case traductor.Int, traductor.Bool:
 			// Movemos el registro x1 cone el valor al registro x0
 			v.C.MovReg(registros.X0, registros.X1) // x1 es el registro para enteros
-		case traductor.Bool:
-			// Agregar aqui
+			// Reservamos el espacio en el frame pointer
+			v.C.PositionFramePointer = v.PositionFramePointer
+			// Restamos el frame pointer al offset del frame pointer
+			v.C.Str(registros.X0)
 		case traductor.Float:
-			// Agregar aqui
+			// Se guarda el valor inmediato en D0
+			v.C.PositionFramePointer = v.PositionFramePointer
+			v.C.Str(registros.D0)
 		}
-		// Reservamos el espacio en el frame pointer
-		v.C.PositionFramePointer = v.PositionFramePointer
-		// Restamos el frame pointer al offset del frame pointer
-		v.C.Str(registros.X0)
 		// Cambiamos el tipo del objeto local al tipo del valor del objeto
 		LocalObjecto.Type_ = ValorObjecto.Type_
 		// Aumentamos el offset del frame pointer
@@ -250,11 +258,17 @@ func (v *CompileARMVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interfac
 
 func (v *CompileARMVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} {
 	value, err := strconv.ParseFloat(ctx.GetText(), 64)
+	//Verificar que se pueda convertir el texto a float64
+	fmt.Println(" ---------- VisitDouble ----------")
 	if err != nil {
 		panic(fmt.Sprintf("Error al convertir a float: %s", ctx.GetText()))
 	}
+	// Comentario para debuguar el valor del float
 	v.C.COMENT(fmt.Sprintf("Float: %f", value))
+
+	//Guardamos el objeto float64 en la pila para su proxima recuperacion
 	floatObject := v.C.FloatObject()
+	// Realizamos el push del objeto float64 con su valor
 	v.C.PushConst(floatObject, value)
 
 	return nil
@@ -264,15 +278,20 @@ func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interfac
 
 	value := 0
 	valueStr := strings.ToLower(ctx.GetText())
+	// Pasamos el dato en formato String a un entero 0 false | 1 true segun corresponda
 	if valueStr == "true" {
 		value = 1
 	} else {
 		value = 0
 	}
-
+	// Agregamos un comentario para el booleano y facilidad de debug
+	// Recordemos que el booleano se maneja como un entero en ARM
 	v.C.COMENT(fmt.Sprintf("Booleano: %d", value))
+
+	// Creamos el objeto booleano y lo empujamos a la pila para su proxima recuperacion
 	boolObject := v.C.BoolObject()
 	v.C.PushConst(boolObject, value)
+
 	return nil
 }
 
@@ -482,6 +501,7 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 
 		var value traductor.ObjectStack
 		if isFloat {
+			// CAPTURAMOS EL VALOR FLOAT
 			value = v.C.POPOBJECT(registros.D0)
 		} else {
 			value = v.C.POPOBJECT(registros.X0)
@@ -491,15 +511,13 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 		case traductor.Int:
 			// Mandamos el registro x1 pues anteriormente hicimos un mov x1 con el valor entero
 			v.C.ImprimirEntero(registros.X1)
+		case traductor.Bool:
+			v.C.ImprimirBooleano(registros.X1)
 		case traductor.Float:
 			v.C.ImprimirDecimal()
 		case traductor.StringType:
 			v.C.MovReg(registros.X0, registros.X11)
 			v.C.ImprimirCadena(registros.X0)
-		case traductor.Rune:
-			//v.C.ImprimirCaracter(registros.X0)
-		case traductor.Bool:
-			v.C.ImprimirBooleano(registros.X0)
 		case traductor.Slice:
 			//v.C.ImprimirArreglo(value.TipoElemento_)
 		}

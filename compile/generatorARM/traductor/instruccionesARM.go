@@ -123,6 +123,10 @@ func (g *GeneratorARMInstructions) Str(rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, g.PositionFramePointer*8))
 }
 
+func (g *GeneratorARMInstructions) Fmov(rs string, rd string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FMOV %s, %s", rd, rs))
+}
+
 func (g *GeneratorARMInstructions) Svc() {
 	g.Instrucciones = append(g.Instrucciones, "SVC #0")
 }
@@ -255,22 +259,26 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 		//g.Push(registros.X0)
 
 	case Float:
+		// Convertimos el float64 a sus bits de representación
 		floatBits := math.Float64bits(valor.(float64))
 
 		// Extraemos los 4 bloques de 16 bits
 		floatParts := make([]uint16, 4)
 
+		// Descomponemos el floatBits en 4 partes de 16 bits
 		for i := 0; i < 4; i++ {
 			floatParts[i] = uint16((floatBits >> (i * 16)) & 0xFFFF)
 		}
 
+		// Generamos las instrucciones ARM para cargar el float en X0
 		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOVZ X0, #%d, LSL #0", floatParts[0]))
 
+		// Usamos MOVK para cargar los siguientes 3 bloques de 16 bits
 		for i := 1; i < 4; i++ {
 			g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOVK X0, #%d, LSL #%d", floatParts[i], i*16))
 		}
-
-		g.Push(registros.X0)
+		//Mover bits a registro D0
+		g.Fmov(registros.X0, registros.D0)
 
 	case StringType:
 		// Agregamos STR registro, [x29, #-posicionFramePointer]   // guardar dirección del string en la posicion correcta

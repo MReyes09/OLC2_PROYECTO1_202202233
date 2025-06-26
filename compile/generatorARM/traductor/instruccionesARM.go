@@ -77,14 +77,31 @@ func (g *GeneratorARMInstructions) FDiv(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FDIV %s, %s, %s", rd, rs1, rs2))
 }
 
-func (g *GeneratorARMInstructions) Mod(rd string, rs1 string, rs2 string) {
-	temp := registros.X2
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, rs1, rs2))
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, rs2, rs1))
+func (g *GeneratorARMInstructions) Mod(rd string, dividend string, divisor string) {
+	temp := registros.X3 // O cualquier otro temporal no usado
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, dividend, divisor))
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, divisor, dividend))
 }
 
-func (g *GeneratorARMInstructions) LDR(rd string, rs1 string, offSet int) {
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, rs1, offSet))
+// Nueva implemetacion para LDR
+
+func (g *GeneratorARMInstructions) LDR(rd string, base string, offset int) {
+	if offset >= -255 && offset%8 == 0 {
+		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, base, offset))
+	} else {
+		// Versión usando registro temporal para offsets grandes
+		g.LdrByTemp(rd, offset)
+	}
+}
+
+func (g *GeneratorARMInstructions) LdrByTemp(rd string, offset int) {
+	g.Mov("x9", offset)
+	g.Add("x9", "x29", "x9")
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [x9]", rd))
+}
+
+func (g *GeneratorARMInstructions) Adr(rd string, label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ADR %s, %s", rd, label))
 }
 
 func (g *GeneratorARMInstructions) Br(destino string) {
@@ -119,8 +136,29 @@ func (g *GeneratorARMInstructions) Srtb(rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STRB %s, [%s]", rs1, rs2))
 }
 
+// Implementacion nueva de STR
 func (g *GeneratorARMInstructions) Str(rs string) {
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, g.PositionFramePointer*8))
+	offset := g.PositionFramePointer * 8
+	if offset <= 255 {
+		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, offset))
+	} else {
+		g.StrByTemp(rs, offset)
+	}
+}
+
+// Guardando registros offset > 255
+func (g *GeneratorARMInstructions) StrByTemp(rs string, offset int) {
+	g.Mov("x9", -offset)                                                       // offset negativo (hacia abajo en el stack)
+	g.Add("x9", "x29", "x9")                                                   // dirección efectiva = x29 - offset
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x9]", rs)) // guardar valor
+}
+
+func (g *GeneratorARMInstructions) StrFromReg(rs string, rd string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [%s]", rs, rd))
+}
+
+func (g *GeneratorARMInstructions) Fmov(rs string, rd string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FMOV %s, %s", rd, rs))
 }
 
 func (g *GeneratorARMInstructions) Svc() {
@@ -236,10 +274,9 @@ func (g *GeneratorARMInstructions) COMENT(comentario string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("// %s", comentario))
 }
 
-func (g *GeneratorARMInstructions) POPOBJECT(rd string) ObjectStack {
+func (g *GeneratorARMInstructions) POPOBJECT() ObjectStack {
 	object := g.Stack[len(g.Stack)-1]
 	g.POPOBJECT2()
-	//g.Pop(rd) Esto lo quitamos porque manejamos el frame pointer y no stack pointer "CAUSA ERROR SI SE DESCOMENTA!"
 	return object
 
 }
@@ -255,26 +292,30 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 		//g.Push(registros.X0)
 
 	case Float:
+		// Convertimos el float64 a sus bits de representación
 		floatBits := math.Float64bits(valor.(float64))
 
 		// Extraemos los 4 bloques de 16 bits
 		floatParts := make([]uint16, 4)
 
+		// Descomponemos el floatBits en 4 partes de 16 bits
 		for i := 0; i < 4; i++ {
 			floatParts[i] = uint16((floatBits >> (i * 16)) & 0xFFFF)
 		}
 
+		// Generamos las instrucciones ARM para cargar el float en X0
 		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOVZ X0, #%d, LSL #0", floatParts[0]))
 
+		// Usamos MOVK para cargar los siguientes 3 bloques de 16 bits
 		for i := 1; i < 4; i++ {
 			g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOVK X0, #%d, LSL #%d", floatParts[i], i*16))
 		}
-
-		g.Push(registros.X0)
+		//Mover bits a registro D0
+		g.Fmov(registros.X0, registros.D0)
 
 	case StringType:
 		// Agregamos STR registro, [x29, #-posicionFramePointer]   // guardar dirección del string en la posicion correcta
-		g.PushInFramePointer(registros.X0, g.PositionFramePointer*8)
+		//g.PushInFramePointer(registros.X0, g.PositionFramePointer*8)
 		cadena := primitvos.StringToByte(valor.(string))
 
 		for _, charCode := range cadena {
@@ -299,12 +340,19 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 	return topObjectStack
 }
 
+func (g *GeneratorARMInstructions) ShowStack() {
+	fmt.Println("Contenido del Stack:", len(g.Stack))
+	for i, obj := range g.Stack {
+		fmt.Printf("Objeto %d: Id: %s, Tipo: %d, Offset: %d, Longitud: %d, Profundidad: %d\n",
+			i, obj.Id_, obj.Type_, obj.Offset_, obj.Length_, obj.Depth_)
+	}
+}
+
 // GetObject busca un objeto en el Stack por su Id_ y devuelve el desplazamiento (Offset_) y el objeto encontrado
 func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
 	byteOffset := 0
 
 	for i := 0; i < len(g.Stack); i++ {
-		fmt.Println("Buscando objeto con id:", id, "en el stack, objeto actual:", g.Stack[i].Id_, "con tipo:", g.Stack[i].Type_, "y offset:", g.Stack[i].Offset_)
 		if g.Stack[i].Id_ == id {
 			return g.Stack[i].Offset_, g.Stack[i]
 		}
@@ -373,6 +421,7 @@ func (g *GeneratorARMInstructions) GenerateCodeARM() string {
 	var sb strings.Builder
 
 	sb.WriteString(".data\n")
+	sb.WriteString("buffer: .space 256\n")
 	sb.WriteString("salto_linea_str: .ascii \"\\n\"\n")
 	sb.WriteString("espacio_str: .ascii \" \"\n")
 	sb.WriteString("corchete_apertura: .ascii \"[\"\n")

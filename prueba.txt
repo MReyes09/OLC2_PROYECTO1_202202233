@@ -1,14 +1,14 @@
-// NUEVO!
 func main(){
-  println("Valor numero:", 10)
-  println("Declaracion x := 123")
-  y := "Saludando!"
-  x := 123
-  println("Y ->", y)
-  println("X ->", x)
+  mensaje1 := "con Variables String!!!!"
+  println("Trabajamos string nativo y", mensaje1)
 
-  println("al reves")
-  println("X ->", x)
-  println("Y ->", y)
+  x := 10
+  y := true
+  println(10, "Ahora var x =", x)
+  println(10,"= x =", x, "Esto es", y, "!!!")
 
-}   
+  z := 123.321
+
+  println("Juntamos x y z")
+  println("x =", x, "z=", z, "Bonus de y", y)
+}

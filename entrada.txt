@@ -1,5 +1,41 @@
-mut x string := "Hola"
+func main() {
+    // Enteros
+    a := 8
+    b := 5
+    c := 2
 
-func main(){
-    println("Pasito Perron")
+    // Flotantes
+    x := 3.2
+    y := 1.8
+    z := 6.0
+
+    // Operaciones entre enteros
+    suma := a + c              // 8 + 2 = 10
+    resta := b - c             // 5 - 2 = 3
+    multi := a * b             // 8 * 5 = 40
+    div := a / c               // 8 / 2 = 4
+    mod := b % c               // 5 % 2 = 1
+
+    // Operaciones entre floats
+    sumaF := x + z             // 3.2 + 6.0 = 9.2
+    restaF := z - y            // 6.0 - 1.8 = 4.2
+    multiF := y * x            // 1.8 * 3.2 = 5.76
+    divF := z / x              // 6.0 / 3.2 = 1.875
+
+    // Mezclas sin conversiones
+    mezcla := a + x * b - y    // 8 + (3.2 * 5) - 1.8 = 22.2
+
+    // Prints
+    println(suma)
+    println(resta)
+    println(multi)
+    println(div)
+    println(mod)
+
+    println(sumaF)
+    println(restaF)
+    println(multiF)
+    println(divF)
+
+    println(mezcla)
 }

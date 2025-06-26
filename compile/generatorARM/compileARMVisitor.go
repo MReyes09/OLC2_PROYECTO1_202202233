@@ -358,7 +358,6 @@ func (v *CompileARMVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{
 
 	//Obtenemos lo que esta en la cima de la pila y validamos su tipo
 	DerechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
-
 	Derecha := v.C.POPOBJECT()
 
 	IzquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
@@ -415,75 +414,57 @@ func (v *CompileARMVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{
 }
 
 func (v *CompileARMVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- VisitMulDivModulo -------------")
 	v.Visit(ctx.Expr(0))
 	v.Visit(ctx.Expr(1))
 
 	operador := ctx.GetOp().GetText()
-	derechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
 
-	var derecha traductor.ObjectStack
-	if derechaEsFloat {
-		derecha = v.C.POPOBJECT()
-	} else {
-		derecha = v.C.POPOBJECT()
-	}
+	derechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	derecha := v.C.POPOBJECT()
 
 	izquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
-	var izquierda traductor.ObjectStack
-	if izquierdaEsFloat {
-		izquierda = v.C.POPOBJECT()
-	} else {
-		izquierda = v.C.POPOBJECT()
-	}
+	izquierda := v.C.POPOBJECT()
 
 	switch operador {
 	case "*":
 		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
-			v.C.Mul(registros.X0, registros.X0, registros.X1)
+			v.C.COMENT("MULTIPLICACION DE ENTEROS")
+			v.LoadIntObjet(izquierda, derecha)
+			v.C.Mul(registros.X0, registros.X2, registros.X1)
+			v.SaveResult(registros.X0, traductor.Int)
 
-			v.C.PushObjectStack(v.C.CloneObject(izquierda))
 		} else if derecha.Type_ == traductor.Float || izquierda.Type_ == traductor.Float {
-			if !izquierdaEsFloat {
-				v.C.Scvtf(registros.D0, registros.X0)
-			}
-			if !derechaEsFloat {
-				v.C.Scvtf(registros.D1, registros.X1)
-			}
+			v.C.COMENT("MULTIPLICACION DE FLOAT64")
+			v.ChangeTypeToFloat(izquierda.Offset_, izquierdaEsFloat, registros.X0, registros.D0)
+			v.ChangeTypeToFloat(derecha.Offset_, derechaEsFloat, registros.X1, registros.D1)
 			v.C.FMul(registros.D0, registros.D0, registros.D1)
-
-			if izquierdaEsFloat {
-				v.C.PushObjectStack(v.C.CloneObject(izquierda))
-			} else {
-				v.C.PushObjectStack(v.C.CloneObject(derecha))
-			}
+			v.SaveResult(registros.D0, traductor.Float)
 		}
 
 	case "/":
 		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
-			v.C.Div(registros.X0, registros.X0, registros.X1)
+			v.C.COMENT("DIVISION DE ENTEROS")
+			v.LoadIntObjet(izquierda, derecha)
+			v.C.Div(registros.X0, registros.X2, registros.X1)
+			v.SaveResult(registros.X0, traductor.Int)
 
-			v.C.PushObjectStack(v.C.CloneObject(izquierda))
 		} else if derecha.Type_ == traductor.Float || izquierda.Type_ == traductor.Float {
-			if !izquierdaEsFloat {
-				v.C.Scvtf(registros.D0, registros.X0)
-			}
-			if !derechaEsFloat {
-				v.C.Scvtf(registros.D1, registros.X1)
-			}
+			v.C.COMENT("DIVISION DE FLOAT64")
+			v.ChangeTypeToFloat(izquierda.Offset_, izquierdaEsFloat, registros.X0, registros.D0)
+			v.ChangeTypeToFloat(derecha.Offset_, derechaEsFloat, registros.X1, registros.D1)
 			v.C.FDiv(registros.D0, registros.D0, registros.D1)
+			v.SaveResult(registros.D0, traductor.Float)
 
-			if izquierdaEsFloat {
-				v.C.PushObjectStack(v.C.CloneObject(izquierda))
-			} else {
-				v.C.PushObjectStack(v.C.CloneObject(derecha))
-			}
 		}
 
 	case "%":
 		if derecha.Type_ == traductor.Int && izquierda.Type_ == traductor.Int {
-			v.C.Mod(registros.X0, registros.X0, registros.X1)
-
-			v.C.PushObjectStack(v.C.CloneObject(izquierda))
+			v.C.COMENT("MODULO DE ENTEROS")
+			v.LoadIntObjet(izquierda, derecha)
+			v.C.Mod(registros.X0, registros.X2, registros.X1)
+			v.SaveResult(registros.X0, traductor.Int)
 		}
 	}
 	return nil

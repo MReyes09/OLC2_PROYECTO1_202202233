@@ -77,10 +77,10 @@ func (g *GeneratorARMInstructions) FDiv(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FDIV %s, %s, %s", rd, rs1, rs2))
 }
 
-func (g *GeneratorARMInstructions) Mod(rd string, rs1 string, rs2 string) {
-	temp := registros.X2
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, rs1, rs2))
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, rs2, rs1))
+func (g *GeneratorARMInstructions) Mod(rd string, dividend string, divisor string) {
+	temp := registros.X3 // O cualquier otro temporal no usado
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, dividend, divisor))
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, divisor, dividend))
 }
 
 // Nueva implemetacion para LDR

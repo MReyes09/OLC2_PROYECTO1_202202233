@@ -166,6 +166,19 @@ func (f *FragmentVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} 
 	return nil
 }
 
+func (f *FragmentVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext) interface{} {
+	f.Depth += 1
+
+	f.Visit(ctx.Expr(0)) // izquierda
+	f.Visit(ctx.Expr(1)) // derecha
+
+	// Se agrega un frame porque es una operacion y la multiplicacion de las expresiones debe guardarse
+	f.LocalOffSet += 1
+
+	f.Depth -= 1
+	return nil
+}
+
 // Auxiliar
 
 /*func (f *FragmentVisitor) cleanOffset() {

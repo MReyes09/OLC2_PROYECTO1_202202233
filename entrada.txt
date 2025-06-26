@@ -1,31 +1,41 @@
-func main(){
-    // enteros
-    x := 4
-    y := 2
+func main() {
+    // Enteros
+    a := 10
+    b := 4
+    c := 3
 
-    // floats
-    f := 1.5
-    g := 2.5
+    // Flotantes
+    x := 2.5
+    y := 1.5
+    z := 4.0
 
-    // strings
-    s1 := "Hola "
-    s2 := " Mundo!"
+    // Operaciones entre enteros
+    suma := a + b              // 10 + 4 = 14
+    resta := a - c             // 10 - 3 = 7
+    multi := b * c             // 4 * 3 = 12
+    div := a / b               // 10 / 4 = 2
+    mod := a % c               // 10 % 3 = 1
 
-    // operaciones con paréntesis
-    res1 := x + (y + 3)             // 4 + (2 + 3) = 9
-    res2 := (x - y) + 7             // (4 - 2) + 7 = 9
-    res3 := (f + g) - 1.0           // (1.5 + 2.5) - 1.0 = 3.0
-    res4 := (x + f) + (g - y)       // (4 + 1.5) + (2.5 - 2) = 6.0
-    res5 := x + (f + (g - 1.0))     // 4 + (1.5 + (2.5 - 1.0)) = 7.0
+    // Operaciones entre floats
+    sumaF := x + y             // 2.5 + 1.5 = 4.0
+    restaF := z - y            // 4.0 - 1.5 = 2.5
+    multiF := x * z            // 2.5 * 4.0 = 10.0
+    divF := z / x              // 4.0 / 2.5 = 1.6
 
-    // concatenaciones con paréntesis
-    //saludo := s1 + (s2 + "!")       // No furula multiples concatenaciones XD
-	saludo := s1 + s2
+    // Mezclas
+    mezcla := float64(a) + x * float64(b) - y  // 10 + (2.5 * 4) - 1.5 = 18.5
 
-	println(res1)
-	println(res2)
-    println(res3)
-	println(res4)
-    println(res5)
-    println(saludo)
+    // Prints
+    println(suma)
+    println(resta)
+    println(multi)
+    println(div)
+    println(mod)
+
+    println(sumaF)
+    println(restaF)
+    println(multiF)
+    println(divF)
+
+    println(mezcla)
 }

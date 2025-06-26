@@ -45,7 +45,9 @@ func (f *FragmentVisitor) Visit(tree antlr.ParseTree) interface{} {
 
 // VisitVarDcl
 func (f *FragmentVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) interface{} {
-	return f.Visit(ctx.VarDcl())
+	f.Visit(ctx.VarDcl())
+	//f.cleanOffset()
+	return nil
 }
 
 // varDcl: 'mut'? ID_VARIABLE ':=' expr           # VarDclWithInference
@@ -93,6 +95,7 @@ func (f *FragmentVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 func (f *FragmentVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	//Visitamos imprimir
 	f.Visit(ctx.Imprimir())
+	//f.ResetUsedPositions()
 	return nil
 }
 
@@ -101,6 +104,7 @@ func (f *FragmentVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{
 	for _, expr := range ctx.AllExpr() {
 		// recuerda aumentar el offset de la base
 		f.Visit(expr)
+		f.UsedPositions = append(f.UsedPositions, f.LocalOffSet)
 	}
 	return nil
 }
@@ -164,6 +168,18 @@ func (f *FragmentVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} 
 
 // Auxiliar
 
-func (f *FragmentVisitor) cleanOffset() {
-	f.LocalOffSet = f.MaxPosition - f.LocalOffSet
+/*func (f *FragmentVisitor) cleanOffset() {
+	if len(f.Fragment) == 0 {
+		panic("No hay fragmentos para limpiar el offset")
+	}
+	f.LocalOffSet = f.LocalOffSet - f.MaxPosition
+	f.Fragment[len(f.Fragment)-1].Offset = f.LocalOffSet
 }
+
+func (f *FragmentVisitor) ResetUsedPositions() {
+	if len(f.UsedPositions) > 0 {
+		f.LocalOffSet = f.LocalOffSet - len(f.UsedPositions) + 1
+		f.UsedPositions = make([]int, 0)
+	}
+}
+*/

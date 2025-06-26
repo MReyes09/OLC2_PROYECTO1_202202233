@@ -385,7 +385,8 @@ func (v *CompileARMVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{
 			v.C.ConcatString()
 
 			v.SaveResult(registros.X0, traductor.StringType)
-
+			// Reiniciamos el buffer para uso futuro
+			v.C.Adr(registros.X10, "buffer")
 		} else if Derecha.Type_ == traductor.Float || Izquierda.Type_ == traductor.Float {
 			v.C.COMENT("SUMA DE FLOAT64")
 			// float64 + ...
@@ -784,10 +785,15 @@ func (v *CompileARMVisitor) LoadIdentifierAndSave(object traductor.ObjectStack) 
 	// Lo empujamos a la pila para que sea manipulado
 	v.C.PushObjectStack(objectClone)
 
-	// Reflejamos los cambios en arm
-	v.C.PositionFramePointer = v.PositionFramePointer // Guardamos la posicion del frame pointer
-	v.C.Str(registros.X0)                             // Guardamos el valor en el stack frame
-	v.PositionFramePointer += 1                       // Aumentamos el offset del frame pointer
+	// Guardamos en stack frame según tipo
+	v.C.PositionFramePointer = v.PositionFramePointer
+	switch object.Type_ {
+	case traductor.Int, traductor.StringType, traductor.Bool:
+		v.C.Str(registros.X0)
+	case traductor.Float:
+		v.C.Str(registros.D0)
+	}
+	v.PositionFramePointer += 1 // Aumentamos el offset del frame pointer
 }
 
 // --------------------- FUNCIONES AUXILIARES EXPRESIONES ---------------------
@@ -831,26 +837,8 @@ func CleanUpStack(usedPositions []int) []int {
 }
 
 // --------------------- FUNCIONES AUXILIARES PARA POSICION MAYOR A 255 ---------------------
-/*
-func (v *CompileARMVisitor) StoreAtOffset(registro string, offset int) {
-	offsetBytes := -offset * 8
-	if offsetBytes < -256 || offsetBytes > 255 {
-		v.C.Mov("x9", offsetBytes)
-		v.C.Add("x9", "x29", "x9")
-		v.C.StrFromReg(registro, "x9")
-	} else {
-		v.C.Str(registro, registros.X29, offsetBytes)
-	}
+func (v *CompileARMVisitor) StrOffset(reg string, offset int) {
+	v.C.Mov("x9", offset)
+	v.C.Add("x9", "x29", "x9")
+	//v.C.Str(reg, "[x9]")
 }
-
-func (v *CompileARMVisitor) LoadFromOffset(registro string, offset int) {
-	offsetBytes := -offset * 8
-	if offsetBytes < -256 || offsetBytes > 255 {
-		v.C.Mov("x9", offsetBytes)
-		v.C.Add("x9", "x29", "x9")
-		v.C.LdrToReg(registro, "x9")
-	} else {
-		v.C.LDR(registro, registros.X29, offsetBytes)
-	}
-}
-*/

@@ -83,8 +83,21 @@ func (g *GeneratorARMInstructions) Mod(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, rs2, rs1))
 }
 
-func (g *GeneratorARMInstructions) LDR(rd string, rs1 string, offSet int) {
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, rs1, offSet))
+// Nueva implemetacion para LDR
+
+func (g *GeneratorARMInstructions) LDR(rd string, base string, offset int) {
+	if offset >= -255 && offset%8 == 0 {
+		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, base, offset))
+	} else {
+		// Versión usando registro temporal para offsets grandes
+		g.LdrByTemp(rd, offset)
+	}
+}
+
+func (g *GeneratorARMInstructions) LdrByTemp(rd string, offset int) {
+	g.Mov("x9", offset)
+	g.Add("x9", "x29", "x9")
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [x9]", rd))
 }
 
 func (g *GeneratorARMInstructions) Adr(rd string, label string) {
@@ -123,8 +136,21 @@ func (g *GeneratorARMInstructions) Srtb(rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STRB %s, [%s]", rs1, rs2))
 }
 
+// Implementacion nueva de STR
 func (g *GeneratorARMInstructions) Str(rs string) {
-	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, g.PositionFramePointer*8))
+	offset := g.PositionFramePointer * 8
+	if offset <= 255 {
+		g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, offset))
+	} else {
+		g.StrByTemp(rs, offset)
+	}
+}
+
+// Guardando registros offset > 255
+func (g *GeneratorARMInstructions) StrByTemp(rs string, offset int) {
+	g.Mov("x9", -offset)                                                       // offset negativo (hacia abajo en el stack)
+	g.Add("x9", "x29", "x9")                                                   // dirección efectiva = x29 - offset
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x9]", rs)) // guardar valor
 }
 
 func (g *GeneratorARMInstructions) StrFromReg(rs string, rd string) {

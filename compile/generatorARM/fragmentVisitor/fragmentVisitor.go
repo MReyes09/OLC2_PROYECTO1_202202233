@@ -2,6 +2,7 @@ package fragmentvisitor
 
 import (
 	"OLC2CLIENTE/gramatica/gramAntlr"
+	"fmt"
 
 	"github.com/antlr4-go/antlr/v4"
 )
@@ -17,6 +18,7 @@ type FragmentVisitor struct {
 	Fragment    []FragmentElement
 	LocalOffSet int
 	BaseOffSet  int
+	Depth       int // Profundidad de anidamiento, si es necesario
 }
 
 func NewFragmentVisitor(baseOffset int) *FragmentVisitor {
@@ -25,6 +27,7 @@ func NewFragmentVisitor(baseOffset int) *FragmentVisitor {
 		Fragment:             make([]FragmentElement, 0),
 		LocalOffSet:          0,
 		BaseOffSet:           baseOffset,
+		Depth:                -1, // Inicialmente no hay anidamiento
 	}
 	return f
 }
@@ -34,17 +37,17 @@ func (f *FragmentVisitor) Visit(tree antlr.ParseTree) interface{} {
 	return tree.Accept(f)
 }
 
-// -------------------------- DECLARACION DE VARIABLES --------------------------
-// Instrucciones: VarDeclStmt
+// ------------------ DECLARACIONES Y ASIGNACIONES ---------------------------------
+
+// VisitVarDcl
 func (f *FragmentVisitor) VisitVarDeclStmt(ctx *gramAntlr.VarDeclStmtContext) interface{} {
-	f.Visit(ctx.VarDcl())
-	return nil
+	return f.Visit(ctx.VarDcl())
 }
 
 // varDcl: 'mut'? ID_VARIABLE ':=' expr           # VarDclWithInference
 func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInferenceContext) interface{} {
 	varName := ctx.ID_VARIABLE().GetText()
-
+	fmt.Println("Visitando VarDclWithInference:", varName)
 	// Primero visitamos la expresión, para que incremente el offset si es necesario
 	f.Visit(ctx.Expr())
 
@@ -53,19 +56,22 @@ func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		Name:   varName,
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
-
+	fmt.Println("Offset de la variable:", f.LocalOffSet+f.BaseOffSet)
 	f.LocalOffSet += 1 // para la propia variable
 	return nil
 }
 
 func (f *FragmentVisitor) VisitVarDclWithTypeAndValue(ctx *gramAntlr.VarDclWithTypeAndValueContext) interface{} {
+
 	varName := ctx.ID_VARIABLE().GetText()
+
+	f.Visit(ctx.Expr())
+
 	f.Fragment = append(f.Fragment, FragmentElement{
 		Name:   varName,
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
 	f.LocalOffSet += 1
-	f.Visit(ctx.Expr())
 	return nil
 }
 
@@ -78,6 +84,8 @@ func (f *FragmentVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTypeO
 	f.LocalOffSet += 1
 	return nil
 }
+
+// ------------------------- PRINT Y PRINTLN ---------------------------------
 
 func (f *FragmentVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	//Visitamos imprimir
@@ -94,36 +102,51 @@ func (f *FragmentVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interface{
 	return nil
 }
 
+// --------------------------------- TIPOS PRIMITIVOS ---------------------------------
 func (f *FragmentVisitor) VisitString(ctx *gramAntlr.StringContext) interface{} {
-	// Aquí podrías manejar la cadena literal si es necesario
-	// LLegamos a un terminal! ya podemos aumentar el offset pues string necesita su espacio
-	f.LocalOffSet += 1
-
+	if f.Depth >= 0 {
+		f.LocalOffSet += 1
+	}
 	return nil
 }
 
 func (f *FragmentVisitor) VisitInteger(ctx *gramAntlr.IntegerContext) interface{} {
-	/*
-		Agregamos el VisitInteger pero ho hacemos nada especial con él.
-		Usaremos el valor inmediato en el código ARM generado.
-		Evitamos usar el offset aquí porque no necesitamos almacenar un entero
-	*/
+	if f.Depth >= 0 {
+		f.LocalOffSet += 1
+	}
 	return nil
 }
 
 func (f *FragmentVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interface{} {
-	/*
-		Agregamos el VisitFloat pero no hacemos nada especial con él.
-		Usaremos el valor inmediato en el código ARM generado.
-		Evitamos usar el offset aquí porque no necesitamos almacenar un float
-	*/
+	if f.Depth >= 0 {
+		f.LocalOffSet += 1
+	}
 	return nil
 }
 
 func (f *FragmentVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} {
-	// Agregamos el VisitDouble pero no hacemos nada especial con él.
-	// Usaremos el valor inmediato en el código ARM generado.
-	// Evitamos usar el offset aquí porque no necesitamos almacenar un double
-	//f.LocalOffSet += 1
+	if f.Depth >= 0 {
+		f.LocalOffSet += 1
+	}
+	return nil
+}
+
+// --------------------------------- OPERACIONES ---------------------------------
+
+func (f *FragmentVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{} {
+	f.Visit(ctx.Expr())
+	return nil
+}
+
+func (f *FragmentVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} {
+	f.Depth += 1
+
+	f.Visit(ctx.Expr(0)) // izquierda
+	f.Visit(ctx.Expr(1)) // derecha
+
+	// Se agrega un frame porque es una operacion y la suma de las expresiones debe guardarse
+	f.LocalOffSet += 1
+
+	f.Depth -= 1
 	return nil
 }

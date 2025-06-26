@@ -87,6 +87,10 @@ func (g *GeneratorARMInstructions) LDR(rd string, rs1 string, offSet int) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("LDR %s, [%s, #%d]", rd, rs1, offSet))
 }
 
+func (g *GeneratorARMInstructions) Adr(rd string, label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ADR %s, %s", rd, label))
+}
+
 func (g *GeneratorARMInstructions) Br(destino string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("BR %s", destino))
 }
@@ -240,10 +244,9 @@ func (g *GeneratorARMInstructions) COMENT(comentario string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("// %s", comentario))
 }
 
-func (g *GeneratorARMInstructions) POPOBJECT(rd string) ObjectStack {
+func (g *GeneratorARMInstructions) POPOBJECT() ObjectStack {
 	object := g.Stack[len(g.Stack)-1]
 	g.POPOBJECT2()
-	//g.Pop(rd) Esto lo quitamos porque manejamos el frame pointer y no stack pointer "CAUSA ERROR SI SE DESCOMENTA!"
 	return object
 
 }
@@ -282,7 +285,7 @@ func (g *GeneratorARMInstructions) PushConst(object ObjectStack, valor interface
 
 	case StringType:
 		// Agregamos STR registro, [x29, #-posicionFramePointer]   // guardar dirección del string en la posicion correcta
-		g.PushInFramePointer(registros.X0, g.PositionFramePointer*8)
+		//g.PushInFramePointer(registros.X0, g.PositionFramePointer*8)
 		cadena := primitvos.StringToByte(valor.(string))
 
 		for _, charCode := range cadena {
@@ -305,6 +308,14 @@ func (g *GeneratorARMInstructions) GetTopObjectStack() ObjectStack {
 	topObjectStack := g.Stack[len(g.Stack)-1]
 	//fmt.Println("id_Top:", topObjectStack.Id_, "tipo:", topObjectStack.Type_, "offset:", topObjectStack.Offset_)
 	return topObjectStack
+}
+
+func (g *GeneratorARMInstructions) ShowStack() {
+	fmt.Println("Contenido del Stack:", len(g.Stack))
+	for i, obj := range g.Stack {
+		fmt.Printf("Objeto %d: Id: %s, Tipo: %d, Offset: %d, Longitud: %d, Profundidad: %d\n",
+			i, obj.Id_, obj.Type_, obj.Offset_, obj.Length_, obj.Depth_)
+	}
 }
 
 // GetObject busca un objeto en el Stack por su Id_ y devuelve el desplazamiento (Offset_) y el objeto encontrado
@@ -381,6 +392,7 @@ func (g *GeneratorARMInstructions) GenerateCodeARM() string {
 	var sb strings.Builder
 
 	sb.WriteString(".data\n")
+	sb.WriteString("buffer: .space 256\n")
 	sb.WriteString("salto_linea_str: .ascii \"\\n\"\n")
 	sb.WriteString("espacio_str: .ascii \" \"\n")
 	sb.WriteString("corchete_apertura: .ascii \"[\"\n")

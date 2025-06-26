@@ -20,7 +20,8 @@ type CompileARMVisitor struct {
 	FragmentPointerOffSet int
 	ReturnLabels          string
 	PositionFramePointer  int
-	Depth                 int // Profundidad de anidamiento, si es necesario
+	Depth                 int   // Profundidad de anidamiento, si es necesario
+	UsedPositions         []int // Posiciones usadas en el frame pointer
 }
 
 type DataFuncion struct {
@@ -37,7 +38,8 @@ func NewCompileARMVisitor() *CompileARMVisitor {
 		FragmentPointerOffSet: 0,
 		ReturnLabels:          "",
 		PositionFramePointer:  1,
-		Depth:                 -1, // Inicialmente no hay anidamiento
+		Depth:                 -1,             // Inicialmente no hay anidamiento
+		UsedPositions:         make([]int, 0), // Inicializamos el slice de posiciones usadas
 	}
 	return v
 }
@@ -62,6 +64,13 @@ func (v *CompileARMVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) in
 	fmt.Println("Offset:", offSet, "Object.Id:", object.Id_, "Object.Type:", object.Type_)
 
 	if v.InFunction != "" {
+		// Caso especial de identificador, posibilidad de uso en expresion anidada con profundidad
+		if v.Depth >= 0 {
+			v.C.COMENT("Identificador: " + id + " con profundidad: " + strconv.Itoa(v.Depth))
+			v.LoadIdentifierAndSave(object)
+			return nil
+		}
+		v.C.COMENT("Identificador: " + id)
 		//ALTERACION CON IDENTIFIER!!!
 		// MOVILIZAMOS EL VALOR AL REGISTRO SEGUN EL TIPO DE DATO!
 		switch object.Type_ {
@@ -708,16 +717,25 @@ func (v *CompileARMVisitor) SaveFrameLocalObject(id string) {
 		LocalObjecto := v.C.GetFrameLocal(v.FragmentPointerOffSet)
 		// Evaluamos el ultimo objeto en la pila
 		ValorObjecto := v.C.POPOBJECT()
+
 		// Movemos el valor anterior al registro x0 que es mi variable que se guardara en frame pointer
 		// Validamos que tipo de dato  es para saber que registro usar
 		switch ValorObjecto.Type_ {
 		case traductor.StringType:
+			// Caso especial, el objeto valorObject pudo haber sino una operacion anterior
+			if ValorObjecto.Offset_ != 0 {
+				v.C.LDR(registros.X11, registros.X29, -ValorObjecto.Offset_*8)
+			}
 			v.C.MovReg(registros.X0, registros.X11) // x11 es el registro para strings y el inicio de la cadena
 			// Reservamos el espacio en el frame pointer
 			v.C.PositionFramePointer = v.PositionFramePointer
 			// Restamos el frame pointer al offset del frame pointer
 			v.C.Str(registros.X0)
 		case traductor.Int, traductor.Bool:
+			// Caso especial, el objeto valorObject pudo haber sino una operacion anterior
+			if ValorObjecto.Offset_ != 0 {
+				v.C.LDR(registros.X1, registros.X29, -ValorObjecto.Offset_*8)
+			}
 			// Movemos el registro x1 cone el valor al registro x0
 			v.C.MovReg(registros.X0, registros.X1) // x1 es el registro para enteros
 			// Reservamos el espacio en el frame pointer
@@ -725,6 +743,10 @@ func (v *CompileARMVisitor) SaveFrameLocalObject(id string) {
 			// Restamos el frame pointer al offset del frame pointer
 			v.C.Str(registros.X0)
 		case traductor.Float:
+			// Caso especial, el objeto valorObject pudo haber sino una operacion anterior
+			if ValorObjecto.Offset_ != 0 {
+				v.C.LDR(registros.D0, registros.X29, -ValorObjecto.Offset_*8)
+			}
 			// Se guarda el valor inmediato en D0
 			v.C.PositionFramePointer = v.PositionFramePointer
 			v.C.Str(registros.D0)
@@ -739,6 +761,33 @@ func (v *CompileARMVisitor) SaveFrameLocalObject(id string) {
 	}
 
 	v.C.TagObjecto(id)
+}
+
+func (v *CompileARMVisitor) LoadIdentifierAndSave(object traductor.ObjectStack) {
+
+	switch object.Type_ {
+	case traductor.Int, traductor.StringType, traductor.Bool:
+		// Carga en x0 el valor del objeto desde el stack frame
+		v.C.LDR(registros.X0, registros.X29, -object.Offset_*8)
+
+	case traductor.Float:
+		// Carga en d0 el valor float del objeto desde el stack frame
+		v.C.LDR(registros.D0, registros.X29, -object.Offset_*8)
+
+	default:
+		panic("Tipo no soportado en LoadIdentifier")
+	}
+	// Clonamos el objeto para manipularlo
+	objectClone := v.C.CloneObject(object)
+	// Le cambiamos su offset al del frame pointer
+	objectClone.Offset_ = v.PositionFramePointer
+	// Lo empujamos a la pila para que sea manipulado
+	v.C.PushObjectStack(objectClone)
+
+	// Reflejamos los cambios en arm
+	v.C.PositionFramePointer = v.PositionFramePointer // Guardamos la posicion del frame pointer
+	v.C.Str(registros.X0)                             // Guardamos el valor en el stack frame
+	v.PositionFramePointer += 1                       // Aumentamos el offset del frame pointer
 }
 
 // --------------------- FUNCIONES AUXILIARES EXPRESIONES ---------------------
@@ -775,3 +824,33 @@ func (v *CompileARMVisitor) SaveResult(registro string, tipo traductor.TypeObjec
 	v.C.Str(registro)
 	v.PositionFramePointer += 1
 }
+
+// --------------------- DEPURACION DE OFFSETS BASURA ---------------------
+func CleanUpStack(usedPositions []int) []int {
+	return nil
+}
+
+// --------------------- FUNCIONES AUXILIARES PARA POSICION MAYOR A 255 ---------------------
+/*
+func (v *CompileARMVisitor) StoreAtOffset(registro string, offset int) {
+	offsetBytes := -offset * 8
+	if offsetBytes < -256 || offsetBytes > 255 {
+		v.C.Mov("x9", offsetBytes)
+		v.C.Add("x9", "x29", "x9")
+		v.C.StrFromReg(registro, "x9")
+	} else {
+		v.C.Str(registro, registros.X29, offsetBytes)
+	}
+}
+
+func (v *CompileARMVisitor) LoadFromOffset(registro string, offset int) {
+	offsetBytes := -offset * 8
+	if offsetBytes < -256 || offsetBytes > 255 {
+		v.C.Mov("x9", offsetBytes)
+		v.C.Add("x9", "x29", "x9")
+		v.C.LdrToReg(registro, "x9")
+	} else {
+		v.C.LDR(registro, registros.X29, offsetBytes)
+	}
+}
+*/

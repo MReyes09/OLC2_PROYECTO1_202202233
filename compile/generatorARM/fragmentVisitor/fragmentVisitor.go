@@ -15,10 +15,12 @@ type FragmentElement struct {
 
 type FragmentVisitor struct {
 	*gramAntlr.BasegramaticaVisitor
-	Fragment    []FragmentElement
-	LocalOffSet int
-	BaseOffSet  int
-	Depth       int // Profundidad de anidamiento, si es necesario
+	Fragment      []FragmentElement
+	LocalOffSet   int
+	BaseOffSet    int
+	Depth         int // Profundidad de anidamiento, si es necesario
+	UsedPositions []int
+	MaxPosition   int
 }
 
 func NewFragmentVisitor(baseOffset int) *FragmentVisitor {
@@ -28,6 +30,8 @@ func NewFragmentVisitor(baseOffset int) *FragmentVisitor {
 		LocalOffSet:          0,
 		BaseOffSet:           baseOffset,
 		Depth:                -1, // Inicialmente no hay anidamiento
+		UsedPositions:        make([]int, 0),
+		MaxPosition:          0,
 	}
 	return f
 }
@@ -56,7 +60,6 @@ func (f *FragmentVisitor) VisitVarDclWithInference(ctx *gramAntlr.VarDclWithInfe
 		Name:   varName,
 		Offset: f.LocalOffSet + f.BaseOffSet,
 	})
-	fmt.Println("Offset de la variable:", f.LocalOffSet+f.BaseOffSet)
 	f.LocalOffSet += 1 // para la propia variable
 	return nil
 }
@@ -131,6 +134,14 @@ func (f *FragmentVisitor) VisitDouble(ctx *gramAntlr.DoubleContext) interface{} 
 	return nil
 }
 
+// --------------------------------- IDENTIFICADORES ---------------------------------
+func (f *FragmentVisitor) VisitIdentifier(ctx *gramAntlr.IdentifierContext) interface{} {
+	if f.Depth >= 0 {
+		f.LocalOffSet += 1
+	}
+	return nil
+}
+
 // --------------------------------- OPERACIONES ---------------------------------
 
 func (f *FragmentVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{} {
@@ -149,4 +160,10 @@ func (f *FragmentVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{} 
 
 	f.Depth -= 1
 	return nil
+}
+
+// Auxiliar
+
+func (f *FragmentVisitor) cleanOffset() {
+	f.LocalOffSet = f.MaxPosition - f.LocalOffSet
 }

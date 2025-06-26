@@ -127,6 +127,10 @@ func (g *GeneratorARMInstructions) Str(rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [x29, #-%d]", rs, g.PositionFramePointer*8))
 }
 
+func (g *GeneratorARMInstructions) StrFromReg(rs string, rd string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("STR %s, [%s]", rs, rd))
+}
+
 func (g *GeneratorARMInstructions) Fmov(rs string, rd string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FMOV %s, %s", rd, rs))
 }

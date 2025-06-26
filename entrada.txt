@@ -1,35 +1,8 @@
-func main() {
-    // enteros
-    x := 4
-    y := 2
-
-    // floats
-    f := 1.5
-    g := 2.5
-
-    // strings
-    s1 := "Hola"
-    s2 := " Mundo"
-
-    // operaciones con paréntesis
-    res1 := x + (y + 3)             // 4 + (2 + 3) = 9
-    res2 := (x - y) + 7             // (4 - 2) + 7 = 9
-    res3 := (f + g) - 1.0           // (1.5 + 2.5) - 1.0 = 3.0
-    //res4 := (x + f) + (g - y)       // (4 + 1.5) + (2.5 - 2) = 6.0
-    //res5 := x + (f + (g - 1.0))     // 4 + (1.5 + (2.5 - 1.0)) = 7.0
-
-    // concatenaciones con paréntesis
-    saludo := s1 + (s2 + "!")       // "Hola" + (" Mundo" + "!") = "Hola Mundo!"
-
-    // prints
-    println(res1)
-    println(res2)
-    println(res3)
-    //println(res4)
-    //println(res5)
-    println(saludo)
-}
-
 func main(){
-	mut numero := 6 + (9 + 8)
+	x := 10
+	println("hola x =", x)
+	y := "papito"
+	z := "valio madres"
+	println(z + y)
+
 }

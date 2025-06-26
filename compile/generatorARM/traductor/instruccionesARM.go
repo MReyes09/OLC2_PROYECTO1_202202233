@@ -353,7 +353,6 @@ func (g *GeneratorARMInstructions) GetObject(id string) (int, ObjectStack) {
 	byteOffset := 0
 
 	for i := 0; i < len(g.Stack); i++ {
-		fmt.Println("Buscando objeto con id:", id, "en el stack, objeto actual:", g.Stack[i].Id_, "con tipo:", g.Stack[i].Type_, "y offset:", g.Stack[i].Offset_)
 		if g.Stack[i].Id_ == id {
 			return g.Stack[i].Offset_, g.Stack[i]
 		}

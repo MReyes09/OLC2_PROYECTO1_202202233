@@ -467,6 +467,7 @@ func (v *CompileARMVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext
 			v.SaveResult(registros.X0, traductor.Int)
 		}
 	}
+	v.Depth -= 1
 	return nil
 }
 

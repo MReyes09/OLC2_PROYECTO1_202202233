@@ -83,6 +83,14 @@ func (g *GeneratorARMInstructions) Mod(rd string, dividend string, divisor strin
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MSUB %s, %s, %s, %s", rd, temp, divisor, dividend))
 }
 
+func (g *GeneratorARMInstructions) And(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("AND %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Orr(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ORR %s, %s, %s", rd, rs1, rs2))
+}
+
 // Nueva implemetacion para LDR
 
 func (g *GeneratorARMInstructions) LDR(rd string, base string, offset int) {

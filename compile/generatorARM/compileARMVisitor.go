@@ -572,7 +572,7 @@ func (v *CompileARMVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsC
 	return nil
 }
 
-// expr    | '!' expr                                              # Not
+// expr: '!' expr                                              # Not
 func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
 	v.Depth += 1
 	v.C.COMENT(" ------------- Operación NOT -------------")
@@ -591,6 +591,35 @@ func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
 	// Aplicar NOT lógico: XOR con 1 (0 -> 1, 1 -> 0)
 	v.C.Eor(registros.X0, registros.X0, "#1")
 
+	v.SaveResult(registros.X0, traductor.Bool)
+	v.Depth -= 1
+	return nil
+}
+
+// expr: expr op = ('&&' | '||') expr                          # Logical
+func (v *CompileARMVisitor) VisitLogical(ctx *gramAntlr.LogicalContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- Operación Lógica -------------")
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+	operador := ctx.GetOp().GetText() // Should be '&&' or '||'
+
+	derecha := v.C.POPOBJECT()
+	izquierda := v.C.POPOBJECT()
+
+	if izquierda.Type_ != traductor.Bool || derecha.Type_ != traductor.Bool {
+		panic("Operadores lógicos solo pueden aplicarse a booleanos")
+	}
+
+	v.C.LDR(registros.X0, registros.X29, -izquierda.Offset_*8)
+	v.C.LDR(registros.X1, registros.X29, -derecha.Offset_*8)
+
+	switch operador {
+	case "&&":
+		v.C.And(registros.X0, registros.X0, registros.X1)
+	case "||":
+		v.C.Orr(registros.X0, registros.X0, registros.X1)
+	}
 	v.SaveResult(registros.X0, traductor.Bool)
 	v.Depth -= 1
 	return nil

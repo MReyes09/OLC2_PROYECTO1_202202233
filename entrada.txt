@@ -1,26 +1,6 @@
-func main() {
-    // Enteros
-    a := 8
-    b := 5
-    c := 8
+func main(){
 
-    // Flotantes
-    x := 2.5
-    y := 3.5
-    z := 2.5
-
-    // Comparaciones mixtas
-    r1 := a > b     // true
-    r2 := b >= a    // false
-    r3 := a <= c    // true
-    r4 := x < y     // true
-    r5 := y <= z    // false
-    r6 := x >= z    // true
-
-    println(r1)     // 1
-    println(r2)     // 0
-    println(r3)     // 1
-    println(r4)     // 1
-    println(r5)     // 0
-    println(r6)     // 1
+mut var1 := !!true
+println(var1)
+ 
 }

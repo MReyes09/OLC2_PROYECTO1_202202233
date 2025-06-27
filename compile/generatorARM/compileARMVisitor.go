@@ -301,6 +301,7 @@ func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interfac
 
 	if v.Depth >= 0 {
 		boolObject.Offset_ = v.PositionFramePointer
+		v.C.PositionFramePointer = v.PositionFramePointer // Guardamos la posicion del frame pointer
 		v.C.PushConst(boolObject, value)
 		v.C.Str(registros.X1)
 		fmt.Println("Boolean pusheado -> offset:", boolObject.Offset_, "Profundidad:", v.Depth, "valor:", value)
@@ -582,6 +583,7 @@ func (v *CompileARMVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsC
 
 // expr    | '!' expr                                              # Not
 func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
+	v.Depth += 1
 	v.C.COMENT(" ------------- Operación NOT -------------")
 	v.Visit(ctx.Expr()) // Evaluar la expresión interna
 
@@ -592,30 +594,14 @@ func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
 	if value.Type_ != traductor.Bool {
 		panic("Operador '!' solo puede aplicarse a booleanos")
 	}
-
-	// Si estamos dentro de un contexto anidado, cargamos desde el frame pointer
-	if v.Depth >= 0 {
-		v.C.LDR(registros.X0, registros.X29, -value.Offset_*8)
-	} else {
-		// Caso normal: el valor ya está en X0 por PushConst/POP
-		v.C.Pop(registros.X0)
-	}
+	// Cargar el valor en el registro X0
+	v.C.LDR(registros.X0, registros.X29, -value.Offset_*8)
 
 	// Aplicar NOT lógico: XOR con 1 (0 -> 1, 1 -> 0)
 	v.C.Eor(registros.X0, registros.X0, "#1")
 
-	// Guardarlo en stack frame si es anidado
-	if v.Depth >= 0 {
-		v.C.Str(registros.X0)
-		value.Offset_ = v.PositionFramePointer
-		v.PositionFramePointer++
-	} else {
-		// De lo contrario, empujar directamente a la pila
-		v.C.Push(registros.X0)
-	}
-
-	// Volver a meter el objeto clonado con tipo bool
-	v.C.PushObjectStack(v.C.CloneObject(value))
+	v.SaveResult(registros.X0, traductor.Bool)
+	v.Depth -= 1
 	return nil
 }
 

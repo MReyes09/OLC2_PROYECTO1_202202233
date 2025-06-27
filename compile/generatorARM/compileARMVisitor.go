@@ -22,6 +22,7 @@ type CompileARMVisitor struct {
 	PositionFramePointer  int
 	Depth                 int   // Profundidad de anidamiento, si es necesario
 	UsedPositions         []int // Posiciones usadas en el frame pointer
+	LabelCompareCount     int   // Contador de etiquetas de comparación
 }
 
 type DataFuncion struct {
@@ -40,6 +41,7 @@ func NewCompileARMVisitor() *CompileARMVisitor {
 		PositionFramePointer:  1,
 		Depth:                 -1,             // Inicialmente no hay anidamiento
 		UsedPositions:         make([]int, 0), // Inicializamos el slice de posiciones usadas
+		LabelCompareCount:     0,
 	}
 	return v
 }
@@ -296,8 +298,17 @@ func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interfac
 
 	// Creamos el objeto booleano y lo empujamos a la pila para su proxima recuperacion
 	boolObject := v.C.BoolObject()
-	v.C.PushConst(boolObject, value)
 
+	if v.Depth >= 0 {
+		boolObject.Offset_ = v.PositionFramePointer
+		v.C.PushConst(boolObject, value)
+		v.C.Str(registros.X1)
+		fmt.Println("Boolean pusheado -> offset:", boolObject.Offset_, "Profundidad:", v.Depth, "valor:", value)
+		v.PositionFramePointer += 1 // Aumentamos el offset del frame pointer
+		return nil
+	}
+	v.C.PushConst(boolObject, value)
+	fmt.Println("Boolean pusheado -> offset:", boolObject.Offset_, "Profundidad:", v.Depth, "valor:", value)
 	return nil
 }
 
@@ -348,7 +359,6 @@ func (v *CompileARMVisitor) VisitAddSub(ctx *gramAntlr.AddSubContext) interface{
 	// Vemos estado de la pila
 	// Obtenemos el operador que puede ser '+' o '-'
 	operador := ctx.GetChild(1).(antlr.TerminalNode).GetText()
-	v.C.ShowStack()
 	/*
 		Hacemos un pop del objeto y lo asignamos a Derecha.
 		Sabemos que lo ultimo en la pila es la expresion del lado derecho
@@ -471,6 +481,57 @@ func (v *CompileARMVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext
 	return nil
 }
 
+// --------------------------------- OPERADORES DE COMPARACION ---------------------------------
+// VisitMinorMajorEqual
+func (v *CompileARMVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqualContext) interface{} {
+	v.C.COMENT(" ------------- Operación Relacional -------------")
+	v.Depth += 1
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+	op := ctx.GetOp().GetText()
+
+	derechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	derecha := v.C.POPOBJECT()
+
+	izquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	izquierda := v.C.POPOBJECT()
+
+	if izquierdaEsFloat || derechaEsFloat {
+		v.C.COMENT("Comparación de Float64")
+		v.ChangeTypeToFloat(izquierda.Offset_, izquierdaEsFloat, registros.X0, registros.D0)
+		v.ChangeTypeToFloat(derecha.Offset_, derechaEsFloat, registros.X1, registros.D1)
+		v.C.Fcmp(registros.D0, registros.D1)
+	} else {
+		v.C.COMENT("Comparación de Enteros")
+		v.LoadIntObjet(izquierda, derecha)
+		v.C.Cmp(registros.X2, registros.X1)
+	}
+	etiquetaFalse := "Lfalse" + strconv.Itoa(v.LabelCompareCount)
+	etiquetaTrue := "Ltrue" + strconv.Itoa(v.LabelCompareCount)
+
+	switch op {
+	case "<":
+		v.C.BCond("LT", etiquetaTrue)
+	case ">":
+		v.C.BCond("GT", etiquetaTrue)
+	case "<=":
+		v.C.BCond("LE", etiquetaTrue)
+	case ">=":
+		v.C.BCond("GE", etiquetaTrue)
+	}
+
+	v.C.Mov(registros.X0, 0)
+	v.C.B(etiquetaFalse)
+	v.C.SetLabel(etiquetaTrue)
+	v.C.Mov(registros.X0, 1)
+	v.C.SetLabel(etiquetaFalse)
+	v.SaveResult(registros.X0, traductor.Bool)
+	// Incrementamos el contador de etiquetas de comparación
+	v.LabelCompareCount++
+	v.Depth -= 1
+	return nil
+}
+
 // instrucciones: imprimir         # PrintStmt
 func (v *CompileARMVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	v.Visit(ctx.Imprimir())
@@ -509,6 +570,7 @@ func (v *CompileARMVisitor) VisitPrintln(ctx *gramAntlr.PrintlnContext) interfac
 				v.C.LDR(registros.X1, registros.X29, -miExpr.Offset_*8)
 			}
 			v.C.ImprimirBooleano(registros.X1)
+			v.C.ImprimirCadena(registros.X1)
 
 		case traductor.Float:
 			if miExpr.Offset_ != 0 {
@@ -803,6 +865,8 @@ func (v *CompileARMVisitor) SaveResult(registro string, tipo traductor.TypeObjec
 		result = v.C.FloatObject()
 	case traductor.StringType:
 		result = v.C.StrObject()
+	case traductor.Bool:
+		result = v.C.BoolObject()
 	default:
 		panic("Tipo desconocido")
 	}

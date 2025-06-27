@@ -177,6 +177,18 @@ func (g *GeneratorARMInstructions) Fsub(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FSUB %s, %s, %s", rd, rs1, rs2))
 }
 
+func (g *GeneratorARMInstructions) BCond(condition string, label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("B.%s %s", condition, label))
+}
+
+func (g *GeneratorARMInstructions) Cmp(rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("CMP %s, %s", rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) B(label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("B %s", label))
+}
+
 func (g *GeneratorARMInstructions) ImprimirCadena(rs string) {
 	g.Estandar.Usar("print_cadena")
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))
@@ -235,6 +247,10 @@ func (g *GeneratorARMInstructions) Neg(rd string, rs string) {
 
 func (g *GeneratorARMInstructions) FNeg(rd string, rs string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FNEG %s, %s", rd, rs))
+}
+
+func (g *GeneratorARMInstructions) Fcmp(rs string, rd string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FCMP %s, %s", rs, rd))
 }
 
 // ------------------------ FUNCIONES DE TERMINACION ------------------------

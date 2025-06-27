@@ -471,6 +471,98 @@ func (v *CompileARMVisitor) VisitMulDivModulo(ctx *gramAntlr.MulDivModuloContext
 	return nil
 }
 
+// ------------------------------- OPERADORES RELACIONALES/LOGICOS-----------------------------
+/*
+expr:
+    '!' expr                                                # Not
+	| expr op = ('<' | '>' | '<=' | '>=') expr              # MinorMajorEqual
+    | expr op = ('==' | '!=') expr                          # EqualsNotEquals
+    | expr op = ('&&' | '||') expr                          # Logical
+
+*/
+
+// VisitEqualsNotEquals
+func (v *CompileARMVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- VisitEqualsNotEquals -------------")
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+
+	op := ctx.GetOp().GetText()
+
+	derecha := v.C.POPOBJECT()
+	izquierda := v.C.POPOBJECT()
+
+	// LDR Izquierda y Derecha
+	v.C.LDR(registros.X2, registros.X29, -izquierda.Offset_*8)
+	v.C.LDR(registros.X1, registros.X29, -derecha.Offset_*8)
+
+	v.C.Cmp(registros.X2, registros.X1)
+
+	switch op {
+	case "==":
+		v.C.BCond("EQ", "Ltrue")
+	case "!=":
+		v.C.BCond("NE", "Ltrue")
+	}
+
+	v.C.Mov(registros.X0, 0)
+	v.C.Br("Lfalse")
+
+	v.C.SetLabel("Ltrue")
+	v.C.Mov(registros.X0, 1)
+
+	v.C.SetLabel("Lfalse")
+	v.SaveResult(registros.X0, traductor.Bool)
+	v.Depth -= 1
+	return nil
+}
+
+// VisitMinorMajorEqual
+func (v *CompileARMVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqualContext) interface{} {
+	fmt.Println("-------------ENTRAMOS EN VisitMinorMajorEqual")
+	v.Depth += 1
+	v.C.COMENT(" ------------- VisitMinorMajorEqual -------------")
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+	op := ctx.GetOp().GetText()
+
+	derecha := v.C.POPOBJECT()
+	izquierda := v.C.POPOBJECT()
+	// LDR Izquierda y Derecha
+	v.C.LDR(registros.X2, registros.X29, -izquierda.Offset_*8)
+	v.C.LDR(registros.X1, registros.X29, -derecha.Offset_*8)
+	v.C.Cmp(registros.X2, registros.X1)
+	switch op {
+	case "<":
+		v.C.BCond("LT", "Ltrue")
+	case ">":
+		v.C.BCond("GT", "Ltrue")
+	case "<=":
+		v.C.BCond("LE", "Ltrue")
+	case ">=":
+		v.C.BCond("GE", "Ltrue")
+	}
+	v.C.Mov(registros.X0, 0)
+	v.C.B("Lfalse")
+	v.C.SetLabel("Ltrue")
+	v.C.Mov(registros.X0, 1)
+	v.C.SetLabel("Lfalse")
+	v.SaveResult(registros.X0, traductor.Bool)
+	v.Depth -= 1
+	return nil
+}
+
+// VisitLogical
+func (v *CompileARMVisitor) VisitLogical(ctx *gramAntlr.LogicalContext) interface{} {
+	return nil
+}
+
+// VisitNot
+func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
+	return nil
+}
+
 // instrucciones: imprimir         # PrintStmt
 func (v *CompileARMVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	v.Visit(ctx.Imprimir())
@@ -803,8 +895,10 @@ func (v *CompileARMVisitor) SaveResult(registro string, tipo traductor.TypeObjec
 		result = v.C.FloatObject()
 	case traductor.StringType:
 		result = v.C.StrObject()
+	case traductor.Bool:
+		result = v.C.BoolObject()
 	default:
-		panic("Tipo desconocido")
+		panic(fmt.Sprintf("Tipo desconocido: %v", tipo))
 	}
 	result.Offset_ = v.PositionFramePointer
 	v.C.PushObjectStack(result)

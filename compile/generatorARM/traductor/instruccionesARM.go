@@ -77,6 +77,34 @@ func (g *GeneratorARMInstructions) FDiv(rd string, rs1 string, rs2 string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FDIV %s, %s, %s", rd, rs1, rs2))
 }
 
+func (g *GeneratorARMInstructions) B(label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("B %s", label))
+}
+
+func (g *GeneratorARMInstructions) And(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("AND %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Orr(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("ORR %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Eor(rd string, rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("EOR %s, %s, %s", rd, rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) Cmp(rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("CMP %s, %s", rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) CmpF(rs1 string, rs2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("FCMP %s, %s", rs1, rs2))
+}
+
+func (g *GeneratorARMInstructions) BCond(condition string, label string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("B.%s %s", condition, label))
+}
+
 func (g *GeneratorARMInstructions) Mod(rd string, dividend string, divisor string) {
 	temp := registros.X3 // O cualquier otro temporal no usado
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("SDIV %s, %s, %s", temp, dividend, divisor))

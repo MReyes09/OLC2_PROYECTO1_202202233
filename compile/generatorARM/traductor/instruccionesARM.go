@@ -189,6 +189,10 @@ func (g *GeneratorARMInstructions) B(label string) {
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("B %s", label))
 }
 
+func (g *GeneratorARMInstructions) Eor(rd string, rn string, operand2 string) {
+	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("EOR %s, %s, %s", rd, rn, operand2))
+}
+
 func (g *GeneratorARMInstructions) ImprimirCadena(rs string) {
 	g.Estandar.Usar("print_cadena")
 	g.Instrucciones = append(g.Instrucciones, fmt.Sprintf("MOV X0, %s", rs))

@@ -192,6 +192,19 @@ func (f *FragmentVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqualCon
 	return nil
 }
 
+func (f *FragmentVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsContext) interface{} {
+	f.Depth += 1
+
+	f.Visit(ctx.Expr(0)) // izquierda
+	f.Visit(ctx.Expr(1)) // derecha
+
+	// Se agrega un frame porque es una operacion y la suma de las expresiones debe guardarse
+	f.LocalOffSet += 1
+
+	f.Depth -= 1
+	return nil
+}
+
 // Auxiliar
 
 /*func (f *FragmentVisitor) cleanOffset() {

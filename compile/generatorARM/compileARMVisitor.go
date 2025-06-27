@@ -532,6 +532,59 @@ func (v *CompileARMVisitor) VisitMinorMajorEqual(ctx *gramAntlr.MinorMajorEqualC
 	return nil
 }
 
+// expr: expr op = ('==' | '!=') expr                          # EqualsNotEquals
+func (v *CompileARMVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsContext) interface{} {
+	fmt.Println("----------------------------VisitEqualsNotEquals")
+	v.C.COMENT(" ------------- Operación de Igualdad -------------")
+	v.Depth += 1
+	v.Visit(ctx.Expr(0))
+	v.Visit(ctx.Expr(1))
+	op := ctx.GetOp().GetText()
+
+	derechaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	derecha := v.C.POPOBJECT()
+	fmt.Println("----------------------------VisitEqualsNotEquals pop der")
+	izquierdaEsFloat := v.C.GetTopObjectStack().Type_ == traductor.Float
+	izquierda := v.C.POPOBJECT()
+	fmt.Println("----------------------------VisitEqualsNotEquals por izq")
+	if izquierdaEsFloat || derechaEsFloat {
+		v.C.COMENT("Comparación de Float64")
+		v.ChangeTypeToFloat(izquierda.Offset_, izquierdaEsFloat, registros.X0, registros.D0)
+		v.ChangeTypeToFloat(derecha.Offset_, derechaEsFloat, registros.X1, registros.D1)
+		v.C.Fcmp(registros.D0, registros.D1)
+	} else {
+		v.C.COMENT("Comparación de Enteros")
+		v.LoadIntObjet(izquierda, derecha)
+		v.C.Cmp(registros.X2, registros.X1)
+	}
+
+	etiquetaFalse := "Lfalse" + strconv.Itoa(v.LabelCompareCount)
+	etiquetaTrue := "Ltrue" + strconv.Itoa(v.LabelCompareCount)
+
+	switch op {
+	case "==":
+		v.C.BCond("EQ", etiquetaTrue)
+	case "!=":
+		v.C.BCond("NE", etiquetaTrue)
+	}
+
+	v.C.Mov(registros.X0, 0)
+	v.C.B(etiquetaFalse)
+	v.C.SetLabel(etiquetaTrue)
+	v.C.Mov(registros.X0, 1)
+	v.C.SetLabel(etiquetaFalse)
+	v.SaveResult(registros.X0, traductor.Bool)
+	// Incrementamos el contador de etiquetas de comparación
+	v.LabelCompareCount++
+	v.Depth -= 1
+	return nil
+}
+
+// expr    | '!' expr                                              # Not
+func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
+	return nil
+}
+
 // instrucciones: imprimir         # PrintStmt
 func (v *CompileARMVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {
 	v.Visit(ctx.Imprimir())

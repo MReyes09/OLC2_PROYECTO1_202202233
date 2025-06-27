@@ -320,34 +320,25 @@ func (v *CompileARMVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{
 }
 
 func (v *CompileARMVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- Operación Negate -------------")
 	v.Visit(ctx.Expr())
 
-	// Obtener el tipo de la cima de la pila
-	top := v.C.GetTopObjectStack()
-	//var reg string
-
-	// Elegir el registro adecuado
-	if top.Type_ == traductor.Float {
-		//reg = registros.D0
-	} else {
-		//reg = registros.X0
-	}
-
-	// Hacer POP con el registro correcto
 	value := v.C.POPOBJECT()
 
-	// Aplicar la negación según el tipo
-	if value.Type_ == traductor.Int {
+	switch value.Type_ {
+	case traductor.Int:
+		v.C.LDR(registros.X0, registros.X29, -value.Offset_*8)
 		v.C.Neg(registros.X0, registros.X0)
-
-		v.C.PushObjectStack(v.C.CloneObject(value))
-	} else if value.Type_ == traductor.Float {
-		v.C.COMENT("Float64 Negativo")
+		v.SaveResult(registros.X0, traductor.Int)
+	case traductor.Float:
+		v.C.LDR(registros.D0, registros.X29, -value.Offset_*8)
 		v.C.FNeg(registros.D0, registros.D0)
-
-		v.C.PushObjectStack(v.C.CloneObject(value))
+		v.SaveResult(registros.D0, traductor.Float)
+	default:
+		panic("Operador '-' solo puede aplicarse a enteros o flotantes")
 	}
-
+	v.Depth -= 1
 	return nil
 }
 

@@ -8,6 +8,10 @@ aarch64-linux-gnu-as -o codeGenerate.o codeGenerate.s
 aarch64-linux-gnu-ld -o codeGenerate codeGenerate.o
 qemu-aarch64 ./codeGenerate
 
+aarch64-linux-gnu-as -o final.o final.s
+aarch64-linux-gnu-ld -o final final.o
+qemu-aarch64 ./final
+
 
 // FORMA 2
 sudo apt update && sudo apt upgrade -y

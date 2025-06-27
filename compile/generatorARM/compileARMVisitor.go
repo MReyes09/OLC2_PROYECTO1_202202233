@@ -301,6 +301,7 @@ func (v *CompileARMVisitor) VisitBoolean(ctx *gramAntlr.BooleanContext) interfac
 
 	if v.Depth >= 0 {
 		boolObject.Offset_ = v.PositionFramePointer
+		v.C.PositionFramePointer = v.PositionFramePointer // Guardamos la posicion del frame pointer
 		v.C.PushConst(boolObject, value)
 		v.C.Str(registros.X1)
 		fmt.Println("Boolean pusheado -> offset:", boolObject.Offset_, "Profundidad:", v.Depth, "valor:", value)
@@ -319,34 +320,25 @@ func (v *CompileARMVisitor) VisitParens(ctx *gramAntlr.ParensContext) interface{
 }
 
 func (v *CompileARMVisitor) VisitNegate(ctx *gramAntlr.NegateContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- Operación Negate -------------")
 	v.Visit(ctx.Expr())
 
-	// Obtener el tipo de la cima de la pila
-	top := v.C.GetTopObjectStack()
-	//var reg string
-
-	// Elegir el registro adecuado
-	if top.Type_ == traductor.Float {
-		//reg = registros.D0
-	} else {
-		//reg = registros.X0
-	}
-
-	// Hacer POP con el registro correcto
 	value := v.C.POPOBJECT()
 
-	// Aplicar la negación según el tipo
-	if value.Type_ == traductor.Int {
+	switch value.Type_ {
+	case traductor.Int:
+		v.C.LDR(registros.X0, registros.X29, -value.Offset_*8)
 		v.C.Neg(registros.X0, registros.X0)
-
-		v.C.PushObjectStack(v.C.CloneObject(value))
-	} else if value.Type_ == traductor.Float {
-		v.C.COMENT("Float64 Negativo")
+		v.SaveResult(registros.X0, traductor.Int)
+	case traductor.Float:
+		v.C.LDR(registros.D0, registros.X29, -value.Offset_*8)
 		v.C.FNeg(registros.D0, registros.D0)
-
-		v.C.PushObjectStack(v.C.CloneObject(value))
+		v.SaveResult(registros.D0, traductor.Float)
+	default:
+		panic("Operador '-' solo puede aplicarse a enteros o flotantes")
 	}
-
+	v.Depth -= 1
 	return nil
 }
 
@@ -582,8 +574,29 @@ func (v *CompileARMVisitor) VisitEqualsNotEquals(ctx *gramAntlr.EqualsNotEqualsC
 
 // expr    | '!' expr                                              # Not
 func (v *CompileARMVisitor) VisitNot(ctx *gramAntlr.NotContext) interface{} {
+	v.Depth += 1
+	v.C.COMENT(" ------------- Operación NOT -------------")
+	v.Visit(ctx.Expr()) // Evaluar la expresión interna
+
+	// Obtener el valor de la cima de la pila
+	value := v.C.POPOBJECT()
+
+	// Verificar tipo del valor: debe ser booleano
+	if value.Type_ != traductor.Bool {
+		panic("Operador '!' solo puede aplicarse a booleanos")
+	}
+	// Cargar el valor en el registro X0
+	v.C.LDR(registros.X0, registros.X29, -value.Offset_*8)
+
+	// Aplicar NOT lógico: XOR con 1 (0 -> 1, 1 -> 0)
+	v.C.Eor(registros.X0, registros.X0, "#1")
+
+	v.SaveResult(registros.X0, traductor.Bool)
+	v.Depth -= 1
 	return nil
 }
+
+// IMPRESIONES
 
 // instrucciones: imprimir         # PrintStmt
 func (v *CompileARMVisitor) VisitPrintStmt(ctx *gramAntlr.PrintStmtContext) interface{} {

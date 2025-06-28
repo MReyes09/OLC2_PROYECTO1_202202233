@@ -182,6 +182,104 @@ func (v *CompileARMVisitor) VisitVarDclWithTypeOnly(ctx *gramAntlr.VarDclWithTyp
 	return nil
 }
 
+// ---------------------------------- ASIGNACIONES -----------------------------------
+func (v *CompileARMVisitor) VisitAsignStmt(ctx *gramAntlr.AsignStmtContext) interface{} {
+	v.Visit(ctx.VarAsign())
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitVarExpr(ctx *gramAntlr.VarExprContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	v.C.COMENT(fmt.Sprintf("ASIGNACION DE VARIABLE: %s", id))
+	v.Visit(ctx.Expr())
+	offsetVar, _ := v.C.GetObject(id)
+	v.AssignVar(offsetVar)
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitVarAdd(ctx *gramAntlr.VarAddContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	op := ctx.GetOp().GetText()
+	v.C.COMENT(" ASIGNACION DE VARIABLE CON OPERADOR: " + op + " a la variable: " + id)
+	v.Visit(ctx.Expr())
+
+	offsetVar, objectVar := v.C.GetObject(id)
+	// Cargamos el objeto de la variable para operarlo
+	switch objectVar.Type_ {
+	case traductor.Int:
+		v.C.LDR(registros.X2, registros.X29, -offsetVar*8) // Cargamos el valor de la variable en x1
+	case traductor.Float:
+		v.C.LDR(registros.D2, registros.X29, -offsetVar*8) // Cargamos el valor de la variable en d1
+	}
+
+	objectValue := v.C.POPOBJECT() // Obtenemos el objeto de la expresion
+	if objectValue.Offset_ != 0 {
+		//Cargamos el valor de la expresion en el registro correspondiente
+		switch objectValue.Type_ {
+		case traductor.Int:
+			v.C.LDR(registros.X1, registros.X29, -objectValue.Offset_*8) // Cargamos el valor de la expresion en x2
+		case traductor.Float:
+			v.C.LDR(registros.D0, registros.X29, -objectValue.Offset_*8) // Cargamos el valor de la expresion en d2
+		}
+	}
+	// Dependiendo del operador, realizamos la operacion correspondiente
+	v.C.PositionFramePointer = offsetVar
+	switch op {
+	case "+=":
+		if objectValue.Type_ == traductor.Int {
+			v.C.Add(registros.X1, registros.X2, registros.X1)
+		} else {
+			v.C.Fadd(registros.D0, registros.D2, registros.D0)
+		}
+	case "-=":
+		if objectValue.Type_ == traductor.Int {
+			v.C.Sub(registros.X1, registros.X2, registros.X1)
+		} else {
+			v.C.Fsub(registros.D0, registros.D2, registros.D0)
+		}
+	}
+
+	if objectValue.Type_ == traductor.Int {
+		v.C.Str(registros.X1) // Guardamos el resultado en la variable
+	} else {
+		v.C.Str(registros.D0) // Guardamos el resultado en la variable
+	}
+
+	return nil
+}
+
+func (v *CompileARMVisitor) VisitVarInc(ctx *gramAntlr.VarIncContext) interface{} {
+	id := ctx.ID_VARIABLE().GetText()
+	op := ctx.GetOp().GetText()
+	offsetVar, objectVar := v.C.GetObject(id)
+	v.C.LDR(registros.X1, registros.X29, -offsetVar*8)
+	v.C.PositionFramePointer = offsetVar
+	switch op {
+	case "++":
+		switch objectVar.Type_ {
+		case traductor.Int:
+			v.C.Add(registros.X1, registros.X1, "#1") // Incrementamos el valor de la variable en 1
+			v.C.Str(registros.X1)                     // Guardamos el resultado en la variable
+		case traductor.Float:
+			v.C.Fmov(registros.D1, "#1.0") // Movemos el valor de la variable a d1
+			v.C.Fadd(registros.D0, registros.D0, registros.D1)
+			v.C.Str(registros.D0) // Guardamos el resultado en la variable
+		}
+	case "--":
+		switch objectVar.Type_ {
+		case traductor.Int:
+			v.C.Sub(registros.X1, registros.X1, "#1") // Decrementamos el valor de la variable en 1
+			v.C.Str(registros.X1)                     // Guardamos el resultado en la variable
+		case traductor.Float:
+			v.C.Fmov(registros.D1, "#1.0") // Movemos el valor de la variable a d1
+			v.C.Fsub(registros.D0, registros.D0, registros.D1)
+			v.C.Str(registros.D0) // Guardamos el resultado en la variable
+		}
+	}
+	return nil
+}
+
 // --------------------------------- EXPRESIONES -----------------------------------
 
 // --------------------------------- TIPO DE DATOS -----------------------------------
@@ -935,6 +1033,33 @@ func (v *CompileARMVisitor) LoadIdentifierAndSave(object traductor.ObjectStack) 
 	v.PositionFramePointer += 1 // Aumentamos el offset del frame pointer
 }
 
+// ---------------------- FUNCIONES AUXILIADES PARA ASIGNACION EN VARIABLES ----------------------
+func (v *CompileARMVisitor) AssignVar(offsetVar int) {
+	// Evaluamos el ultimo objeto en la pila
+	ValorObjecto := v.C.POPOBJECT()
+
+	switch ValorObjecto.Type_ {
+	case traductor.StringType:
+		if ValorObjecto.Offset_ != 0 {
+			v.C.LDR(registros.X11, registros.X29, -ValorObjecto.Offset_*8)
+		}
+		v.C.PositionFramePointer = offsetVar
+		v.C.Str(registros.X11)
+	case traductor.Int, traductor.Bool:
+		if ValorObjecto.Offset_ != 0 {
+			v.C.LDR(registros.X1, registros.X29, -ValorObjecto.Offset_*8)
+		}
+		v.C.PositionFramePointer = offsetVar
+		v.C.Str(registros.X1)
+	case traductor.Float:
+		if ValorObjecto.Offset_ != 0 {
+			v.C.LDR(registros.D0, registros.X29, -ValorObjecto.Offset_*8)
+		}
+		v.C.PositionFramePointer = offsetVar
+		v.C.Str(registros.D0)
+	}
+}
+
 // --------------------- FUNCIONES AUXILIARES EXPRESIONES ---------------------
 func (v *CompileARMVisitor) LoadIntObjet(Izquierda traductor.ObjectStack, Derecha traductor.ObjectStack) {
 	// Cargamos los valores de izquierda y derecha al registro x0 y x1
@@ -975,11 +1100,4 @@ func (v *CompileARMVisitor) SaveResult(registro string, tipo traductor.TypeObjec
 // --------------------- DEPURACION DE OFFSETS BASURA ---------------------
 func CleanUpStack(usedPositions []int) []int {
 	return nil
-}
-
-// --------------------- FUNCIONES AUXILIARES PARA POSICION MAYOR A 255 ---------------------
-func (v *CompileARMVisitor) StrOffset(reg string, offset int) {
-	v.C.Mov("x9", offset)
-	v.C.Add("x9", "x29", "x9")
-	//v.C.Str(reg, "[x9]")
 }

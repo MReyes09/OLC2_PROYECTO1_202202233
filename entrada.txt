@@ -1,6 +1,11 @@
 func main(){
 
-mut var1 := !!true
-println(var1)
- 
+    mut var1 := 100
+    println("Ahora", var1)
+    var1++
+    println(var1)
+    var1--
+    var1--
+    println(var1)
+
 }

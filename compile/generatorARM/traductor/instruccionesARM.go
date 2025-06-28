@@ -306,7 +306,6 @@ func (g *GeneratorARMInstructions) POPOBJECT() ObjectStack {
 	object := g.Stack[len(g.Stack)-1]
 	g.POPOBJECT2()
 	return object
-
 }
 
 func (g *GeneratorARMInstructions) POPOBJECT2() {
